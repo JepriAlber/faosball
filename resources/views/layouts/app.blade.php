@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html
-    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    x-data="{
-        page: '{{ $page ?? 'dashboard' }}',
-        loaded: true,
-        darkMode: $persist(false).as('darkMode'),
-        stickyMenu: false,
-        sidebarToggle: false,
-        scrollTop: false
-    }"
-    :class="{ 'dark': darkMode }"
->
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
+    page: '{{ $page ?? 'dashboard' }}',
+    loaded: true,
+    darkMode: $persist(false).as('darkMode'),
+    stickyMenu: false,
+    sidebarToggle: false,
+    scrollTop: false
+}" :class="{ 'dark': darkMode }">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +25,8 @@
     {{-- Stack untuk CSS tambahan per-halaman --}}
     @stack('styles')
 </head>
-<body class="bg-white dark:bg-gray-900">
+
+<body class="bg-white">
 
     {{-- ===== Preloader ===== --}}
     @include('partials.preloader')
@@ -43,11 +41,8 @@
         <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
 
             {{-- Overlay mobile saat sidebar terbuka --}}
-            <div
-                @click="sidebarToggle = false"
-                :class="sidebarToggle ? 'block lg:hidden' : 'hidden'"
-                class="fixed inset-0 z-[9] bg-gray-900/50"
-            ></div>
+            <div @click="sidebarToggle = false" :class="sidebarToggle ? 'block lg:hidden' : 'hidden'"
+                class="fixed inset-0 z-[9] bg-gray-900/50"></div>
 
             {{-- ===== Header ===== --}}
             @include('partials.header')
@@ -69,4 +64,5 @@
     @stack('scripts')
 
 </body>
+
 </html>

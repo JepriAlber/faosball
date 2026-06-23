@@ -28,7 +28,7 @@
     {{-- Stack untuk CSS tambahan per-halaman --}}
     @stack('styles')
 </head>
-<body class="bg-white dark:bg-gray-900">
+<body class="bg-white">
 
     {{-- ===== Preloader ===== --}}
     @include('partials.preloader')

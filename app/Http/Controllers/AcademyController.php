@@ -26,7 +26,8 @@ class AcademyController extends Controller
      */
     public function create()
     {
-        return view('academy.create');
+        $title = 'Tambah Academy';
+        return view('academy.create', compact('title'));
     }
 
     /**
@@ -73,19 +74,21 @@ class AcademyController extends Controller
      */
     public function show(string $id)
     {
+        $title = 'Detail Academy';
         $academy = Academy::findOrFail($id);
 
-        return view('academy.show', compact('academy'));
+        return view('academy.show', compact('academy', 'title'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
+    {   
+        $title = 'Edit Academy';
         $academy = Academy::findOrFail($id);
 
-        return view('academy.edit', compact('academy'));
+        return view('academy.edit', compact('academy', 'title'));
     }
 
     /**

@@ -1,5 +1,5 @@
 <aside :class="sidebarToggle ? 'translate-x-0 lg:w-[90px]' : '-translate-x-full lg:translate-x-0 lg:w-[290px]'"
-    class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 lg:transition-all lg:duration-300 lg:ease-linear dark:border-gray-800 dark:bg-black lg:static">
+    class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 lg:transition-all lg:duration-300 lg:ease-linear lg:static">
     <!-- SIDEBAR HEADER -->
     <div :class="sidebarToggle ? 'lg:justify-center' : 'justify-start'"
         class="flex items-center gap-2 pt-8 pb-7 sidebar-header">
@@ -11,7 +11,7 @@
       --}}
             <span class="logo hidden lg:block" :class="sidebarToggle ? 'lg:hidden' : ''">
                 <img class="dark:hidden" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
-                <img class="hidden dark:block" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
+                <img class="hidden" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
             </span>
 
             {{-- Logo ikon kecil: hanya tampil di desktop saat sidebar collapsed --}}
@@ -108,7 +108,7 @@
                     @endphp
 
                     <li>
-                        <a href="{{ route('profile') }}"
+                        <a href="#"
                             class="menu-item group {{ $isProfileActive ? 'menu-item-active' : 'menu-item-inactive' }}">
                             <svg class="{{ $isProfileActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -205,8 +205,8 @@
 
         <!-- Sign Out -->
         <div :class="sidebarToggle ? 'lg:hidden' : ''"
-            class="mx-auto mb-10 mt-auto w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center dark:bg-white/[0.03]">
-            <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            class="mx-auto mb-10 mt-auto w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center">
+            <p class="mb-3 text-sm font-medium text-gray-700">
                 Keluar dari akun?
             </p>
             <form method="POST" action="">

@@ -14,13 +14,13 @@
         @include('partials.alert')
         <!-- Alerts End -->
 
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="rounded-2xl border border-gray-200 bg-white">
             <!-- Table Header Actions -->
             <div
-                class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800">
+                class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Academy List</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manajemen profil, tagline, dan status akademi
+                    <h3 class="text-lg font-semibold text-gray-800">Academy List</h3>
+                    <p class="mt-1 text-sm text-gray-500">Manajemen profil, tagline, dan status akademi
                         sepak bola.</p>
                 </div>
                 <div>
@@ -40,35 +40,35 @@
             <div class="max-w-full overflow-x-auto custom-scrollbar">
                 <table class="w-full min-w-[1000px] table-auto text-left">
                     <thead>
-                        <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-white/[0.01]">
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">Info Academy
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Info Academy
                             </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">Kontak</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">Tagline</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400 text-right">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Kontak</th>
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Tagline</th>
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Status</th>
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 text-right">
                                 Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100">
                         @forelse ($academies as $academy)
                             <tr>
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800 flex items-center justify-center">
+                                            class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center">
                                             @if ($academy->logo)
                                                 <img src="{{ asset('storage/' . $academy->logo) }}"
                                                     alt="Logo {{ $academy->name }}" class="h-full w-full object-cover">
                                             @else
-                                                <span class="font-bold text-gray-400 dark:text-gray-600 text-lg">
+                                                <span class="font-bold text-gray-400 text-lg">
                                                     {{ strtoupper(substr($academy->name, 0, 2)) }}
                                                 </span>
                                             @endif
                                         </div>
                                         <div>
                                             <a href="{{ route('academy.show', $academy->id_academy) }}"
-                                                class="block font-medium text-gray-800 hover:text-brand-500 text-theme-sm dark:text-white/90 dark:hover:text-brand-400">
+                                                class="block font-medium text-gray-800 hover:text-brand-500 text-theme-sm">
                                                 {{ $academy->name }}
                                             </a>
                                             <span class="block text-gray-400 text-theme-xs mt-0.5">
@@ -79,22 +79,22 @@
                                 </td>
                                 <td class="px-5 py-4">
                                     <span
-                                        class="block text-theme-sm text-gray-700 dark:text-gray-300">{{ $academy->email }}</span>
+                                        class="block text-theme-sm text-gray-700">{{ $academy->email }}</span>
                                     <span class="block text-theme-xs text-gray-400 mt-0.5">{{ $academy->phone }}</span>
                                 </td>
                                 <td class="px-5 py-4">
                                     <span
-                                        class="text-theme-sm text-gray-600 dark:text-gray-400 line-clamp-1 italic">"{{ $academy->tagline }}"</span>
+                                        class="text-theme-sm text-gray-600 line-clamp-1 italic">"{{ $academy->tagline }}"</span>
                                 </td>
                                 <td class="px-5 py-4">
                                     @if ($academy->status)
                                         <span
-                                            class="inline-flex rounded-full bg-green-50 px-2.5 py-0.5 text-theme-xs font-medium text-green-700 dark:bg-green-500/15 dark:text-green-500">
+                                            class="inline-flex rounded-full bg-green-50 px-2.5 py-0.5 text-theme-xs font-medium text-green-700">
                                             Aktif
                                         </span>
                                     @else
                                         <span
-                                            class="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-theme-xs font-medium text-red-700 dark:bg-red-500/15 dark:text-red-400">
+                                            class="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-theme-xs font-medium text-red-700">
                                             Nonaktif
                                         </span>
                                     @endif
@@ -102,7 +102,7 @@
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-end gap-2.5">
                                         <a href="{{ route('academy.show', $academy->id_academy) }}"
-                                            class="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400"
+                                            class="text-gray-500 hover:text-brand-500"
                                             title="Detail">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +117,7 @@
                                             </svg>
                                         </a>
                                         <a href="{{ route('academy.edit', $academy->id_academy) }}"
-                                            class="text-gray-500 hover:text-yellow-500 dark:text-gray-400 dark:hover:text-yellow-500"
+                                            class="text-gray-500 hover:text-yellow-500"
                                             title="Edit">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
@@ -128,7 +128,7 @@
                                         </a>
                                         <button type="button"
                                             @click="deleteAction = '{{ route('academy.destroy', $academy->id_academy) }}'; academyName = '{{ addslashes($academy->name) }}'; showDeleteModal = true"
-                                            class="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500"
+                                            class="text-gray-500 hover:text-red-500"
                                             title="Hapus">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
@@ -147,16 +147,16 @@
                                     <div class="flex flex-col items-center justify-center">
                                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                             xmlns="http://www.w3.org/2000/svg"
-                                            class="text-gray-300 dark:text-gray-700 mb-3">
+                                            class="text-gray-300 mb-3">
                                             <path
                                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
                                         </svg>
-                                        <span class="block text-gray-500 dark:text-gray-400 text-sm font-medium">Belum ada
+                                        <span class="block text-gray-500 text-sm font-medium">Belum ada
                                             data Academy</span>
                                         <a href="{{ route('academy.create') }}"
-                                            class="mt-3 text-xs text-brand-500 hover:text-brand-600 dark:text-brand-400 font-semibold underline">Tambah
+                                            class="mt-3 text-xs text-brand-500 hover:text-brand-600 font-semibold underline">Tambah
                                             sekarang</a>
                                     </div>
                                 </td>
@@ -168,7 +168,7 @@
 
             <!-- Pagination -->
             @if ($academies->hasPages())
-                <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
+                <div class="px-5 py-4 border-t border-gray-100">
                     {{ $academies->links() }}
                 </div>
             @endif
@@ -180,7 +180,7 @@
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
-            <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
+            <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl border border-gray-100"
                 @click.away="showDeleteModal = false" x-transition:enter="transition ease-out duration-300 transform"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-200 transform"
@@ -189,7 +189,7 @@
                 <!-- Icon & Header -->
                 <div class="flex items-center gap-4">
                     <span
-                        class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-500 flex-shrink-0">
+                        class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600 flex-shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 9V14M12 17.01L12.01 16.9989M12 3L2 21H22L12 3Z" stroke="currentColor"
@@ -197,15 +197,15 @@
                         </svg>
                     </span>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white/90">Konfirmasi Hapus</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Tindakan ini tidak dapat dibatalkan.</p>
+                        <h3 class="text-lg font-bold text-gray-800">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan.</p>
                     </div>
                 </div>
 
                 <!-- Body Message -->
                 <div class="mt-4">
-                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Apakah Anda yakin ingin menghapus data Academy <strong class="text-gray-800 dark:text-white"
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Apakah Anda yakin ingin menghapus data Academy <strong class="text-gray-800"
                             x-text="academyName"></strong>? Semua data terkait dengan akademi ini akan dihapus secara
                         permanen.
                     </p>
@@ -214,7 +214,7 @@
                 <!-- Footer Buttons -->
                 <div class="mt-6 flex items-center justify-end gap-3">
                     <button type="button" @click="showDeleteModal = false"
-                        class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:bg-transparent dark:text-gray-400 dark:hover:bg-white/5">
+                        class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                         Batal
                     </button>
                     <form :action="deleteAction" method="POST" class="inline">

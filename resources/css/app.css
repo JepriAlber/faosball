@@ -1,31 +1,10 @@
-/* =============================================
-   1. GOOGLE FONTS
-   ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
-/* =============================================
-   2. TAILWIND CSS v4
-   ============================================= */
 @import 'tailwindcss';
 
-/* =============================================
-   3. SOURCE PATHS — beritahu Tailwind di mana
-      class-class digunakan
-   ============================================= */
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* =============================================
-   4. DARK MODE VARIANT
-   Tailwind v4 perlu dideklarasikan manual
-   karena kita pakai class-based (.dark)
-   ============================================= */
 @custom-variant dark (&:is(.dark *));
 
-/* =============================================
-   5. TAILADMIN CUSTOM CSS
-   Diimport TERAKHIR agar bisa override Tailwind
-   ============================================= */
 @import './theme.css';
