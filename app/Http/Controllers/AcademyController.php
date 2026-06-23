@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\academy;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Academy;
 use App\Http\Requests\academy\AcademyFormRequest;
+use App\Models\Academy;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,8 +15,10 @@ class AcademyController extends Controller
      */
     public function index()
     {
+        $title = 'Manajemen Academy';
         $academies = Academy::latest()->paginate(10);
-        return view('academy.index', compact('academies'));
+
+        return view('academy.index', compact('academies', 'title'));
     }
 
     /**
@@ -43,12 +42,12 @@ class AcademyController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
 
             // Set status (checkbox/toggle fallback)
-            $validated['status'] = $request->has('status') ? (bool)$request->input('status') : false;
+            $validated['status'] = $request->has('status') ? (bool) $request->input('status') : false;
 
             // Handle file upload
             if ($request->hasFile('logo')) {
                 $file = $request->file('logo');
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('academies/logo', $filename, 'public');
                 $validated['logo'] = $path;
             }
@@ -56,6 +55,7 @@ class AcademyController extends Controller
             Academy::create($validated);
 
             DB::commit();
+
             return redirect()->route('academy.index')->with('success', 'Academy berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -63,7 +63,8 @@ class AcademyController extends Controller
             if (isset($path)) {
                 Storage::disk('public')->delete($path);
             }
-            return back()->withInput()->with('error', 'Gagal menambahkan academy: ' . $e->getMessage());
+
+            return back()->withInput()->with('error', 'Gagal menambahkan academy: '.$e->getMessage());
         }
     }
 
@@ -73,6 +74,7 @@ class AcademyController extends Controller
     public function show(string $id)
     {
         $academy = Academy::findOrFail($id);
+
         return view('academy.show', compact('academy'));
     }
 
@@ -82,6 +84,7 @@ class AcademyController extends Controller
     public function edit(string $id)
     {
         $academy = Academy::findOrFail($id);
+
         return view('academy.edit', compact('academy'));
     }
 
@@ -96,7 +99,7 @@ class AcademyController extends Controller
         DB::beginTransaction();
         try {
             $validated['slug'] = Str::slug($validated['name']);
-            $validated['status'] = $request->has('status') ? (bool)$request->input('status') : false;
+            $validated['status'] = $request->has('status') ? (bool) $request->input('status') : false;
 
             if ($request->hasFile('logo')) {
                 // Delete old logo
@@ -106,7 +109,7 @@ class AcademyController extends Controller
 
                 // Upload new logo
                 $file = $request->file('logo');
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time().'_'.Str::random(10).'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('academies/logo', $filename, 'public');
                 $validated['logo'] = $path;
             }
@@ -114,13 +117,15 @@ class AcademyController extends Controller
             $academy->update($validated);
 
             DB::commit();
+
             return redirect()->route('academy.index')->with('success', 'Academy berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             if (isset($path)) {
                 Storage::disk('public')->delete($path);
             }
-            return back()->withInput()->with('error', 'Gagal memperbarui academy: ' . $e->getMessage());
+
+            return back()->withInput()->with('error', 'Gagal memperbarui academy: '.$e->getMessage());
         }
     }
 
@@ -140,10 +145,12 @@ class AcademyController extends Controller
             $academy->delete();
 
             DB::commit();
+
             return redirect()->route('academy.index')->with('success', 'Academy berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('academy.index')->with('error', 'Gagal menghapus academy: ' . $e->getMessage());
+
+            return redirect()->route('academy.index')->with('error', 'Gagal menghapus academy: '.$e->getMessage());
         }
     }
 }
