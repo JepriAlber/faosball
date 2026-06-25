@@ -75,11 +75,7 @@ class User extends Authenticatable
 
     public function academy()
     {
-        return $this->belongsTo(
-            Academy::class,
-            'id_academy',
-            'id_academy'
-        );
+        return $this->belongsTo(Academy::class,'id_academy');
     }
 
 

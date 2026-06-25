@@ -87,16 +87,16 @@
                                     </a>
                                 </li>
                                 {{-- Contoh tambah sub-menu:
-                <li>
-                  <a
-                    href="{{ route('dashboard.analytics') }}"
-                    class="menu-dropdown-item group"
-                    :class="{{ Route::is('dashboard.analytics') ? 'true' : 'false' }} ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                  >
-                    Analitik
-                  </a>
-                </li>
-                --}}
+                                    <li>
+                                    <a
+                                        href="{{ route('dashboard.analytics') }}"
+                                        class="menu-dropdown-item group"
+                                        :class="{{ Route::is('dashboard.analytics') ? 'true' : 'false' }} ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
+                                    >
+                                        Analitik
+                                    </a>
+                                    </li>
+                                    --}}
                             </ul>
                         </div>
                     </li>
@@ -138,6 +138,125 @@
                                 fill="" />
                         </svg>
                     </h3>
+
+                    <!-- ===== Menu Item: Football Academy (dengan dropdown) ===== -->
+
+                    @php
+                        $footballAcademyRoutes = ['players.*', 'training.*'];
+
+                        $isFootballAcademyActive = false;
+
+                        foreach ($footballAcademyRoutes as $route) {
+                            if (Route::is($route)) {
+                                $isFootballAcademyActive = true;
+                                break;
+                            }
+                        }
+
+                    @endphp
+
+
+                    <li x-data="{ open: {{ $isFootballAcademyActive ? 'true' : 'false' }} }">
+
+                        <a href="#" @click.prevent="open = !open" class="menu-item group"
+                            :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+
+
+                            <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5Z"
+                                    fill="" />
+
+                            </svg>
+
+
+                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+
+                                Football Academy
+
+                            </span>
+
+
+
+                            <svg class="menu-item-arrow transition-transform duration-200"
+                                :class="[
+                                    open ? 'menu-item-arrow-active rotate-180' : 'menu-item-arrow-inactive',
+                                    sidebarToggle ? 'lg:hidden' : ''
+                                ]"
+                                width="20" height="20" viewBox="0 0 20 20" fill="none">
+
+                                <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+                            </svg>
+
+
+                        </a>
+
+
+
+                        {{-- Dropdown submenu --}}
+
+                        <div x-show="open" x-collapse class="overflow-hidden">
+
+
+                            <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
+                                class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
+
+
+                                {{-- Players --}}
+
+                                <li>
+
+                                    <a href="{{ route('players.index') }}" class="menu-dropdown-item group"
+                                        :class="{{ Route::is('players.*') ? 'true' : 'false' }}
+                                            ?
+                                            'menu-dropdown-item-active' :
+                                            'menu-dropdown-item-inactive'">
+
+                                        Players
+
+                                    </a>
+
+                                </li>
+
+
+
+                                {{-- Training nanti --}}
+
+                                {{-- 
+            <li>
+
+                <a href="{{ route('training.index') }}"
+                    class="menu-dropdown-item group"
+
+                    :class="{{ Route::is('training.*') ? 'true' : 'false' }}
+                    ? 'menu-dropdown-item-active'
+                    : 'menu-dropdown-item-inactive'">
+
+                    Training
+
+                </a>
+
+            </li>
+            --}}
+
+
+                            </ul>
+
+
+                        </div>
+
+
+                    </li>
+
+                    <!-- ===== END: Football Academy ===== -->
+
+
+
+
                     <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
                             Administration

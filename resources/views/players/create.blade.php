@@ -40,7 +40,7 @@
                         </label>
 
                         <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama player"
-                            class="w-full rounded-xl border @error('name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500"
+                            class="w-full rounded-xl border @error('name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm outline-none transition focus:border-brand-500"
                             required>
 
                         @error('name')
@@ -52,13 +52,8 @@
                     <div>
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">Nickname</label>
 
-                        <input type="text" name="nick_name" value="{{ old('nick_name') }}"
-                            class="w-full rounded-xl border @error('nick_name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm"
-                            placeholder="Nickname">
-
-                        @error('nick_name')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
+                        <input type="text" name="nickname" value="{{ old('nickname') }}"
+                            class="w-full rounded-xl border px-5 py-3 text-sm" placeholder="Nickname">
                     </div>
 
                     <!-- Birth Date -->
@@ -66,29 +61,20 @@
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">Tanggal Lahir</label>
 
                         <input type="date" name="birth_date" value="{{ old('birth_date') }}"
-                            class="w-full rounded-xl border @error('birth_date') border-red-500 @else border-gray-200 @enderror px-5 py-3 text-sm">
-
-                        @error('birth_date')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
+                            class="w-full rounded-xl border px-5 py-3 text-sm">
                     </div>
 
                     <!-- Gender -->
                     <div>
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">Gender</label>
 
-                        <select name="gender"
-                            class="w-full rounded-xl border @error('gender') border-red-500 @else border-gray-200 @enderror px-5 py-3 text-sm">
+                        <select name="gender" class="w-full rounded-xl border px-5 py-3 text-sm">
 
                             <option value="">Pilih</option>
                             <option value="male" @selected(old('gender') == 'male')>Male</option>
                             <option value="female" @selected(old('gender') == 'female')>Female</option>
 
                         </select>
-
-                        @error('gender')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
                     </div>
 
                     <!-- Nationality -->
@@ -160,8 +146,9 @@
                             class="w-full rounded-xl border px-5 py-3 text-sm">
                     </div>
 
-                    <!-- Status Toggle (ACADEMY STYLE) -->
+                    <!-- Status Toggle -->
                     <div x-data="{ switcherOn: {{ old('status', 'active') === 'active' ? 'true' : 'false' }} }">
+
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">Status</label>
 
                         <input type="hidden" name="status" :value="switcherOn ? 'active' : 'inactive'">
@@ -171,10 +158,10 @@
                                 <input type="checkbox" class="sr-only" @change="switcherOn = !switcherOn"
                                     :checked="switcherOn">
 
-                                <div class="block h-8 w-14 rounded-full bg-gray-200" :class="switcherOn && '!bg-brand-500'">
-                                </div>
+                                <div class="block h-8 w-14 rounded-full bg-gray-200 transition-colors"
+                                    :class="switcherOn && '!bg-brand-500'"></div>
 
-                                <div class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition"
+                                <div class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition-transform"
                                     :class="switcherOn && 'translate-x-full'"></div>
                             </div>
 
@@ -182,7 +169,7 @@
                         </label>
                     </div>
 
-                    <!-- Photo Upload (ACADEMY STYLE) -->
+                    <!-- Photo Upload -->
                     <div x-data="{ imagePreview: null }">
 
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">
@@ -204,7 +191,9 @@
                                 ">
 
                             <template x-if="!imagePreview">
-                                <p class="text-sm text-gray-500">Klik atau drag untuk upload foto</p>
+                                <p class="text-sm text-gray-500">
+                                    Klik atau drag untuk upload foto
+                                </p>
                             </template>
 
                             <template x-if="imagePreview">
@@ -222,30 +211,40 @@
                     </div>
 
                     <!-- Create Account Toggle -->
-                    <div x-data="{ createAccount: false }">
+                    <div x-data="{ switcherOn: false }">
 
                         <label class="mb-2.5 block text-sm font-medium text-gray-800">
                             Create Account
                         </label>
 
-                        <input type="hidden" name="create_account" :value="createAccount ? 1 : 0">
+                        <input type="hidden" name="create_account" :value="switcherOn ? 1 : 0">
 
-                        <button type="button" @click="createAccount = !createAccount"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
+                        <label class="flex cursor-pointer items-center">
+                            <div class="relative">
+                                <input type="checkbox" class="sr-only" @change="switcherOn = !switcherOn"
+                                    :checked="switcherOn">
 
-                            <span x-text="createAccount ? 'Enabled' : 'Disabled'"></span>
+                                <div class="block h-8 w-14 rounded-full bg-gray-200 transition-colors"
+                                    :class="switcherOn && '!bg-brand-500'"></div>
 
-                        </button>
+                                <div class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition-transform"
+                                    :class="switcherOn && 'translate-x-full'"></div>
+                            </div>
 
-                        <div x-show="createAccount" class="mt-4 space-y-3">
+                            <span class="ml-3 text-sm text-gray-500" x-text="switcherOn ? 'Enabled' : 'Disabled'"></span>
+                        </label>
 
-                            <input type="email" name="email" placeholder="Email"
+                        <!-- Account Fields -->
+                        <div x-show="switcherOn" x-transition class="mt-4 space-y-3">
+
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="Email"
                                 class="w-full rounded-xl border px-5 py-3 text-sm">
 
                             <input type="password" name="password" placeholder="Password"
                                 class="w-full rounded-xl border px-5 py-3 text-sm">
 
                         </div>
+
                     </div>
 
                 </div>
