@@ -16,6 +16,7 @@ class Academy extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'slug',
         'phone',
         'email',

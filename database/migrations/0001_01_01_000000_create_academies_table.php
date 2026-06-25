@@ -12,17 +12,57 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('academies', function (Blueprint $table) {
-            $table->uuid('id_academy')->primary();
+
+            $table->uuid('id_academy')  ->primary();
+            
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Club Short Code
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('code',10)
+                ->unique();
+
+
+
+            $table->string('slug')
+                ->unique();
+
+
+
+            $table->string('phone')
+                ->nullable();
+
+
+            $table->string('email')
+                ->nullable();
+
+
             $table->text('address');
-            $table->string('tagline')->nullable();
-            $table->boolean('status')->default(true);
-            $table->string('logo')->nullable();
-            $table->text('description')->nullable();
+
+
+            $table->string('tagline')
+                ->nullable();
+
+
+            $table->boolean('status')
+                ->default(true);
+
+
+            $table->string('logo')
+                ->nullable();
+
+
+            $table->text('description')
+                ->nullable();
+
+
             $table->timestamps();
+
         });
     }
 

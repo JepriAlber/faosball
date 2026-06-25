@@ -13,18 +13,46 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
 
-            $table->uuid('id_user')->primary(); 
-            $table->uuid('id_academy'); 
-            $table->string('name'); 
-            $table->string('email') ->unique(); 
-            $table->timestamp('email_verified_at') ->nullable(); 
-            $table->string('password'); 
-            $table->boolean('status') ->default(true); 
-            $table->timestamp('last_login_at') ->nullable(); 
-            $table->rememberToken(); 
-            $table->timestamps(); 
-            $table->softDeletes();
+            $table->uuid('id_user')->primary();
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Academy Tenant
+            |--------------------------------------------------------------------------
+            */
+
+            $table->uuid('id_academy')->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | User Information
+            |--------------------------------------------------------------------------
+            */
+
+            $table->string('name'); 
+            $table->string('email') ->unique();
+            $table->timestamp('email_verified_at') ->nullable();
+            $table->string('password');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Account Status
+            |--------------------------------------------------------------------------
+            */
+
+            $table->boolean('status') ->default(true);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activity
+            |--------------------------------------------------------------------------
+            */
+
+            $table->timestamp('last_login_at')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
+            $table->softDeletes();
 
             /*
             |--------------------------------------------------------------------------
@@ -33,10 +61,9 @@ return new class extends Migration
             */
 
             $table->foreign('id_academy')
-                  ->references('id_academy')
-                  ->on('academies')
-                  ->cascadeOnDelete();
-
+                ->references('id_academy')
+                ->on('academies')
+                ->nullOnDelete();
 
             $table->index('id_academy');
 
