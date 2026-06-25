@@ -209,7 +209,7 @@
             <p class="mb-3 text-sm font-medium text-gray-700">
                 Keluar dari akun?
             </p>
-            <form method="POST" action="">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
                     class="flex w-full items-center justify-center rounded-lg bg-brand-500 p-3 text-sm font-medium text-white transition-colors hover:bg-brand-600">

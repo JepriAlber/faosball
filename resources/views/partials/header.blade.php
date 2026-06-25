@@ -201,7 +201,7 @@
                         </li>
                     </ul>
 
-                    <form method="POST" action="">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
                             class="group text-theme-sm mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700">
