@@ -39,11 +39,8 @@
 
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
-
                         </svg>
-
                         Tambah Player
-
                     </a>
                 </div>
 
@@ -52,163 +49,100 @@
 
             <!-- Table Content -->
             <div class="max-w-full overflow-x-auto custom-scrollbar">
-
                 <table class="w-full min-w-[1100px] table-auto text-left">
-
                     <thead>
-
                         <tr class="border-b border-gray-100 bg-gray-50/50">
-
                             <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
                                 Info Player
                             </th>
-
                             <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
                                 Profil
                             </th>
-
                             <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
                                 Posisi
                             </th>
-
                             <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
                                 Status
                             </th>
-
                             <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 text-right">
                                 Aksi
                             </th>
-
                         </tr>
-
                     </thead>
 
-
                     <tbody class="divide-y divide-gray-100">
-
                         @forelse ($players as $player)
                             <tr>
-
                                 <td class="px-5 py-4">
-
                                     <div class="flex items-center gap-3">
-
                                         <div
                                             class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center">
 
-                                            @if ($player->photo)
+                                            @if ($player->photo && Storage::disk('public')->exists($player->photo))
                                                 <img src="{{ asset('storage/' . $player->photo) }}"
                                                     alt="{{ $player->name }}" class="h-full w-full object-cover">
                                             @else
                                                 <span class="font-bold text-gray-400 text-lg">
-                                                    {{ strtoupper(substr($player->name, 0, 2)) }}
+                                                    {{ Str::upper(Str::substr($player->name ?? 'P', 0, 2)) }}
                                                 </span>
                                             @endif
 
                                         </div>
-
-
                                         <div>
-
                                             <a href="{{ route('players.show', $player->id_player) }}"
                                                 class="block font-medium text-gray-800 hover:text-brand-500 text-theme-sm">
-
                                                 {{ $player->name }}
-
                                             </a>
-
-
                                             <span class="block text-gray-400 text-theme-xs mt-0.5">
-
                                                 {{ $player->player_code }}
 
                                                 @if ($player->nick_name)
                                                     - {{ $player->nick_name }}
                                                 @endif
-
                                             </span>
-
                                         </div>
-
                                     </div>
-
                                 </td>
 
-
-
                                 <td class="px-5 py-4">
-
                                     <span class="block text-theme-sm text-gray-700">
-
                                         {{ $player->birth_date ? \Carbon\Carbon::parse($player->birth_date)->format('d M Y') : '-' }}
 
                                     </span>
 
-
                                     <span class="block text-theme-xs text-gray-400 mt-0.5">
-
                                         {{ ucfirst($player->gender ?? '-') }}
-
                                         @if ($player->nationality)
                                             - {{ $player->nationality }}
                                         @endif
-
                                     </span>
-
-
                                 </td>
 
-
-
                                 <td class="px-5 py-4">
-
                                     <span class="block text-theme-sm text-gray-700">
-
                                         {{ $player->primary_position ?? '-' }}
-
                                     </span>
-
-
                                     <span class="block text-theme-xs text-gray-400 mt-0.5">
-
                                         {{ $player->secondary_position ?? '-' }}
-
                                     </span>
-
-
                                 </td>
 
-
-
                                 <td class="px-5 py-4">
-
-
                                     @if ($player->status)
                                         <span
                                             class="inline-flex rounded-full bg-green-50 px-2.5 py-0.5 text-theme-xs font-medium text-green-700">
-
                                             Aktif
-
                                         </span>
                                     @else
                                         <span
                                             class="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-theme-xs font-medium text-red-700">
-
                                             Nonaktif
-
                                         </span>
                                     @endif
-
-
                                 </td>
 
-
-
                                 <td class="px-5 py-4">
-
                                     <div class="flex items-center justify-end gap-2.5">
-
-
                                         {{-- Detail --}}
 
                                         <a href="{{ route('players.show', $player->id_player) }}"
@@ -226,21 +160,17 @@
                                                     stroke="currentColor" stroke-width="1.5" />
 
                                             </svg>
-
                                         </a>
-
 
                                         {{-- Edit --}}
 
                                         <a href="{{ route('players.edit', $player->id_player) }}"
                                             class="text-gray-500 hover:text-yellow-500" title="Edit">
-
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
 
                                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
                                                     stroke="currentColor" stroke-width="1.5" />
-
                                             </svg>
 
                                         </a>
@@ -282,27 +212,17 @@
                                                     stroke-linejoin="round" />
 
                                             </svg>
-
                                         </button>
-
-
                                     </div>
-
                                 </td>
-
-
                             </tr>
-
 
                         @empty
 
 
                             <tr>
-
                                 <td colspan="5" class="px-5 py-10 text-center">
-
                                     <div class="flex flex-col items-center justify-center">
-
                                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                             xmlns="http://www.w3.org/2000/svg" class="text-gray-300 mb-3">
 
@@ -310,37 +230,22 @@
                                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
-
                                         </svg>
-
 
                                         <span class="block text-gray-500 text-sm font-medium">
                                             Belum ada data Player
                                         </span>
 
-
                                         <a href="{{ route('players.create') }}"
                                             class="mt-3 text-xs text-brand-500 hover:text-brand-600 font-semibold underline">
-
                                             Tambah sekarang
-
                                         </a>
-
-
                                     </div>
-
                                 </td>
-
                             </tr>
                         @endforelse
-
-
                     </tbody>
-
-
                 </table>
-
-
             </div>
 
 
@@ -348,9 +253,7 @@
 
             @if ($players->hasPages())
                 <div class="px-5 py-4 border-t border-gray-100">
-
                     {{ $players->links() }}
-
                 </div>
             @endif
 
@@ -399,7 +302,6 @@
                             Konfirmasi Hapus
                         </h3>
 
-
                         <p class="text-sm text-gray-500">
                             Tindakan ini tidak dapat dibatalkan.
                         </p>
@@ -413,62 +315,33 @@
                 <!-- Body Message -->
 
                 <div class="mt-4">
-
                     <p class="text-sm text-gray-600 leading-relaxed">
-
                         Apakah Anda yakin ingin menghapus data Player
-
                         <strong class="text-gray-800" x-text="playerName"></strong>?
-
                         Semua data terkait pemain ini akan dihapus secara permanen.
-
                     </p>
-
                 </div>
 
-
-
                 <!-- Footer Buttons -->
-
                 <div class="mt-6 flex items-center justify-end gap-3">
-
 
                     <button type="button" @click="showDeleteModal = false"
                         class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-
                         Batal
-
                     </button>
 
-
-
                     <form :action="deleteAction" method="POST" class="inline">
-
                         @csrf
-
                         @method('DELETE')
-
 
                         <button type="submit"
                             class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
-
                             Hapus Permanen
-
                         </button>
-
-
                     </form>
-
-
                 </div>
-
-
             </div>
-
-
         </div>
-
-
     </div>
 
 @endsection

@@ -6,46 +6,60 @@ use App\Models\Player;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Str;
 
 class PlayerService
 {
 
     protected AcademyService $academyService;
 
-
     public function __construct(AcademyService $academyService) {
         
         $this->academyService = $academyService;
     }
 
+    /**
+     * hendel upload foto player
+     * 
+     * @param $file
+     * 
+     * @return string
+     */
+    protected function uploadPhoto($file, string $playerCode): string
+    {
+        $filename = $playerCode . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        return $file->storeAs(
+            'players',
+            $filename,
+            'public'
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
     | Create Player
     |--------------------------------------------------------------------------
     */
-
     public function create(array $data): Player
     {
-
         return DB::transaction(function () use ($data) {
 
+            /* Create Player */
+            $playerCode = $this->generatePlayerCode();
 
-            /*
-            |--------------------------------------------------------------------------
-            | Create Player
-            |--------------------------------------------------------------------------
-            */
+            $photo = null;
+            if (isset($data['photo'])) {
+                $photo = $this->uploadPhoto($data['photo'], $playerCode);
+            }
 
             $player = Player::create([
-
-                'player_code' => $this->generatePlayerCode(),
+                'player_code' => $playerCode,
                 'name' => $data['name'],
                 'nick_name' => $data['nick_name'] ?? null,
                 'birth_date' => $data['birth_date'],
                 'gender' => $data['gender'],
-                'nationality' => $data['nationality']   ?? 'Indonesia',
+                'nationality' => $data['nationality'] ?? 'Indonesia',
                 'height' => $data['height'] ?? null,
                 'weight' => $data['weight'] ?? null,
                 'preferred_foot' => $data['preferred_foot'] ?? null,
@@ -53,33 +67,18 @@ class PlayerService
                 'secondary_position' => $data['secondary_position'] ?? null,
                 'join_date' => $data['join_date'] ?? now(),
                 'status' => $data['status'] ?? 'active',
-                'photo' => $data['photo'] ?? null,
+                'photo' => $photo,
                 'notes' => $data['notes'] ?? null,
-
             ]);
 
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Create Player Account Optional
-            |--------------------------------------------------------------------------
-            */
-                
-            if (!empty($data['create_account']) && $data['create_account'] === true) {
-
-                $user = $this->createPlayerAccount( $player, $data );
-
-                $player->update([
-                    'id_user' => $user->id_user
-                ]);
-
+            /* Create Player Account */
+            if (!empty($data['create_account'])) {
+                $user = $this->createPlayerAccount($player, $data);
+                $player->update(['id_user' => $user->id_user]);
             }
 
             return $player;
-
         });
-
     }
 
 
@@ -91,7 +90,6 @@ class PlayerService
     */
 
     protected function createPlayerAccount( Player $player, array $data): User {
-
         $user = User::create([
             'id_academy' => $player->id_academy,
             'name' => $player->name,
@@ -100,7 +98,6 @@ class PlayerService
                 $data['password']
             ),
             'status' => true,
-
         ]);
 
         $user->assignRole('Player');
