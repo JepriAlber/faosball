@@ -1,0 +1,186 @@
+/*
+|--------------------------------------------------------------------------
+| FAOSBall Base Theme
+|--------------------------------------------------------------------------
+*/
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply font-outfit relative z-1 bg-gray-50 text-base font-normal;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply text-gray-900 dark:text-white;
+    }
+
+    a {
+        @apply transition-colors duration-200;
+    }
+
+    input,
+    textarea,
+    select {
+        @apply outline-none;
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Scrollbar Utilities
+|--------------------------------------------------------------------------
+*/
+
+@utility no-scrollbar {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+@utility custom-scrollbar {
+    &::-webkit-scrollbar {
+        @apply size-1.5;
+    }
+
+    &::-webkit-scrollbar-track {
+        @apply rounded-full;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-gray-200;
+    }
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #344054;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Form Utilities
+|--------------------------------------------------------------------------
+*/
+
+@layer utilities {
+
+    input[type="date"]::-webkit-inner-spin-button,
+    input[type="time"]::-webkit-inner-spin-button,
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+    }
+
+    .focus-ring {
+        @apply outline-none ring-4 ring-brand-500/10;
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| TailAdmin Sidebar
+|--------------------------------------------------------------------------
+*/
+
+.sidebar:hover {
+    width: 290px;
+}
+
+.sidebar:hover .logo {
+    display: block;
+}
+
+.sidebar:hover .logo-icon {
+    display: none;
+}
+
+.sidebar:hover .sidebar-header {
+    justify-content: space-between;
+}
+
+.sidebar:hover .menu-group-title {
+    display: block;
+}
+
+.sidebar:hover .menu-group-icon {
+    display: none;
+}
+
+.sidebar:hover .menu-item-text {
+    display: inline;
+}
+
+.sidebar:hover .menu-item-arrow {
+    display: block;
+}
+
+.sidebar:hover .menu-dropdown {
+    display: flex;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Checkbox
+|--------------------------------------------------------------------------
+*/
+
+.tableCheckbox:checked~span span {
+    @apply opacity-100;
+}
+
+.tableCheckbox:checked~span {
+    @apply border-brand-500 bg-brand-500;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Global Selection
+|--------------------------------------------------------------------------
+*/
+
+::selection {
+    background: var(--color-brand-500);
+    color: white;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Image
+|--------------------------------------------------------------------------
+*/
+
+img {
+    max-width: 100%;
+    height: auto;
+}

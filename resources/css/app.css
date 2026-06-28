@@ -1,10 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source "../**/*.blade.php";
+@source "../**/*.js";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
-@import './theme.css';
+
+@import "./theme/variables.css";
+@import "./theme/base.css";
+@import "./theme/utilities.css";
+@import "./theme/components.css";
+@import "./theme/vendor.css";

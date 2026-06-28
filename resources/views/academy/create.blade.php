@@ -3,269 +3,253 @@
 @section('title', $title . ' - ' . config('app.name'))
 
 @section('content')
-    <!-- Breadcrumb Start -->
+
     <div x-data="{ pageName: @js($title) }">
         @include('partials.breadcrumb')
     </div>
-    <!-- Breadcrumb End -->
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-8">
+    <div class="card">
 
-        <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-5">
+        <div class="card-header">
+
             <div>
-                <h3 class="text-lg font-semibold text-gray-800">Informasi Profil Player</h3>
-                <p class="text-sm text-gray-500">Masukkan detail lengkap untuk mendaftarkan pemain baru.</p>
+                <h3 class="card-title">Informasi Profil Academy</h3>
+                <p class="card-description">Masukkan detail lengkap untuk mendaftarkan akademi baru.</p>
             </div>
 
-            <div>
-                <a href="{{ route('players.index') }}"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+            <div class="card-actions">
+                <a href="{{ route('academy.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
             </div>
+
         </div>
 
-        <form action="{{ route('players.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('academy.store') }}" method="POST" enctype="multipart/form-data">
+
             @csrf
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div class="form-row">
 
-                <!-- ================= LEFT COLUMN ================= -->
-                <div class="flex flex-col gap-5">
+                {{-- Left Column --}}
+                <div>
 
-                    <!-- Name -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Nama Player <span class="text-red-500">*</span>
+                    {{-- Name --}}
+                    <div class="form-group">
+
+                        <label for="name" class="form-label">
+                            Nama Academy <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama player"
-                            class="w-full rounded-xl border @error('name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500"
+                        <input type="text" id="name" name="name" value="{{ old('name') }}"
+                            placeholder="Masukkan nama akademi"
+                            class="form-input @error('name') form-danger @elseif(old('name')) form-success @enderror"
                             required>
 
                         @error('name')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
+
                     </div>
 
-                    <!-- Nickname -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Nickname</label>
+                    {{-- Tagline --}}
+                    <div class="form-group">
 
-                        <input type="text" name="nick_name" value="{{ old('nick_name') }}"
-                            class="w-full rounded-xl border @error('nick_name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm"
-                            placeholder="Nickname">
-
-                        @error('nick_name')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Birth Date -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Tanggal Lahir</label>
-
-                        <input type="date" name="birth_date" value="{{ old('birth_date') }}"
-                            class="w-full rounded-xl border @error('birth_date') border-red-500 @else border-gray-200 @enderror px-5 py-3 text-sm">
-
-                        @error('birth_date')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Gender -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Gender</label>
-
-                        <select name="gender"
-                            class="w-full rounded-xl border @error('gender') border-red-500 @else border-gray-200 @enderror px-5 py-3 text-sm">
-
-                            <option value="">Pilih</option>
-                            <option value="male" @selected(old('gender') == 'male')>Male</option>
-                            <option value="female" @selected(old('gender') == 'female')>Female</option>
-
-                        </select>
-
-                        @error('gender')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <!-- Nationality -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Nationality</label>
-
-                        <input type="text" name="nationality" value="{{ old('nationality', 'Indonesia') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
-                    </div>
-
-                    <!-- Height -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Tinggi (cm)</label>
-                        <input type="number" name="height" value="{{ old('height') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
-                    </div>
-
-                    <!-- Weight -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Berat (kg)</label>
-                        <input type="number" name="weight" value="{{ old('weight') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
-                    </div>
-
-                    <!-- Preferred Foot -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Kaki Dominan</label>
-
-                        <select name="preferred_foot" class="w-full rounded-xl border px-5 py-3 text-sm">
-
-                            <option value="">Pilih</option>
-                            <option value="right" @selected(old('preferred_foot') == 'right')>Right</option>
-                            <option value="left" @selected(old('preferred_foot') == 'left')>Left</option>
-                            <option value="both" @selected(old('preferred_foot') == 'both')>Both</option>
-
-                        </select>
-                    </div>
-
-                </div>
-
-                <!-- ================= RIGHT COLUMN ================= -->
-                <div class="flex flex-col gap-5">
-
-                    <!-- Primary Position -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Posisi Utama <span class="text-red-500">*</span>
+                        <label for="tagline" class="form-label">
+                            Tagline / Slogan <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="primary_position" value="{{ old('primary_position') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm" placeholder="Forward / Midfielder" required>
+                        <input type="text" id="tagline" name="tagline" value="{{ old('tagline') }}"
+                            placeholder="Contoh: Maju Bersama Sepakbola"
+                            class="form-input @error('tagline') form-danger @enderror" required>
+
+                        @error('tagline')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
                     </div>
 
-                    <!-- Secondary Position -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Posisi Kedua
+                    {{-- Phone --}}
+                    <div class="form-group">
+
+                        <label for="phone" class="form-label">
+                            Nomor Telepon <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="secondary_position" value="{{ old('secondary_position') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
+                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
+                            placeholder="Contoh: 08123456789" class="form-input @error('phone') form-danger @enderror"
+                            required>
+
+                        @error('phone')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
                     </div>
 
-                    <!-- Join Date -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Join Date</label>
+                    {{-- Email --}}
+                    <div class="form-group">
 
-                        <input type="date" name="join_date" value="{{ old('join_date') }}"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
+                        <label for="email" class="form-label">
+                            Email <span class="text-error-500">*</span>
+                        </label>
+
+                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                            placeholder="Contoh: info@akademi.com" class="form-input @error('email') form-danger @enderror"
+                            required>
+
+                        @error('email')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
                     </div>
 
-                    <!-- Status Toggle (ACADEMY STYLE) -->
-                    <div x-data="{ switcherOn: {{ old('status', 'active') === 'active' ? 'true' : 'false' }} }">
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Status</label>
+                    {{-- Status --}}
+                    <div class="form-group">
 
-                        <input type="hidden" name="status" :value="switcherOn ? 'active' : 'inactive'">
+                        <label class="form-label">
+                            Status Aktif
+                        </label>
 
-                        <label class="flex cursor-pointer items-center">
-                            <div class="relative">
-                                <input type="checkbox" class="sr-only" @change="switcherOn = !switcherOn"
-                                    :checked="switcherOn">
+                        <div x-data="{ switcherOn: {{ old('status', true) ? 'true' : 'false' }} }">
 
-                                <div class="block h-8 w-14 rounded-full bg-gray-200" :class="switcherOn && '!bg-brand-500'">
+                            <label class="flex cursor-pointer items-center">
+
+                                <input type="checkbox" name="status" value="1" class="sr-only" :checked="switcherOn"
+                                    @change="switcherOn=!switcherOn">
+
+                                <div class="form-toggle" :class="switcherOn && 'form-toggle-active'">
+                                    <span class="form-toggle-dot" :class="switcherOn && 'form-toggle-checked'"></span>
                                 </div>
 
-                                <div class="absolute left-1 top-1 h-6 w-6 rounded-full bg-white transition"
-                                    :class="switcherOn && 'translate-x-full'"></div>
-                            </div>
+                                <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"
+                                    x-text="switcherOn ? 'Aktif' : 'Nonaktif'"></span>
 
-                            <span class="ml-3 text-sm text-gray-500" x-text="switcherOn ? 'Active' : 'Inactive'"></span>
-                        </label>
-                    </div>
-
-                    <!-- Photo Upload (ACADEMY STYLE) -->
-                    <div x-data="{ imagePreview: null }">
-
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Foto Player
-                        </label>
-
-                        <div
-                            class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 py-6 px-4 text-center cursor-pointer">
-
-                            <input type="file" name="photo" accept="image/*"
-                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                @change="
-                                    const file = $event.target.files[0];
-                                    if(file){
-                                        const reader = new FileReader();
-                                        reader.onload = e => imagePreview = e.target.result;
-                                        reader.readAsDataURL(file);
-                                    }
-                                ">
-
-                            <template x-if="!imagePreview">
-                                <p class="text-sm text-gray-500">Klik atau drag untuk upload foto</p>
-                            </template>
-
-                            <template x-if="imagePreview">
-                                <img :src="imagePreview" class="h-32 w-32 rounded-xl object-cover">
-                            </template>
+                            </label>
 
                         </div>
-                    </div>
 
-                    <!-- Notes -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">Notes</label>
-
-                        <textarea name="notes" rows="3" class="w-full rounded-xl border px-5 py-3 text-sm">{{ old('notes') }}</textarea>
-                    </div>
-
-                    <!-- Create Account Toggle -->
-                    <div x-data="{ createAccount: false }">
-
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Create Account
-                        </label>
-
-                        <input type="hidden" name="create_account" :value="createAccount ? 1 : 0">
-
-                        <button type="button" @click="createAccount = !createAccount"
-                            class="w-full rounded-xl border px-5 py-3 text-sm">
-
-                            <span x-text="createAccount ? 'Enabled' : 'Disabled'"></span>
-
-                        </button>
-
-                        <div x-show="createAccount" class="mt-4 space-y-3">
-
-                            <input type="email" name="email" placeholder="Email"
-                                class="w-full rounded-xl border px-5 py-3 text-sm">
-
-                            <input type="password" name="password" placeholder="Password"
-                                class="w-full rounded-xl border px-5 py-3 text-sm">
-
-                        </div>
                     </div>
 
                 </div>
+
+
+                {{-- Right Column --}}
+                <div>
+
+                    {{-- Logo --}}
+                    <div class="form-group" x-data="{ imagePreview: null }">
+
+                        <label class="form-label">
+                            Logo Academy
+                        </label>
+
+                        <div class="form-file-upload">
+
+                            <input type="file" id="logo" name="logo"
+                                class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" accept="image/*"
+                                @change="
+                            const file=$event.target.files[0];
+                            if(file){
+                                const reader=new FileReader();
+                                reader.onload=(e)=>imagePreview=e.target.result;
+                                reader.readAsDataURL(file);
+                            }
+                        ">
+
+                            <div x-show="!imagePreview" class="empty-state">
+
+                                <span class="avatar avatar-lg mb-3">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M12 16V8M8 12L12 8L16 12M3 15V18C3 18.5 3.2 19 3.6 19.4C4 19.8 4.5 20 5 20H19C19.5 20 20 19.8 20.4 19.4C20.8 19 21 18.5 21 18V15"
+                                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+
+                                <p class="empty-title">
+                                    Klik untuk unggah logo
+                                </p>
+
+                                <p class="empty-description">
+                                    SVG, PNG, JPG, WEBP maksimal 2MB
+                                </p>
+
+                            </div>
+
+                            <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
+
+                                <div class="avatar avatar-lg avatar-square mb-3">
+                                    <img :src="imagePreview" class="h-full w-full object-cover">
+                                </div>
+
+                                <span class="link-primary text-xs font-semibold">
+                                    Ganti gambar
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        @error('logo')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
+                    </div>
+
+                    {{-- Address --}}
+                    <div class="form-group">
+
+                        <label for="address" class="form-label">
+                            Alamat <span class="text-error-500">*</span>
+                        </label>
+
+                        <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap akademi"
+                            class="form-textarea @error('address') form-danger @enderror" required>{{ old('address') }}</textarea>
+
+                        @error('address')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
+                    </div>
+
+                    {{-- Description --}}
+                    <div class="form-group">
+
+                        <label for="description" class="form-label">
+                            Deskripsi
+                        </label>
+
+                        <textarea id="description" name="description" rows="3"
+                            placeholder="Jelaskan secara singkat mengenai profil akademi Anda"
+                            class="form-textarea @error('description') form-danger @enderror">{{ old('description') }}</textarea>
+
+                        @error('description')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <!-- Buttons -->
-            <div class="mt-8 flex items-center justify-end gap-4 border-t border-gray-100 pt-6">
+            {{-- Submit --}}
+            <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
-                <button type="reset"
-                    class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button type="reset" class="btn btn-secondary">
                     Reset
                 </button>
 
-                <button type="submit"
-                    class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
-                    Simpan Player
+                <button type="submit" class="btn btn-primary">
+                    Simpan Academy
                 </button>
 
             </div>
 
         </form>
+
     </div>
+
 @endsection

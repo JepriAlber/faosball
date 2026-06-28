@@ -26,7 +26,7 @@
     @stack('styles')
 </head>
 
-<body class="bg-white">
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
 
     {{-- ===== Preloader ===== --}}
     @include('partials.preloader')

@@ -3,210 +3,254 @@
 @section('title', $title . ' - ' . config('app.name'))
 
 @section('content')
-    <!-- Breadcrumb Start -->
+
     <div x-data="{ pageName: @js($title) }">
         @include('partials.breadcrumb')
     </div>
-    <!-- Breadcrumb End -->
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-8">
-        <div
-            class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-5">
+    <div class="card">
+
+        <div class="card-header">
+
             <div>
-                <h3 class="text-lg font-semibold text-gray-800">Ubah Profil Academy</h3>
-                <p class="text-sm text-gray-500">Perbarui rincian informasi untuk akademi
-                    {{ $academy->name }}.</p>
+                <h3 class="card-title">Ubah Profil Academy</h3>
+                <p class="card-description">Perbarui rincian informasi untuk akademi {{ $academy->name }}.</p>
             </div>
-            <div>
-                <a href="{{ route('academy.index') }}"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+
+            <div class="card-actions">
+                <a href="{{ route('academy.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
             </div>
+
         </div>
 
         <form action="{{ route('academy.update', $academy->id_academy) }}" method="POST" enctype="multipart/form-data">
+
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <!-- Left Column -->
-                <div class="flex flex-col gap-5">
-                    <!-- Name -->
-                    <div>
-                        <label for="name" class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Nama Academy <span class="text-red-500">*</span>
+            <div class="form-row">
+
+                {{-- Left Column --}}
+                <div>
+
+                    {{-- Name --}}
+                    <div class="form-group">
+
+                        <label for="name" class="form-label">
+                            Nama Academy <span class="text-error-500">*</span>
                         </label>
+
                         <input type="text" id="name" name="name" value="{{ old('name', $academy->name) }}"
-                            placeholder="Masukkan nama akademi"
-                            class="w-full rounded-xl border @error('name') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500"
+                            placeholder="Masukkan nama akademi" class="form-input @error('name') form-danger @enderror"
                             required>
+
                         @error('name')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Tagline -->
-                    <div>
-                        <label for="tagline" class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Tagline / Slogan <span class="text-red-500">*</span>
+                    {{-- Tagline --}}
+                    <div class="form-group">
+
+                        <label for="tagline" class="form-label">
+                            Tagline / Slogan <span class="text-error-500">*</span>
                         </label>
+
                         <input type="text" id="tagline" name="tagline" value="{{ old('tagline', $academy->tagline) }}"
                             placeholder="Contoh: Maju Bersama Sepakbola"
-                            class="w-full rounded-xl border @error('tagline') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500"
-                            required>
+                            class="form-input @error('tagline') form-danger @enderror" required>
+
                         @error('tagline')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Phone -->
-                    <div>
-                        <label for="phone" class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Nomor Telepon <span class="text-red-500">*</span>
+                    {{-- Phone --}}
+                    <div class="form-group">
+
+                        <label for="phone" class="form-label">
+                            Nomor Telepon <span class="text-error-500">*</span>
                         </label>
+
                         <input type="text" id="phone" name="phone" value="{{ old('phone', $academy->phone) }}"
-                            placeholder="Contoh: 08123456789"
-                            class="w-full rounded-xl border @error('phone') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500"
+                            placeholder="Contoh: 08123456789" class="form-input @error('phone') form-danger @enderror"
                             required>
+
                         @error('phone')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Email <span class="text-red-500">*</span>
+                    {{-- Email --}}
+                    <div class="form-group">
+
+                        <label for="email" class="form-label">
+                            Email <span class="text-error-500">*</span>
                         </label>
+
                         <input type="email" id="email" name="email" value="{{ old('email', $academy->email) }}"
-                            placeholder="Contoh: info@akademi.com"
-                            class="w-full rounded-xl border @error('email') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500"
+                            placeholder="Contoh: info@akademi.com" class="form-input @error('email') form-danger @enderror"
                             required>
+
                         @error('email')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Status Toggle -->
-                    <div>
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
+                    {{-- Status --}}
+                    <div class="form-group">
+
+                        <label class="form-label">
                             Status Aktif
                         </label>
-                        <div x-data="{ switcherOn: {{ old('status', $academy->status ? 'true' : 'false') == 'true' || old('status', $academy->status) === 1 || old('status', $academy->status) === '1' ? 'true' : 'false' }} }">
-                            <label for="status-toggle" class="flex cursor-pointer select-none items-center">
-                                <div class="relative">
-                                    <input type="checkbox" id="status-toggle" name="status" value="1" class="sr-only"
-                                        @change="switcherOn = !switcherOn" :checked="switcherOn">
-                                    <div class="block h-8 w-14 rounded-full bg-gray-200 transition-colors"
-                                        :class="switcherOn && '!bg-brand-500'"></div>
-                                    <div class="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white transition-transform"
-                                        :class="switcherOn && 'translate-x-full'"></div>
+
+                        <div x-data="{ switcherOn: {{ old('status', $academy->status) ? 'true' : 'false' }} }">
+
+                            <label class="flex cursor-pointer items-center">
+
+                                <input type="checkbox" name="status" value="1" class="sr-only" :checked="switcherOn"
+                                    @change="switcherOn=!switcherOn">
+
+                                <div class="form-toggle" :class="switcherOn && 'form-toggle-active'">
+                                    <span class="form-toggle-dot" :class="switcherOn && 'form-toggle-checked'"></span>
                                 </div>
-                                <span class="ml-3 text-sm font-medium text-gray-500"
+
+                                <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"
                                     x-text="switcherOn ? 'Aktif' : 'Nonaktif'"></span>
+
                             </label>
+
                         </div>
+
                     </div>
+
                 </div>
 
-                <!-- Right Column -->
-                <div class="flex flex-col gap-5">
-                    <!-- Logo Upload (Alpine JS Preview) -->
-                    <div x-data="{ imagePreview: '{{ $academy->logo ? asset('storage/' . $academy->logo) : null }}' }">
-                        <label class="mb-2.5 block text-sm font-medium text-gray-800">
+                {{-- Right Column --}}
+                <div>
+
+                    {{-- Logo --}}
+                    <div class="form-group" x-data="{ imagePreview: '{{ $academy->logo ? asset('storage/' . $academy->logo) : '' }}' }">
+
+                        <label class="form-label">
                             Logo Academy
                         </label>
 
-                        <!-- Drag & Drop Container -->
-                        <div
-                            class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-transparent py-6 px-4 text-center cursor-pointer hover:bg-gray-50 transition">
-                            <input type="file" id="logo" name="logo"
-                                class="absolute inset-0 z-50 h-full w-full opacity-0 cursor-pointer" accept="image/*"
-                                @change="
-                                       const file = $event.target.files[0];
-                                       if (file) {
-                                           const reader = new FileReader();
-                                           reader.onload = (e) => { imagePreview = e.target.result; };
-                                           reader.readAsDataURL(file);
-                                       }
-                                   ">
+                        <div class="form-file-upload">
 
-                            <!-- State 1: Uploading New File (No Preview) -->
-                            <div x-show="!imagePreview" class="flex flex-col items-center justify-center">
-                                <span
-                                    class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 border border-gray-100 text-gray-500 mb-3">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
+                            <input type="file" id="logo" name="logo"
+                                class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" accept="image/*"
+                                @change="
+                                const file=$event.target.files[0];
+                                if(file){
+                                    const reader=new FileReader();
+                                    reader.onload=(e)=>imagePreview=e.target.result;
+                                    reader.readAsDataURL(file);
+                                }
+                            ">
+
+                            {{-- Empty State --}}
+                            <div x-show="!imagePreview" class="empty-state">
+
+                                <span class="avatar avatar-lg mb-3">
+
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path
-                                            d="M12 16V8M8 12L12 8L16 12M3 15V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H19C19.5304 20 20.0391 19.7893 20.4142 19.4142C20.7893 19.0391 21 18.5304 21 18V15"
+                                            d="M12 16V8M8 12L12 8L16 12M3 15V18C3 18.5 3.2 19 3.6 19.4C4 19.8 4.5 20 5 20H19C19.5 20 20 19.8 20.4 19.4C20.8 19 21 18.5 21 18V15"
                                             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                             stroke-linejoin="round" />
                                     </svg>
+
                                 </span>
-                                <p class="text-sm font-medium text-gray-700">
-                                    Klik untuk unggah atau seret berkas ke sini
+
+                                <p class="empty-title">
+                                    Klik untuk unggah logo
                                 </p>
-                                <p class="mt-1 text-xs text-gray-400">
-                                    Format SVG, PNG, JPG, atau WEBP (Maksimal 2MB)
+
+                                <p class="empty-description">
+                                    SVG, PNG, JPG, WEBP maksimal 2MB
                                 </p>
+
                             </div>
 
-                            <!-- State 2: Show Image Preview -->
-                            <div x-show="imagePreview" class="flex flex-col items-center justify-center w-full" x-cloak>
-                                <div
-                                    class="relative h-32 w-32 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 mb-3">
-                                    <img :src="imagePreview" alt="Logo Preview" class="h-full w-full object-cover">
+                            {{-- Preview --}}
+                            <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
+
+                                <div class="avatar avatar-lg avatar-square mb-3">
+                                    <img :src="imagePreview" class="h-full w-full object-cover">
                                 </div>
-                                <span class="text-xs text-brand-500 font-semibold underline">Ganti Gambar</span>
+
+                                <span class="link-primary text-xs font-semibold">
+                                    Ganti gambar
+                                </span>
+
                             </div>
+
                         </div>
 
                         @error('logo')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Address -->
-                    <div>
-                        <label for="address" class="mb-2.5 block text-sm font-medium text-gray-800">
-                            Alamat <span class="text-red-500">*</span>
+                    {{-- Address --}}
+                    <div class="form-group">
+
+                        <label for="address" class="form-label">
+                            Alamat <span class="text-error-500">*</span>
                         </label>
+
                         <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap akademi"
-                            class="w-full rounded-xl border @error('address') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500"
-                            required>{{ old('address', $academy->address) }}</textarea>
+                            class="form-textarea @error('address') form-danger @enderror" required>{{ old('address', $academy->address) }}</textarea>
+
                         @error('address')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                            <span class="form-error">{{ $message }}</span>
                         @enderror
+
                     </div>
 
-                    <!-- Description -->
-                    <div>
-                        <label for="description"
-                            class="mb-2.5 block text-sm font-medium text-gray-800">
+                    {{-- Description --}}
+                    <div class="form-group">
+
+                        <label for="description" class="form-label">
                             Deskripsi
                         </label>
+
                         <textarea id="description" name="description" rows="3"
                             placeholder="Jelaskan secara singkat mengenai profil akademi Anda"
-                            class="w-full rounded-xl border @error('description') border-red-500 @else border-gray-200 @enderror bg-transparent px-5 py-3 text-sm text-gray-800 outline-none transition focus:border-brand-500 active:border-brand-500">{{ old('description', $academy->description) }}</textarea>
-                        @error('description')
-                            <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-            </div>
+                            class="form-textarea @error('description') form-danger @enderror">{{ old('description', $academy->description) }}</textarea>
 
-            <!-- Submit Button Section -->
-            <div class="mt-8 flex items-center justify-end gap-4 border-t border-gray-100 pt-6">
-                <button type="reset"
-                    class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                        @error('description')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
+                    </div>
+
+                </div>
+
+            </div>
+            {{-- Submit --}}
+            <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
+
+                <button type="reset" class="btn btn-secondary">
                     Reset
                 </button>
-                <button type="submit"
-                    class="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600">
+
+                <button type="submit" class="btn btn-primary">
                     Perbarui Academy
                 </button>
+
             </div>
+
         </form>
+
     </div>
+
 @endsection

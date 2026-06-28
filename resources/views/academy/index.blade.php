@@ -14,18 +14,16 @@
         @include('partials.alert')
         <!-- Alerts End -->
 
-        <div class="rounded-2xl border border-gray-200 bg-white">
-            <!-- Table Header Actions -->
-            <div
-                class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100">
+        <div class="card">
+
+            <div class="card-header">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Academy List</h3>
-                    <p class="mt-1 text-sm text-gray-500">Manajemen profil, tagline, dan status akademi
+                    <h3 class="card-title">Academy List</h3>
+                    <p class="card-description">Manajemen profil, tagline, dan status akademi
                         sepak bola.</p>
                 </div>
-                <div>
-                    <a href="{{ route('academy.create') }}"
-                        class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-600">
+                <div class="card-actions">
+                    <a href="{{ route('academy.create') }}" class="btn btn-primary">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
@@ -37,73 +35,64 @@
             </div>
 
             <!-- Table Content -->
-            <div class="max-w-full overflow-x-auto custom-scrollbar">
-                <table class="w-full min-w-[1000px] table-auto text-left">
-                    <thead>
-                        <tr class="border-b border-gray-100 bg-gray-50/50">
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Info Academy
-                            </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Kontak</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Tagline</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">Status</th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 text-right">
-                                Aksi</th>
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead class="table-head">
+                        <tr class="table-header-row">
+                            <th class="table-header-cell">Info Academy </th>
+                            <th class="table-header-cell">Kontak</th>
+                            <th class="table-header-cell">Tagline</th>
+                            <th class="table-header-cell">Status</th>
+                            <th class="table-header-cell text-center"> Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="table-body">
                         @forelse ($academies as $academy)
-                            <tr>
-                                <td class="px-5 py-4">
+                            <tr class="table-row">
+                                <td class="table-cell">
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                        <div class="table-avatar">
                                             @if ($academy->logo)
                                                 <img src="{{ asset('storage/' . $academy->logo) }}"
                                                     alt="Logo {{ $academy->name }}" class="h-full w-full object-cover">
                                             @else
-                                                <span class="font-bold text-gray-400 text-lg">
+                                                <span class="avatar-placeholder">
                                                     {{ strtoupper(substr($academy->name, 0, 2)) }}
                                                 </span>
                                             @endif
                                         </div>
                                         <div>
-                                            <a href="{{ route('academy.show', $academy->id_academy) }}"
-                                                class="block font-medium text-gray-800 hover:text-brand-500 text-theme-sm">
+                                            <a href="{{ route('academy.show', $academy->id_academy) }}" class="table-title">
                                                 {{ $academy->name }}
                                             </a>
-                                            <span class="block text-gray-400 text-theme-xs mt-0.5">
+                                            <span class="table-subtitle">
                                                 {{ $academy->slug }}
                                             </span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="block text-theme-sm text-gray-700">{{ $academy->email }}</span>
-                                    <span class="block text-theme-xs text-gray-400 mt-0.5">{{ $academy->phone }}</span>
+                                <td class="table-cell">
+                                    <span class="table-text">{{ $academy->email }}</span>
+                                    <span class="table-subtitle">{{ $academy->phone }}</span>
                                 </td>
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="text-theme-sm text-gray-600 line-clamp-1 italic">"{{ $academy->tagline }}"</span>
+                                <td class="table-cell">
+                                    <span class="table-description">"{{ $academy->tagline }}"</span>
                                 </td>
-                                <td class="px-5 py-4">
+                                <td class="table-cell">
                                     @if ($academy->status)
-                                        <span
-                                            class="inline-flex rounded-full bg-green-50 px-2.5 py-0.5 text-theme-xs font-medium text-green-700">
+                                        <span class="badge badge-success">
                                             Aktif
                                         </span>
                                     @else
-                                        <span
-                                            class="inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-theme-xs font-medium text-red-700">
+                                        <span class="badge badge-danger">
                                             Nonaktif
                                         </span>
                                     @endif
                                 </td>
-                                <td class="px-5 py-4">
-                                    <div class="flex items-center justify-end gap-2.5">
+                                <td class="table-cell text-right">
+                                    <div class="table-action">
                                         <a href="{{ route('academy.show', $academy->id_academy) }}"
-                                            class="text-gray-500 hover:text-brand-500"
-                                            title="Detail">
+                                            class="btn-icon btn-icon-primary" title="Detail">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -117,8 +106,7 @@
                                             </svg>
                                         </a>
                                         <a href="{{ route('academy.edit', $academy->id_academy) }}"
-                                            class="text-gray-500 hover:text-yellow-500"
-                                            title="Edit">
+                                            class="btn-icon btn-icon-warning" title="Edit">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
@@ -128,8 +116,7 @@
                                         </a>
                                         <button type="button"
                                             @click="deleteAction = '{{ route('academy.destroy', $academy->id_academy) }}'; academyName = '{{ addslashes($academy->name) }}'; showDeleteModal = true"
-                                            class="text-gray-500 hover:text-red-500"
-                                            title="Hapus">
+                                            class="btn-icon btn-icon-danger" title="Hapus">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -143,20 +130,19 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center">
-                                    <div class="flex flex-col items-center justify-center">
+                                <td colspan="5" class="table-empty">
+                                    <div class="empty-state">
                                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                             xmlns="http://www.w3.org/2000/svg"
-                                            class="text-gray-300 mb-3">
+                                            class="text-gray-300 dark:text-gray-700 mb-3">
                                             <path
                                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                                 stroke-linejoin="round" />
                                         </svg>
-                                        <span class="block text-gray-500 text-sm font-medium">Belum ada
-                                            data Academy</span>
-                                        <a href="{{ route('academy.create') }}"
-                                            class="mt-3 text-xs text-brand-500 hover:text-brand-600 font-semibold underline">Tambah
+                                        <h4 class="empty-title">Belum ada data Academy</h4>
+                                        <p class="empty-description">Tambah academy sekarang</p>
+                                        <a href="{{ route('academy.create') }}" class="empty-link">Tambah
                                             sekarang</a>
                                     </div>
                                 </td>
@@ -168,64 +154,63 @@
 
             <!-- Pagination -->
             @if ($academies->hasPages())
-                <div class="px-5 py-4 border-t border-gray-100">
+                <div class="table-footer">
                     {{ $academies->links() }}
                 </div>
             @endif
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div x-show="showDeleteModal"
-            class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
+        <div x-show="showDeleteModal" class="modal-overlay flex items-center justify-center p-4"
             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
-            <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl border border-gray-100"
-                @click.away="showDeleteModal = false" x-transition:enter="transition ease-out duration-300 transform"
+            <div class="modal-container modal-md" @click.away="showDeleteModal = false"
+                x-transition:enter="transition ease-out duration-300 transform"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                 x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
 
-                <!-- Icon & Header -->
-                <div class="flex items-center gap-4">
-                    <span
-                        class="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600 flex-shrink-0">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 9V14M12 17.01L12.01 16.9989M12 3L2 21H22L12 3Z" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </span>
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">Konfirmasi Hapus</h3>
-                        <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="modal-header">
+                    <div class="flex items-center gap-4">
+                        <span class="modal-icon modal-icon-danger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 9V14M12 17.01L12.01 16.9989M12 3L2 21H22L12 3Z" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+
+                        <div>
+                            <h3 class="modal-title">Konfirmasi Hapus</h3>
+                            <p class="modal-description">Tindakan ini tidak dapat dibatalkan.</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Body Message -->
-                <div class="mt-4">
-                    <p class="text-sm text-gray-600 leading-relaxed">
-                        Apakah Anda yakin ingin menghapus data Academy <strong class="text-gray-800"
-                            x-text="academyName"></strong>? Semua data terkait dengan akademi ini akan dihapus secara
-                        permanen.
+                <div class="modal-body">
+                    <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                        Apakah Anda yakin ingin menghapus data Academy
+                        <strong class="font-semibold text-gray-800 dark:text-white" x-text="academyName"></strong>?
+                        Semua data terkait dengan akademi ini akan dihapus secara permanen.
                     </p>
                 </div>
 
-                <!-- Footer Buttons -->
-                <div class="mt-6 flex items-center justify-end gap-3">
-                    <button type="button" @click="showDeleteModal = false"
-                        class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="showDeleteModal = false">
                         Batal
                     </button>
-                    <form :action="deleteAction" method="POST" class="inline">
+
+                    <form :action="deleteAction" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
-                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
+
+                        <button type="submit" class="btn btn-danger">
                             Hapus Permanen
                         </button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>

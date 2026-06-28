@@ -15,17 +15,18 @@
         @include('partials.alert')
         <!-- Alerts End -->
 
-        <div class="rounded-2xl border border-gray-200 bg-white">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6 lg:p-8">
 
             <!-- Table Header Actions -->
-            <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100">
+            <div
+                class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-gray-800 pb-5">
 
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
                         Player List
                     </h3>
 
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
                         Manajemen data pemain akademi sepak bola.
                     </p>
                 </div>
@@ -51,38 +52,38 @@
             <div class="max-w-full overflow-x-auto custom-scrollbar">
                 <table class="w-full min-w-[1100px] table-auto text-left">
                     <thead>
-                        <tr class="border-b border-gray-100 bg-gray-50/50">
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
+                        <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-white/[0.01]">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">
                                 Info Player
                             </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">
                                 Profil
                             </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">
                                 Posisi
                             </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 dark:text-gray-400">
                                 Status
                             </th>
-                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 text-right">
+                            <th class="px-5 py-4 text-theme-xs font-semibold text-gray-500 text-right dark:text-gray-400">
                                 Aksi
                             </th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                         @forelse ($players as $player)
                             <tr>
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                            class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-gray-800 flex items-center justify-center">
 
                                             @if ($player->photo && Storage::disk('public')->exists($player->photo))
                                                 <img src="{{ asset('storage/' . $player->photo) }}"
                                                     alt="{{ $player->name }}" class="h-full w-full object-cover">
                                             @else
-                                                <span class="font-bold text-gray-400 text-lg">
+                                                <span class="font-bold text-gray-400 dark:text-gray-600 text-lg">
                                                     {{ Str::upper(Str::substr($player->name ?? 'P', 0, 2)) }}
                                                 </span>
                                             @endif
@@ -105,12 +106,12 @@
                                 </td>
 
                                 <td class="px-5 py-4">
-                                    <span class="block text-theme-sm text-gray-700">
+                                    <span class="block text-theme-sm text-gray-700 dark:text-gray-300">
                                         {{ $player->birth_date ? \Carbon\Carbon::parse($player->birth_date)->format('d M Y') : '-' }}
 
                                     </span>
 
-                                    <span class="block text-theme-xs text-gray-400 mt-0.5">
+                                    <span class="block text-theme-xs text-gray-400 mt-0.5 dark:text-gray-600">
                                         {{ ucfirst($player->gender ?? '-') }}
                                         @if ($player->nationality)
                                             - {{ $player->nationality }}
@@ -119,10 +120,10 @@
                                 </td>
 
                                 <td class="px-5 py-4">
-                                    <span class="block text-theme-sm text-gray-700">
+                                    <span class="block text-theme-sm text-gray-700 dark:text-gray-300">
                                         {{ $player->primary_position ?? '-' }}
                                     </span>
-                                    <span class="block text-theme-xs text-gray-400 mt-0.5">
+                                    <span class="block text-theme-xs text-gray-400 mt-0.5   ">
                                         {{ $player->secondary_position ?? '-' }}
                                     </span>
                                 </td>
