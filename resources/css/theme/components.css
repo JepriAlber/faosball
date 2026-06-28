@@ -13,7 +13,7 @@
 }
 
 @utility card-header {
-    @apply flex flex-col gap-2 p-2 mb-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-400;
+    @apply flex flex-col gap-2 p-2 mb-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 dark:border-gray-600;
 }
 
 @utility card-title {
@@ -404,7 +404,11 @@
 }
 
 @utility avatar-lg {
-    @apply size-14;
+    @apply size-15;
+}
+
+@utility avatar-xl {
+    @apply size-35;
 }
 
 @utility avatar-placeholder {

@@ -66,9 +66,10 @@ class PlayerController extends Controller
     public function edit(Player $player)
     {
 
+        $title = 'Edit Players';
         return view(
             'players.edit',
-            compact('player')
+            compact('player','title')
         );
 
     }
@@ -77,10 +78,10 @@ class PlayerController extends Controller
     public function update(UpdatePlayerRequest $request, Player $player)
     {
 
-        $player->update(
-            $request->validated()
-        );
-
+      $this->playerService->update(
+                $player,
+                $request->validated()
+            );
 
         return redirect()
             ->route('players.index')

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PlayerService
 {
@@ -34,6 +35,16 @@ class PlayerService
             $filename,
             'public'
         );
+    }
+
+    /**
+     * hendel delete foto players 
+     */
+    protected function deletePhoto(?string $photo): void
+    {
+        if ($photo && Storage::disk('public')->exists($photo)) {
+            Storage::disk('public')->delete($photo);
+        }
     }
 
     /*
@@ -143,6 +154,56 @@ class PlayerService
 
         return strtoupper($academy->code) .'-' .$year .'-' .$number;
 
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Player
+    |--------------------------------------------------------------------------
+    */
+    public function update(Player $player, array $data): Player
+    {
+        return DB::transaction(function () use ($player, $data) {
+
+            $oldPhoto = $player->photo;
+            $newPhoto = $oldPhoto;
+
+            if (!empty($data['photo'])) {
+
+                $newPhoto = $this->uploadPhoto(
+                    $data['photo'],
+                    $player->player_code
+                );
+
+            }
+
+            $player->update([
+                'name' => $data['name'],
+                'nick_name' => $data['nick_name'] ?? null,
+                'birth_date' => $data['birth_date'],
+                'gender' => $data['gender'],
+                'nationality' => $data['nationality'] ?? 'Indonesia',
+                'height' => $data['height'] ?? null,
+                'weight' => $data['weight'] ?? null,
+                'preferred_foot' => $data['preferred_foot'] ?? null,
+                'primary_position' => $data['primary_position'],
+                'secondary_position' => $data['secondary_position'] ?? null,
+                'status' => $data['status'] ?? 'active',
+                'photo' => $newPhoto,
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            if (!empty($data['photo']) && $oldPhoto) {
+
+                if (Storage::disk('public')->exists($oldPhoto)) {
+                    Storage::disk('public')->delete($oldPhoto);
+                }
+
+            }
+
+            return $player;
+        });
     }
 
 

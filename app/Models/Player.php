@@ -13,7 +13,6 @@ class Player extends FaosModel
     protected $table = 'players';
     protected $primaryKey = 'id_player';
 
-
     protected $fillable = [
 
         'id_user',
@@ -35,8 +34,6 @@ class Player extends FaosModel
 
     ];
 
-
-
     protected function casts(): array
     {
         return [
@@ -50,15 +47,11 @@ class Player extends FaosModel
         ];
     }
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Relationship Academy
     |--------------------------------------------------------------------------
     */
-
-
     public function academy()
     {
         return $this->belongsTo(
@@ -68,15 +61,11 @@ class Player extends FaosModel
         );
     }
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Relationship User Account
     |--------------------------------------------------------------------------
     */
-
-
     public function user()
     {
         return $this->belongsTo(
@@ -85,7 +74,5 @@ class Player extends FaosModel
             'id_user'
         );
     }
-
-
 
 }

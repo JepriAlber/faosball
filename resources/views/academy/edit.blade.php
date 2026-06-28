@@ -182,7 +182,7 @@
                             {{-- Preview --}}
                             <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
 
-                                <div class="avatar avatar-lg avatar-square mb-3">
+                                <div class="avatar avatar-xl avatar-square mb-3">
                                     <img :src="imagePreview" class="h-full w-full object-cover">
                                 </div>
 

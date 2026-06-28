@@ -89,6 +89,12 @@ class UpdatePlayerRequest extends FormRequest
                 'in:active,inactive,graduated,left'
             ],
 
+            'photo' => [
+                'nullable',
+                'image',
+                'max:2048'
+            ],
+
 
             'notes' => [
                 'nullable',
@@ -107,42 +113,34 @@ class UpdatePlayerRequest extends FormRequest
             'name.string' => 'Nama player harus berupa teks.',
             'name.max' => 'Nama player maksimal :max karakter.',
 
-
             'nick_name.string' => 'Nama panggilan harus berupa teks.',
             'nick_name.max' => 'Nama panggilan maksimal :max karakter.',
-
 
             'birth_date.required' => 'Tanggal lahir wajib diisi.',
             'birth_date.date' => 'Tanggal lahir tidak valid.',
 
-
             'gender.required' => 'Jenis kelamin wajib dipilih.',
             'gender.in' => 'Jenis kelamin yang dipilih tidak valid.',
-
 
             'nationality.string' => 'Kewarganegaraan harus berupa teks.',
             'nationality.max' => 'Kewarganegaraan maksimal :max karakter.',
 
-
             'height.integer' => 'Tinggi badan harus berupa angka.',
-
 
             'weight.integer' => 'Berat badan harus berupa angka.',
 
-
             'preferred_foot.in' => 'Kaki dominan tidak valid.',
-
 
             'primary_position.required' => 'Posisi utama wajib dipilih.',
 
             'primary_position.max' => 'Posisi utama maksimal :max karakter.',
 
-
             'secondary_position.max' => 'Posisi kedua maksimal :max karakter.',
-
 
             'status.in' => 'Status player tidak valid.',
 
+'photo.image' => 'File harus berupa gambar.',
+'photo.max' => 'Ukuran foto maksimal 2 MB.',
 
             'notes.string' => 'Catatan harus berupa teks.',
 
