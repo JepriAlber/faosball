@@ -39,7 +39,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::resource(
-        'academy',
+        'academies',
         AcademyController::class
     );
 

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    // context service / tenant service.
     /**
      * Register any application services.
      */

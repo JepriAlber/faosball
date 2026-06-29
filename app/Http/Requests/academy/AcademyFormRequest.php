@@ -4,6 +4,7 @@ namespace App\Http\Requests\academy;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AcademyFormRequest extends FormRequest
 {
@@ -23,14 +24,60 @@ class AcademyFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:255'],
-            'address' => ['required', 'string'],
-            'tagline' => ['required', 'string', 'max:255'],
-            'status' => ['nullable', 'boolean'],
-            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'],
-            'description' => ['nullable', 'string'],
+            'name' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+            'code' => [
+                'required',
+                'string',
+                'max:10',
+                'alpha_dash',
+                Rule::unique('academies','code')
+                    ->ignore($this->academy?->id_academy,'id_academy')
+            ],
+
+            'phone' => [
+                'required',
+                'string',
+                'max:50'
+            ],
+
+            'email' => [
+                'required',
+                'email',
+                'max:255'
+            ],
+
+            'address' => [
+                'required',
+                'string'
+            ],
+
+            'tagline' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+            'status' => [
+                'nullable',
+                'boolean'
+            ],
+
+            'logo' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp,svg',
+                'max:2048'
+            ],
+
+            'description' => [
+                'nullable',
+                'string'
+            ],
         ];
     }
 
@@ -56,6 +103,9 @@ class AcademyFormRequest extends FormRequest
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Format gambar logo harus berupa: jpeg, png, jpg, webp, atau svg.',
             'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
+            'code.required'=>'Kode academy wajib diisi.',
+            'code.max'=>'Kode academy maksimal 10 karakter.',
+            'code.alpha_dash'=>'Kode academy hanya boleh berisi huruf, angka, dan tanda strip.',
         ];
     }
 }

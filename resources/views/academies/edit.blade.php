@@ -11,21 +11,22 @@
         <div class="card-header">
 
             <div>
-                <h3 class="card-title">Informasi Profil Academy</h3>
-                <p class="card-description">Masukkan detail lengkap untuk mendaftarkan akademi baru.</p>
+                <h3 class="card-title">Ubah Profil Academy</h3>
+                <p class="card-description">Perbarui rincian informasi untuk akademi {{ $academy->name }}.</p>
             </div>
 
             <div class="card-actions">
-                <a href="{{ route('academy.index') }}" class="btn btn-secondary">
+                <a href="{{ route('academies.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
             </div>
 
         </div>
 
-        <form action="{{ route('academy.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('academies.update', $academy->id_academy) }}" method="POST" enctype="multipart/form-data">
 
             @csrf
+            @method('PUT')
 
             <div class="form-row">
 
@@ -39,15 +40,13 @@
                             Nama Academy <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" id="name" name="name" value="{{ old('name') }}"
-                            placeholder="Masukkan nama akademi"
-                            class="form-input @error('name') form-danger @elseif(old('name')) form-success @enderror"
+                        <input type="text" id="name" name="name" value="{{ old('name', $academy->name) }}"
+                            placeholder="Masukkan nama akademi" class="form-input @error('name') form-danger @enderror"
                             required>
 
                         @error('name')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
-
 
                     </div>
 
@@ -58,7 +57,7 @@
                             Tagline / Slogan <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" id="tagline" name="tagline" value="{{ old('tagline') }}"
+                        <input type="text" id="tagline" name="tagline" value="{{ old('tagline', $academy->tagline) }}"
                             placeholder="Contoh: Maju Bersama Sepakbola"
                             class="form-input @error('tagline') form-danger @enderror" required>
 
@@ -68,6 +67,21 @@
 
                     </div>
 
+                    {{-- code --}}
+
+                    <div>
+                        <label class="form-label">
+                            Kode Academy <span class="text-error-500">*</span>
+                        </label>
+
+                        <input type="text" name="code" value="{{ old('code', $academy->code) }}"
+                            class="form-input  @error('code') form-danger @enderror" required placeholder="Contoh: FAOS">
+
+                        @error('code')
+                            <span class="form-error"> {{ $message }} </span>
+                        @enderror
+                    </div>
+
                     {{-- Phone --}}
                     <div class="form-group">
 
@@ -75,7 +89,7 @@
                             Nomor Telepon <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
+                        <input type="text" id="phone" name="phone" value="{{ old('phone', $academy->phone) }}"
                             placeholder="Contoh: 08123456789" class="form-input @error('phone') form-danger @enderror"
                             required>
 
@@ -92,7 +106,7 @@
                             Email <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                        <input type="email" id="email" name="email" value="{{ old('email', $academy->email) }}"
                             placeholder="Contoh: info@akademi.com" class="form-input @error('email') form-danger @enderror"
                             required>
 
@@ -109,7 +123,7 @@
                             Status Aktif
                         </label>
 
-                        <div x-data="{ switcherOn: {{ old('status', true) ? 'true' : 'false' }} }">
+                        <div x-data="{ switcherOn: {{ old('status', $academy->status) ? 'true' : 'false' }} }">
 
                             <label class="flex cursor-pointer items-center">
 
@@ -131,12 +145,11 @@
 
                 </div>
 
-
                 {{-- Right Column --}}
                 <div>
 
                     {{-- Logo --}}
-                    <div class="form-group" x-data="{ imagePreview: null }">
+                    <div class="form-group" x-data="{ imagePreview: '{{ $academy->logo ? asset('storage/' . $academy->logo) : '' }}' }">
 
                         <label class="form-label">
                             Logo Academy
@@ -147,23 +160,26 @@
                             <input type="file" id="logo" name="logo"
                                 class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" accept="image/*"
                                 @change="
-                            const file=$event.target.files[0];
-                            if(file){
-                                const reader=new FileReader();
-                                reader.onload=(e)=>imagePreview=e.target.result;
-                                reader.readAsDataURL(file);
-                            }
-                        ">
+                                const file=$event.target.files[0];
+                                if(file){
+                                    const reader=new FileReader();
+                                    reader.onload=(e)=>imagePreview=e.target.result;
+                                    reader.readAsDataURL(file);
+                                }
+                            ">
 
+                            {{-- Empty State --}}
                             <div x-show="!imagePreview" class="empty-state">
 
                                 <span class="avatar avatar-lg mb-3">
+
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                         <path
                                             d="M12 16V8M8 12L12 8L16 12M3 15V18C3 18.5 3.2 19 3.6 19.4C4 19.8 4.5 20 5 20H19C19.5 20 20 19.8 20.4 19.4C20.8 19 21 18.5 21 18V15"
                                             stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                             stroke-linejoin="round" />
                                     </svg>
+
                                 </span>
 
                                 <p class="empty-title">
@@ -176,9 +192,10 @@
 
                             </div>
 
+                            {{-- Preview --}}
                             <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
 
-                                <div class="avatar avatar-lg avatar-square mb-3">
+                                <div class="avatar avatar-xl avatar-square mb-3">
                                     <img :src="imagePreview" class="h-full w-full object-cover">
                                 </div>
 
@@ -204,7 +221,7 @@
                         </label>
 
                         <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap akademi"
-                            class="form-textarea @error('address') form-danger @enderror" required>{{ old('address') }}</textarea>
+                            class="form-textarea @error('address') form-danger @enderror" required>{{ old('address', $academy->address) }}</textarea>
 
                         @error('address')
                             <span class="form-error">{{ $message }}</span>
@@ -221,7 +238,7 @@
 
                         <textarea id="description" name="description" rows="3"
                             placeholder="Jelaskan secara singkat mengenai profil akademi Anda"
-                            class="form-textarea @error('description') form-danger @enderror">{{ old('description') }}</textarea>
+                            class="form-textarea @error('description') form-danger @enderror">{{ old('description', $academy->description) }}</textarea>
 
                         @error('description')
                             <span class="form-error">{{ $message }}</span>
@@ -232,7 +249,6 @@
                 </div>
 
             </div>
-
             {{-- Submit --}}
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
@@ -241,7 +257,7 @@
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Academy
+                    Perbarui Academy
                 </button>
 
             </div>

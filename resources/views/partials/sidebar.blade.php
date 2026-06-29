@@ -273,11 +273,11 @@
 
                     <!-- ===== Menu Item: Academy ===== -->
                     @php
-                        $isAcademyActive = Route::is('academy.*');
+                        $isAcademyActive = Route::is('academies.*');
                     @endphp
 
                     <li>
-                        <a href="{{ route('academy.index') }}"
+                        <a href="{{ route('academies.index') }}"
                             class="menu-item group {{ $isAcademyActive ? 'menu-item-active' : 'menu-item-inactive' }}">
                             <svg class="{{ $isAcademyActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"

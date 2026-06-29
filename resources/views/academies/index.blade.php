@@ -20,7 +20,7 @@
                     sepak bola.</p>
             </div>
             <div class="card-actions">
-                <a href="{{ route('academy.create') }}" class="btn btn-primary">
+                <a href="{{ route('academies.create') }}" class="btn btn-primary">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                             stroke-linejoin="round" />
@@ -58,7 +58,7 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <a href="{{ route('academy.show', $academy->id_academy) }}" class="table-title">
+                                        <a href="{{ route('academies.show', $academy->id_academy) }}" class="table-title">
                                             {{ $academy->name }}
                                         </a>
                                         <span class="table-subtitle">
@@ -87,7 +87,7 @@
                             </td>
                             <td class="table-cell text-right">
                                 <div class="table-action">
-                                    <a href="{{ route('academy.show', $academy->id_academy) }}"
+                                    <a href="{{ route('academies.show', $academy->id_academy) }}"
                                         class="btn-icon btn-icon-primary" title="Detail">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +101,7 @@
                                                 stroke-linejoin="round" />
                                         </svg>
                                     </a>
-                                    <a href="{{ route('academy.edit', $academy->id_academy) }}"
+                                    <a href="{{ route('academies.edit', $academy->id_academy) }}"
                                         class="btn-icon btn-icon-warning" title="Edit">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
@@ -110,7 +110,7 @@
                                                 stroke-linejoin="round" />
                                         </svg>
                                     </a>
-                                    <x-button.delete :action="route('academy.destroy', $academy->id_academy)" :name="$academy->name" />
+                                    <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
                                 </div>
                             </td>
                         </tr>
@@ -127,7 +127,7 @@
                                     </svg>
                                     <h4 class="empty-title">Belum ada data Academy</h4>
                                     <p class="empty-description">Tambah academy sekarang</p>
-                                    <a href="{{ route('academy.create') }}" class="empty-link">Tambah
+                                    <a href="{{ route('academies.create') }}" class="empty-link">Tambah
                                         sekarang</a>
                                 </div>
                             </td>

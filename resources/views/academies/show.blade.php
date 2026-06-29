@@ -28,11 +28,11 @@
             </div>
 
             <div class="card-actions">
-                <a href="{{ route('academy.index') }}" class="btn btn-secondary">
+                <a href="{{ route('academies.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
 
-                <a href="{{ route('academy.edit', $academy->id_academy) }}" class="btn btn-primary">
+                <a href="{{ route('academies.edit', $academy->id_academy) }}" class="btn btn-primary">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
