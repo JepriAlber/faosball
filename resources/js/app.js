@@ -1,12 +1,13 @@
 import Alpine from 'alpinejs'
 import persist from '@alpinejs/persist'
 import focus from '@alpinejs/focus'
+import deleteModal from './components/delete-modal'
 
-// Register plugins BEFORE start
 Alpine.plugin(persist)
 Alpine.plugin(focus)
 
-// Expose Alpine globally (diperlukan oleh beberapa komponen inline)
+Alpine.data('deleteModal', deleteModal)
+
 window.Alpine = Alpine
 
 Alpine.start()

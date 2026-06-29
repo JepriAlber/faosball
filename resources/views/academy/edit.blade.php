@@ -4,9 +4,7 @@
 
 @section('content')
 
-    <div x-data="{ pageName: @js($title) }">
-        @include('partials.breadcrumb')
-    </div>
+    <x-breadcrumb :title="$title" :items="$breadcrumb" />
 
     <div class="card">
 

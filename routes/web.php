@@ -25,7 +25,6 @@ Route::middleware('auth')->group(function () {
     | Dashboard
     |--------------------------------------------------------------------------
     */
-
     Route::get('/dashboard', function () {
 
         return view('dashboard');
@@ -34,27 +33,21 @@ Route::middleware('auth')->group(function () {
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Academy Management
     |--------------------------------------------------------------------------
     */
-
     Route::resource(
         'academy',
         AcademyController::class
     );
-
-
 
     /*
     |--------------------------------------------------------------------------
     | Player Management
     |--------------------------------------------------------------------------
     */
-
     Route::get('/players/{player}/account/create', 
         [PlayerController::class, 'createAccount']
     )->name('players.account.create');
@@ -64,14 +57,11 @@ Route::middleware('auth')->group(function () {
         PlayerController::class
     );
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Profile
     |--------------------------------------------------------------------------
     */
-
     Route::get('/profile', [
         ProfileController::class,
         'edit'
@@ -91,7 +81,6 @@ Route::middleware('auth')->group(function () {
         'destroy'
     ])
     ->name('profile.destroy');
-
 
 });
 

@@ -15,19 +15,34 @@ class AcademyController extends Controller
      */
     public function index()
     {
-        $title = 'Manajemen Academy';
-        $academies = Academy::latest()->paginate(10);
-
-        return view('academy.index', compact('academies', 'title'));
+         return view('academy.index',[
+            'title'=>'Manajemen Academy',
+            'breadcrumb'=>[
+                [
+                    'label'=>'Manajemen Academy'
+                ]
+            ],
+            'academies' => Academy::latest()->paginate(10)
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        $title = 'Tambah Academy';
-        return view('academy.create', compact('title'));
+    { 
+         return view('academy.create',[
+            'title'=>'Tambah Academy',
+            'breadcrumb'=>[
+                [
+                    'label'=>'Manajemen Academy',
+                    'url'=>route('academy.index')
+                ],
+                [
+                    'label'=>'Tambah Academy'
+                ]
+            ],
+        ]);
     }
 
     /**
@@ -74,10 +89,21 @@ class AcademyController extends Controller
      */
     public function show(string $id)
     {
-        $title = 'Detail Academy';
         $academy = Academy::findOrFail($id);
 
-        return view('academy.show', compact('academy', 'title'));
+        return view('academy.show', [
+            'title' => 'Detail Academy',
+            'breadcrumb' => [
+                [
+                    'label' => 'Manajemen Academy',
+                    'url' => route('academy.index')
+                ],
+                [
+                    'label' => 'Detail Academy'
+                ]
+            ],
+            'academy' => $academy
+        ]);
     }
 
     /**
@@ -85,10 +111,21 @@ class AcademyController extends Controller
      */
     public function edit(string $id)
     {   
-        $title = 'Edit Academy';
         $academy = Academy::findOrFail($id);
 
-        return view('academy.edit', compact('academy', 'title'));
+         return view('academy.edit', [
+            'title' => 'Edit Academy',
+            'breadcrumb' => [
+                [
+                    'label' => 'Manajemen Academy',
+                    'url' => route('academy.index')
+                ],
+                [
+                    'label' => 'Edit Academy'
+                ]
+            ],
+            'academy' => $academy
+        ]);
     }
 
     /**

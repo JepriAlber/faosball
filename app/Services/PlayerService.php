@@ -129,31 +129,34 @@ class PlayerService
 
     protected function generatePlayerCode(): string
     {
+        $academy=$this->academyService->current();
 
-        $academy = $this->academyService->current();
-
-        if (!$academy) {
-            throw new \Exception(
-                'Academy tidak ditemukan.'
-            );
+        if(!$academy){
+            throw new \Exception('Academy tidak ditemukan.');
         }
 
-        $year = now()->format('Y');
-        $lastPlayer = Player::withoutGlobalScopes()
-            ->where(
-                'id_academy',
-                $academy->id_academy
-            )
-            ->whereYear(
-                'created_at',
-                $year
-            )
-            ->count();
+        $prefix=strtoupper($academy->code).now()->format('y');
 
-        $number = str_pad($lastPlayer + 1, 5, '0', STR_PAD_LEFT );
+        $lastPlayer=Player::withoutGlobalScopes()
+            ->where('id_academy',$academy->id_academy)
+            ->where('player_code','like',$prefix.'%')
+            ->orderByDesc('player_code')
+            ->lockForUpdate()
+            ->first();
 
-        return strtoupper($academy->code) .'-' .$year .'-' .$number;
+        $number=1;
 
+        if($lastPlayer){
+            $number=((int)substr($lastPlayer->player_code,-5))+1;
+        }
+
+        $code=$prefix.str_pad($number,5,'0',STR_PAD_LEFT);
+
+        if(Player::withoutGlobalScopes()->where('player_code',$code)->exists()){
+            return $this->generatePlayerCode();
+        }
+
+        return $code;
     }
 
 

@@ -21,28 +21,39 @@ class PlayerController extends Controller
         $this->playerService = $playerService;
 
     }
-
-
+ 
 
     public function index()
     {
 
-        $players = Player::latest() ->paginate(10);
-        return view('players.index', [
-            'players' => $players,
-            'title' => 'Players'
-        ]); 
+        return view('players.index',[
+        'title'=>'Players',
+        'breadcrumb'=>[
+            [
+                'label'=>'Players'
+            ]
+        ],
+        'players'=>Player::latest()->paginate(10),
+    ]);
 
     }
 
 
-    public function create()
-    {
-        return view(
-            'players.create',
-            ['title' => 'Tambah Player']
-        );
-    }
+   public function create()
+{
+    return view('players.create',[
+        'title'=>'Create Player',
+        'breadcrumb'=>[
+            [
+                'label'=>'Players',
+                'url'=>route('players.index')
+            ],
+            [
+                'label'=>'Create'
+            ]
+        ],
+    ]);
+}
 
 
     public function store(StorePlayerRequest $request)
@@ -62,17 +73,22 @@ class PlayerController extends Controller
 
     }
 
-
-    public function edit(Player $player)
-    {
-
-        $title = 'Edit Players';
-        return view(
-            'players.edit',
-            compact('player','title')
-        );
-
-    }
+public function edit(Player $player)
+{
+    return view('players.edit',[
+        'title'=>'Edit Player',
+        'breadcrumb'=>[
+            [
+                'label'=>'Players',
+                'url'=>route('players.index')
+            ],
+            [
+                'label'=>'Edit'
+            ]
+        ],
+        'player'=>$player,
+    ]);
+}
 
 
     public function update(UpdatePlayerRequest $request, Player $player)
