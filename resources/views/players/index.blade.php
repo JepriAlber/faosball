@@ -6,6 +6,10 @@
 
     <x-breadcrumb :title="$title" :items="$breadcrumb" />
 
+    <!-- Alerts -->
+    <x-alert />
+    <!-- Alerts End -->
+
     <div class="card">
 
         <div class="card-header">

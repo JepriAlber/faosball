@@ -142,12 +142,4 @@ class PlayerController extends Controller
         }
     }
 
-
-    public function createAccount(Player $player)
-    {
-        return view('players.account.create', [
-            'title'=>'Buat Akun Player',
-            'player'=>$player
-        ]);
-    }
 }

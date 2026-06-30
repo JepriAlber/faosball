@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\AcademyController;
+use App\Http\Controllers\PlayerAccountController;
+use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AcademyController;
-use App\Http\Controllers\PlayerController;
 
 
 
@@ -45,13 +46,22 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Player Management
+    | Player Account Management
     |--------------------------------------------------------------------------
-    */
-    Route::get('/players/{player}/account/create', 
-        [PlayerController::class, 'createAccount']
+    */ 
+    Route::get('/players/{player}/account/create',
+        [PlayerAccountController::class, 'create']
     )->name('players.account.create');
 
+    Route::post('/players/{player}/account',
+        [PlayerAccountController::class,'store']
+    )->name('players.account.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Player Management
+    |--------------------------------------------------------------------------
+    */ 
     Route::resource(
         'players',
         PlayerController::class
