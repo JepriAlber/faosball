@@ -154,12 +154,6 @@ class StorePlayerRequest extends FormRequest
 
             'notes.string' => 'Catatan harus berupa teks.',
 
-            /*
-            |--------------------------------------------------------------------------
-            | Account Player
-            |--------------------------------------------------------------------------
-            */
-
             'email.required_if' => 'Email akun player wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan oleh akun lain.',

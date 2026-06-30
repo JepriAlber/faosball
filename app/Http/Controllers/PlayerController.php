@@ -11,12 +11,10 @@ class PlayerController extends Controller
 {
     protected PlayerService $playerService;
 
-
     public function __construct(PlayerService $playerService)
     {
         $this->playerService = $playerService;
     }
-
 
     public function index()
     {
@@ -30,7 +28,6 @@ class PlayerController extends Controller
             'players'=>Player::latest()->paginate(10),
         ]);
     }
-
 
     public function create()
     {
@@ -48,7 +45,6 @@ class PlayerController extends Controller
         ]);
     }
 
-
     public function store(StorePlayerRequest $request)
     {
         try {
@@ -57,14 +53,12 @@ class PlayerController extends Controller
                 $request->validated()
             );
 
-
             return redirect()
                 ->route('players.index')
                 ->with(
                     'success',
                     'Player berhasil dibuat.'
                 );
-
 
         } catch (\Exception $e) {
 
@@ -76,7 +70,6 @@ class PlayerController extends Controller
                 );
         }
     }
-
 
     public function edit(Player $player)
     {
@@ -95,7 +88,6 @@ class PlayerController extends Controller
         ]);
     }
 
-
     public function update(UpdatePlayerRequest $request, Player $player)
     {
         try {
@@ -105,14 +97,12 @@ class PlayerController extends Controller
                 $request->validated()
             );
 
-
             return redirect()
                 ->route('players.index')
                 ->with(
                     'success',
                     'Player berhasil diperbarui.'
                 );
-
 
         } catch (\Exception $e) {
 
@@ -134,14 +124,12 @@ class PlayerController extends Controller
                 $player
             );
 
-
             return redirect()
                 ->route('players.index')
                 ->with(
                     'success',
                     'Player berhasil dihapus.'
                 );
-
 
         } catch (\Exception $e) {
 
