@@ -69,13 +69,14 @@ Route::middleware('auth')->group(function () {
             [PlayerAccountController::class,'update']
         )->name('update');
 
+        
         // Route::patch('/status',
         //     [PlayerAccountController::class,'status']
         // )->name('status');
 
-        // Route::patch('/password',
-        //     [PlayerAccountController::class,'password']
-        // )->name('password');
+        Route::patch('/password',
+            [PlayerAccountController::class,'password']
+        )->name('password');
 
     });
 

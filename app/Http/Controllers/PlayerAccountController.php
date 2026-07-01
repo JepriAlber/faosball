@@ -85,66 +85,106 @@ class PlayerAccountController extends Controller
     
 
 
-public function edit(Player $player)
-{
-    if (!$player->user) {
-        return redirect()
-            ->route('players.show',$player)
-            ->with('error','Player belum memiliki akun.');
-    }
-
-    return view('players.account.edit',[
-        'title'=>'Edit Akun Player',
-        'player'=>$player,
-        'user'=>$player->user,
-        'breadcrumb'=>[
-            [
-                'label'=>'Players',
-                'url'=>route('players.index')
-            ],
-            [
-                'label'=>$player->name,
-                'url'=>route('players.show',$player)
-            ],
-            [
-                'label'=>'Edit Account'
-            ]
-        ],
-    ]);
-}
-
-
-public function update(UpdatePlayerAccountRequest $request,Player $player)
-{
-    try {
-
+    public function edit(Player $player)
+    {
         if (!$player->user) {
             return redirect()
                 ->route('players.show',$player)
                 ->with('error','Player belum memiliki akun.');
         }
 
-        $this->accountService->update(
-            $player->user,
-            $request->validated()
-        );
-
-        return redirect()
-            ->route('players.show',$player)
-            ->with(
-                'success',
-                'Account player berhasil diperbarui.'
-            );
-
-    } catch(\Exception $e){
-
-        return back()
-            ->withInput()
-            ->with(
-                'error',
-                'Gagal update account: '.$e->getMessage()
-            );
-
+        return view('players.account.edit',[
+            'title'=>'Edit Akun Player',
+            'player'=>$player,
+            'user'=>$player->user,
+            'breadcrumb'=>[
+                [
+                    'label'=>'Players',
+                    'url'=>route('players.index')
+                ],
+                [
+                    'label'=>$player->name,
+                    'url'=>route('players.show',$player)
+                ],
+                [
+                    'label'=>'Edit Account'
+                ]
+            ],
+        ]);
     }
-}
+
+
+    public function update(UpdatePlayerAccountRequest $request,Player $player)
+    {
+        try {
+
+            if (!$player->user) {
+                return redirect()
+                    ->route('players.show',$player)
+                    ->with('error','Player belum memiliki akun.');
+            }
+
+            $this->accountService->update(
+                $player->user,
+                $request->validated()
+            );
+
+            return redirect()
+                ->route('players.show',$player)
+                ->with(
+                    'success',
+                    'Account player berhasil diperbarui.'
+                );
+
+        } catch(\Exception $e){
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Gagal update account: '.$e->getMessage()
+                );
+
+        }
+    }
+
+    public function password(Player $player)
+    {
+        try {
+
+            if (!$player->user) {
+                return redirect()
+                    ->route('players.show',$player)
+                    ->with('error','Player belum memiliki akun.');
+            }
+
+
+            $newPassword = str()->random(8);
+
+
+            $this->accountService->resetPassword(
+                $player->user,
+                $newPassword
+            );
+
+
+            return redirect()
+                ->route('players.show',$player)
+                ->with(
+                    'success',
+                    'Password berhasil direset. Password baru: '.$newPassword
+                );
+
+
+        } catch(\Exception $e){
+
+            return redirect()
+                ->route('players.show',$player)
+                ->with(
+                    'error',
+                    'Gagal reset password: '.$e->getMessage()
+                );
+
+        }
+    }
 }

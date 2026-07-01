@@ -68,9 +68,15 @@
                             </a>
 
 
-                            <button type="button" class="dropdown-item">
-                                Reset Password
-                            </button>
+                            <form action="{{ route('players.account.password', $player) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+
+                                <button type="submit" class="dropdown-item-danger w-full text-left">
+                                    Reset Password
+                                </button>
+
+                            </form>
 
 
                             <div class="dropdown-divider"></div>
