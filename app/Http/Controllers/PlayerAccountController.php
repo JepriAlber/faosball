@@ -159,7 +159,7 @@ class PlayerAccountController extends Controller
             }
 
 
-            $newPassword = str()->random(8);
+            $newPassword=$this->accountService->generatePassword();
 
 
             $this->accountService->resetPassword(
