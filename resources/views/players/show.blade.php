@@ -46,7 +46,7 @@
                 </a>
 
 
-                <div x-data="{ open: false }" class="relative">
+                <div x-data="{ open: false, showResetPassword: false }" class="relative">
 
                     <button type="button" @click="open=!open" @click.outside="open=false" class="btn btn-secondary">
 
@@ -68,15 +68,13 @@
                             </a>
 
 
-                            <form action="{{ route('players.account.password', $player) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-
-                                <button type="submit" class="dropdown-item-danger w-full text-left">
-                                    Reset Password
-                                </button>
-
-                            </form>
+                            <button type="button" class="dropdown-item-danger w-full text-left"
+                                @click="$dispatch('reset-password-confirm',{
+        action:'{{ route('players.account.password', $player) }}',
+        name:'{{ $player->name }}'
+    })">
+                                Reset Password
+                            </button>
 
 
                             <div class="dropdown-divider"></div>
@@ -503,5 +501,5 @@
 
     </div>
 
-
+    <x-modal.reset-password />
 @endsection
