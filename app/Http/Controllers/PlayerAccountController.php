@@ -187,4 +187,46 @@ class PlayerAccountController extends Controller
 
         }
     }
+
+    public function status(Player $player)
+    {
+        try {
+
+            if (!$player->user) {
+                return redirect()
+                    ->route('players.show',$player)
+                    ->with('error','Player belum memiliki akun.');
+            }
+
+
+            $status = !$player->user->status;
+
+
+            $this->accountService->changeStatus(
+                $player->user,
+                $status
+            );
+
+
+            return redirect()
+                ->route('players.show',$player)
+                ->with(
+                    'success',
+                    $status
+                        ? 'Account player berhasil diaktifkan.'
+                        : 'Account player berhasil dinonaktifkan.'
+                );
+
+
+        } catch(\Exception $e){
+
+            return redirect()
+                ->route('players.show',$player)
+                ->with(
+                    'error',
+                    'Gagal mengubah status account: '.$e->getMessage()
+                );
+
+        }
+    }
 }

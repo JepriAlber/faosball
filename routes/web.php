@@ -70,9 +70,9 @@ Route::middleware('auth')->group(function () {
         )->name('update');
 
         
-        // Route::patch('/status',
-        //     [PlayerAccountController::class,'status']
-        // )->name('status');
+        Route::patch('/status',
+            [PlayerAccountController::class,'status']
+        )->name('status');
 
         Route::patch('/password',
             [PlayerAccountController::class,'password']

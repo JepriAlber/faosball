@@ -82,9 +82,22 @@
                             <div class="dropdown-divider"></div>
 
 
-                            <button type="button" class="dropdown-item-danger">
-                                Disable Account
-                            </button>
+                            <form action="{{ route('players.account.status', $player) }}" method="POST">
+
+                                @csrf
+                                @method('PATCH')
+
+                                @if ($player->user->status)
+                                    <button type="submit" class="dropdown-item-danger w-full text-left">
+                                        Disable Account
+                                    </button>
+                                @else
+                                    <button type="submit" class="dropdown-item w-full text-left">
+                                        Enable Account
+                                    </button>
+                                @endif
+
+                            </form>
                         @else
                             <a href="{{ route('players.account.create', $player->id_player) }}" class="dropdown-item">
 
@@ -342,13 +355,13 @@
                                 Status Player
                             </span>
 
-                            @if ($player->status)
+                            @if ($player->user->status)
                                 <span class="badge badge-success">
-                                    Aktif
+                                    Active
                                 </span>
                             @else
                                 <span class="badge badge-danger">
-                                    Nonaktif
+                                    Disabled
                                 </span>
                             @endif
 
