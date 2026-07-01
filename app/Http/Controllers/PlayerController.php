@@ -71,6 +71,28 @@ class PlayerController extends Controller
         }
     }
 
+    public function show(Player $player)
+    {
+        $player->load([
+            'academy',
+            'user.roles'
+        ]);
+
+        return view('players.show',[
+            'title'=>'Detail Player',
+            'breadcrumb'=>[
+                [
+                    'label'=>'Players',
+                    'url'=>route('players.index')
+                ],
+                [
+                    'label'=>'Detail Player'
+                ]
+            ],
+            'player'=>$player
+        ]);
+    }
+
     public function edit(Player $player)
     {
         return view('players.edit',[

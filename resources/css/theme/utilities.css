@@ -123,3 +123,7 @@
 @utility checkbox-active {
     @apply border-brand-500 bg-brand-500;
 }
+
+@utility cloak {
+    display: none !important;
+}

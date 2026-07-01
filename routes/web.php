@@ -60,14 +60,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/',
             [PlayerAccountController::class,'store']
         )->name('store');
+ 
+        Route::get('/edit',
+            [PlayerAccountController::class,'edit']
+        )->name('edit');
 
-        // Route::get('/edit',
-        //     [PlayerAccountController::class,'edit']
-        // )->name('edit');
-
-        // Route::put('/',
-        //     [PlayerAccountController::class,'update']
-        // )->name('update');
+        Route::put('/',
+            [PlayerAccountController::class,'update']
+        )->name('update');
 
         // Route::patch('/status',
         //     [PlayerAccountController::class,'status']
