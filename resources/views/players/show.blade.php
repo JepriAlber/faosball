@@ -46,60 +46,9 @@
                 </a>
 
 
-                <div x-data="{ open: false, showResetPassword: false }" class="relative">
-
-                    <button type="button" @click="open=!open" @click.outside="open=false" class="btn btn-secondary">
-
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M10 4.5V4.51M10 10V10.01M10 15.5V15.51" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" />
-                        </svg>
-
-                    </button>
-
-
-                    <div x-show="open" x-cloak class="dropdown-menu right-0">
-
-                        @if ($player->user)
-                            <a href="{{ route('players.account.edit', $player->id_player) }}" class="dropdown-item">
-
-                                Edit Account
-
-                            </a>
-
-
-                            <button type="button" class="dropdown-item-danger w-full text-left"
-                                @click="$dispatch('reset-password-confirm',{
-                                            action:'{{ route('players.account.password', $player) }}',
-                                            name:'{{ $player->name }}'
-                                        })">
-                                Reset Password
-                            </button>
-
-
-                            <div class="dropdown-divider"></div>
-
-
-                            <button type="button" class="w-full text-left"
-                                :class="{{ $player->user->status ? "'dropdown-item-danger'" : "'dropdown-item-success'" }}"
-                                @click="$dispatch('status-confirm',{
-                                        action:'{{ route('players.account.status', $player) }}',
-                                        name:'{{ $player->name }}',
-                                        status: {{ $player->user->status ? 'true' : 'false' }}
-                                    })">
-                                {{ $player->user->status ? 'Disable Account' : 'Enable Account' }}
-                            </button>
-                        @else
-                            <a href="{{ route('players.account.create', $player->id_player) }}" class="dropdown-item">
-
-                                Buat Account
-
-                            </a>
-                        @endif
-
-                    </div>
-
-                </div>
+                <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
+                    route-edit="players.account.edit" route-password="players.account.password"
+                    route-status="players.account.status" />
 
             </div>
 
