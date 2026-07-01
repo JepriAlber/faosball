@@ -70,9 +70,9 @@
 
                             <button type="button" class="dropdown-item-danger w-full text-left"
                                 @click="$dispatch('reset-password-confirm',{
-        action:'{{ route('players.account.password', $player) }}',
-        name:'{{ $player->name }}'
-    })">
+                                            action:'{{ route('players.account.password', $player) }}',
+                                            name:'{{ $player->name }}'
+                                        })">
                                 Reset Password
                             </button>
 
@@ -80,22 +80,15 @@
                             <div class="dropdown-divider"></div>
 
 
-                            <form action="{{ route('players.account.status', $player) }}" method="POST">
-
-                                @csrf
-                                @method('PATCH')
-
-                                @if ($player->user->status)
-                                    <button type="submit" class="dropdown-item-danger w-full text-left">
-                                        Disable Account
-                                    </button>
-                                @else
-                                    <button type="submit" class="dropdown-item w-full text-left">
-                                        Enable Account
-                                    </button>
-                                @endif
-
-                            </form>
+                            <button type="button" class="w-full text-left"
+                                :class="{{ $player->user->status ? "'dropdown-item-danger'" : "'dropdown-item-success'" }}"
+                                @click="$dispatch('status-confirm',{
+                                        action:'{{ route('players.account.status', $player) }}',
+                                        name:'{{ $player->name }}',
+                                        status: {{ $player->user->status ? 'true' : 'false' }}
+                                    })">
+                                {{ $player->user->status ? 'Disable Account' : 'Enable Account' }}
+                            </button>
                         @else
                             <a href="{{ route('players.account.create', $player->id_player) }}" class="dropdown-item">
 
@@ -502,4 +495,5 @@
     </div>
 
     <x-modal.reset-password />
+    <x-modal.status />
 @endsection

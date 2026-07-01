@@ -377,6 +377,10 @@
     @apply flex items-center rounded-lg px-3 py-2 text-sm text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10;
 }
 
+@utility dropdown-item-success {
+    @apply flex items-center rounded-lg px-3 py-2 text-sm text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10;
+}
+
 /* Modal */
 @utility modal-sm {
     @apply max-w-md;
