@@ -6,6 +6,8 @@
 
     <x-breadcrumb :title="$title" :items="$breadcrumb" />
 
+    <x-alert />
+
     <div class="card">
 
         <div class="card-header">
@@ -13,8 +15,9 @@
                 <h3 class="card-title">
                     Buat Akun Player
                 </h3>
+
                 <p class="card-description">
-                    Membuat akun login untuk {{ $player->name }}.
+                    Membuat akun login untuk <strong>{{ $player->name }}</strong>.
                 </p>
             </div>
 
@@ -25,15 +28,14 @@
             </div>
         </div>
 
-
-        <form action="{{ route('players.account.store', $player->id_player) }}" method="POST">
+        <form action="{{ route('players.account.store', $player) }}" method="POST">
             @csrf
 
             <div class="p-5">
 
                 <div class="form-group">
                     <label class="form-label">
-                        Email
+                        Email <span class="text-error-500">*</span>
                     </label>
 
                     <input type="email" name="email" value="{{ old('email') }}"
@@ -42,14 +44,13 @@
                     @error('email')
                         <span class="form-error">{{ $message }}</span>
                     @enderror
-
                 </div>
 
 
                 <div class="form-group">
 
                     <label class="form-label">
-                        Password
+                        Password <span class="text-error-500">*</span>
                     </label>
 
                     <input type="password" name="password" class="form-input @error('password') form-danger @enderror">
@@ -64,7 +65,7 @@
                 <div class="form-group">
 
                     <label class="form-label">
-                        Konfirmasi Password
+                        Konfirmasi Password <span class="text-error-500">*</span>
                     </label>
 
                     <input type="password" name="password_confirmation" class="form-input">

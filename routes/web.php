@@ -49,13 +49,35 @@ Route::middleware('auth')->group(function () {
     | Player Account Management
     |--------------------------------------------------------------------------
     */ 
-    Route::get('/players/{player}/account/create',
-        [PlayerAccountController::class, 'create']
-    )->name('players.account.create');
+    Route::prefix('players/{player}/account')
+    ->name('players.account.')
+    ->group(function(){
 
-    Route::post('/players/{player}/account',
-        [PlayerAccountController::class,'store']
-    )->name('players.account.store');
+        Route::get('/create',
+            [PlayerAccountController::class,'create']
+        )->name('create');
+
+        Route::post('/',
+            [PlayerAccountController::class,'store']
+        )->name('store');
+
+        // Route::get('/edit',
+        //     [PlayerAccountController::class,'edit']
+        // )->name('edit');
+
+        // Route::put('/',
+        //     [PlayerAccountController::class,'update']
+        // )->name('update');
+
+        // Route::patch('/status',
+        //     [PlayerAccountController::class,'status']
+        // )->name('status');
+
+        // Route::patch('/password',
+        //     [PlayerAccountController::class,'password']
+        // )->name('password');
+
+    });
 
     /*
     |--------------------------------------------------------------------------

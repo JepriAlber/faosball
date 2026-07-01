@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountService
 {
-    public function create(array $data, string $role): User
+    public function create(array $data,string $role): User
     {
         return DB::transaction(function () use ($data,$role) {
 
-            $user = User::create([
+            $user=User::create([
                 'id_academy'=>$data['id_academy'],
                 'name'=>$data['name'],
                 'email'=>$data['email'],
@@ -23,10 +23,8 @@ class AccountService
             $user->assignRole($role);
 
             return $user;
-
         });
     }
-
 
     public function update(User $user,array $data): User
     {
@@ -38,23 +36,20 @@ class AccountService
             ]);
 
             return $user;
-
         });
     }
 
-
-    public function updatePassword(User $user,string $password): bool
+    public function resetPassword(User $user,string $password): bool
     {
         return $user->update([
-            'password'=>Hash::make($password)
+            'password'=>Hash::make($password),
         ]);
     }
-
 
     public function changeStatus(User $user,bool $status): bool
     {
         return $user->update([
-            'status'=>$status
+            'status'=>$status,
         ]);
     }
 }
