@@ -12,10 +12,12 @@ use Illuminate\Support\Str;
 class PlayerService
 {
     protected AcademyService $academyService;
+    protected AccountService $accountService;
 
-    public function __construct(AcademyService $academyService)
+    public function __construct(AcademyService $academyService, AccountService $accountService)
     {
        $this->academyService = $academyService;
+       $this->accountService = $accountService;
     }
 
     protected function uploadPhoto($file, string $playerCode): string
@@ -85,10 +87,12 @@ class PlayerService
 
             if (!empty($data['create_account'])) {
 
-                $user = $this->createPlayerAccount(
-                    $player,
-                    $data
-                );
+                $user = $this->accountService->create([
+                    'id_academy'=>$player->id_academy,
+                    'name'=>$player->name,
+                    'email'=>$data['email'],
+                    'password'=>$data['password'],
+                ],'Player');
 
                 $player->update([
                     'id_user'=>$user->id_user
@@ -100,31 +104,8 @@ class PlayerService
 
         });
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Create Player Account
-    |--------------------------------------------------------------------------
-    */
-    protected function createPlayerAccount(Player $player, array $data): User
-    {
-        $user = User::create([
-            'id_academy'=>$player->id_academy,
-            'name'=>$player->name,
-            'email'=>$data['email'],
-            'password'=>Hash::make(
-                $data['password']
-            ),
-            'status'=>true,
-        ]);
-
-        $user->assignRole('Player');
-
-        return $user;
-    }
-
-
+ 
+ 
     /*
     |--------------------------------------------------------------------------
     | Generate Player Code

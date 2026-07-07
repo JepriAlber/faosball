@@ -80,9 +80,7 @@ class PlayerAccountController extends Controller
                     'Gagal membuat akun player: '.$e->getMessage()
                 );
         }
-    }
-
-    
+    } 
 
 
     public function edit(Player $player)
