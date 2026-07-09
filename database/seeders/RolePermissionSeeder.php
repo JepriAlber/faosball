@@ -33,6 +33,18 @@ class RolePermissionSeeder extends Seeder
             'academy.create',
             'academy.update',
             'academy.delete',
+ 
+            // Role
+            'role.view',
+            'role.create',
+            'role.update',
+            'role.delete',
+
+            // Permission
+            'permission.view',
+            'permission.create',
+            'permission.update',
+            'permission.delete',
 
             // User Management
             'user.view',
@@ -87,7 +99,7 @@ class RolePermissionSeeder extends Seeder
             // Parent
             'child.profile.view',
             'child.training.view',
-            'child.payment.view',
+            'child.payment.view', 
 
         ];
 
@@ -197,6 +209,7 @@ class RolePermissionSeeder extends Seeder
 
 
         $superAdminUser->assignRole($superAdmin);
+        $superAdmin->syncPermissions(Permission::all());
 
         /*
         |--------------------------------------------------------------------------

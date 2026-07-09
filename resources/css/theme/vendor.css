@@ -254,9 +254,8 @@
 
 .task.is-dragging {
     border-radius: .75rem;
-    box-shadow:
-        0px 1px 3px 0px rgba(16, 24, 40, .1),
-        0px 1px 2px 0px rgba(16, 24, 40, .06);
+    /* sebelumnya box-shadow ditulis manual, padahal nilainya identik dengan token --shadow-theme-sm */
+    box-shadow: var(--shadow-theme-sm);
     opacity: .8;
     cursor: grabbing;
 }

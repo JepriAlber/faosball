@@ -110,7 +110,8 @@
 
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #344054;
+    /* sebelumnya hardcoded #344054, sekarang pakai token --color-gray-700 dari variables.css (nilainya sama) */
+    background-color: var(--color-gray-700);
 }
 
 

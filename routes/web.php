@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AcademyController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -16,7 +18,7 @@ Route::get('/', function () {
 
 });
 
-
+ 
 
 Route::middleware('auth')->group(function () {
 
@@ -114,6 +116,19 @@ Route::middleware('auth')->group(function () {
         'destroy'
     ])
     ->name('profile.destroy');
+
+    
+    Route::resource('roles', RoleController::class)
+        ->middlewareFor(['index', 'show'], 'permission:role.view')
+        ->middlewareFor(['create', 'store'], 'permission:role.create')
+        ->middlewareFor(['edit', 'update'], 'permission:role.update')
+        ->middlewareFor('destroy', 'permission:role.delete');
+
+    Route::resource('permissions', PermissionController::class)
+        ->middlewareFor(['index', 'show'], 'permission:permission.view')
+        ->middlewareFor(['create', 'store'], 'permission:permission.create')
+        ->middlewareFor(['edit', 'update'], 'permission:permission.update')
+        ->middlewareFor('destroy', 'permission:permission.delete');
 
 });
 

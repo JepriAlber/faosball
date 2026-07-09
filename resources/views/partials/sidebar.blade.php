@@ -86,17 +86,6 @@
                                         Ringkasan
                                     </a>
                                 </li>
-                                {{-- Contoh tambah sub-menu:
-                                    <li>
-                                    <a
-                                        href="{{ route('dashboard.analytics') }}"
-                                        class="menu-dropdown-item group"
-                                        :class="{{ Route::is('dashboard.analytics') ? 'true' : 'false' }} ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'"
-                                    >
-                                        Analitik
-                                    </a>
-                                    </li>
-                                    --}}
                             </ul>
                         </div>
                     </li>
@@ -155,12 +144,10 @@
 
                     @endphp
 
-
                     <li x-data="{ open: {{ $isFootballAcademyActive ? 'true' : 'false' }} }">
 
                         <a href="#" @click.prevent="open = !open" class="menu-item group"
                             :class="open ? 'menu-item-active' : 'menu-item-inactive'">
-
 
                             <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -168,17 +155,11 @@
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                     d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5Z"
                                     fill="" />
-
                             </svg>
 
-
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-
                                 Football Academy
-
                             </span>
-
-
 
                             <svg class="menu-item-arrow transition-transform duration-200"
                                 :class="[
@@ -186,75 +167,46 @@
                                     sidebarToggle ? 'lg:hidden' : ''
                                 ]"
                                 width="20" height="20" viewBox="0 0 20 20" fill="none">
-
                                 <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
                                     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-
                             </svg>
 
-
                         </a>
-
-
 
                         {{-- Dropdown submenu --}}
 
                         <div x-show="open" x-collapse class="overflow-hidden">
 
-
                             <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
                                 class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
-
-
                                 {{-- Players --}}
-
                                 <li>
-
                                     <a href="{{ route('players.index') }}" class="menu-dropdown-item group"
                                         :class="{{ Route::is('players.*') ? 'true' : 'false' }}
                                             ?
                                             'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
-
                                         Players
-
                                     </a>
-
                                 </li>
 
-
-
                                 {{-- Training nanti --}}
-
                                 {{-- 
-            <li>
-
-                <a href="{{ route('training.index') }}"
-                    class="menu-dropdown-item group"
-
-                    :class="{{ Route::is('training.*') ? 'true' : 'false' }}
-                    ? 'menu-dropdown-item-active'
-                    : 'menu-dropdown-item-inactive'">
-
-                    Training
-
-                </a>
-
-            </li>
-            --}}
-
-
+                                    <li>
+                                        <a href="{{ route('training.index') }}"
+                                            class="menu-dropdown-item group"
+                                            :class="{{ Route::is('training.*') ? 'true' : 'false' }}
+                                            ? 'menu-dropdown-item-active'
+                                            : 'menu-dropdown-item-inactive'">
+                                            Training
+                                        </a>
+                                    </li>
+                                    --}}
                             </ul>
-
-
                         </div>
-
-
                     </li>
 
                     <!-- ===== END: Football Academy ===== -->
-
-
 
 
                     <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
@@ -271,49 +223,92 @@
                         </svg>
                     </h3>
 
-                    <!-- ===== Menu Item: Academy ===== -->
-                    @php
-                        $isAcademyActive = Route::is('academies.*');
-                    @endphp
+                    {{-- ===== Administration ===== --}}
+                    @if (app(\App\Services\AcademyService::class)->isSuperAdmin())
+                        @php
+                            $administrationRoutes = ['roles.*', 'permissions.*', 'academies.*'];
 
-                    <li>
-                        <a href="{{ route('academies.index') }}"
-                            class="menu-item group {{ $isAcademyActive ? 'menu-item-active' : 'menu-item-inactive' }}">
-                            <svg class="{{ $isAcademyActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
-                                width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M3 3H21V21H3V3ZM5 5V19H19V5H5ZM12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7ZM9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12Z"
-                                    fill="currentColor" />
-                            </svg>
+                            $isAdministrationActive = false;
 
-                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Academy
-                            </span>
-                        </a>
-                    </li>
-                    <!-- ===== END: Academy ===== -->
+                            foreach ($administrationRoutes as $route) {
+                                if (Route::is($route)) {
+                                    $isAdministrationActive = true;
+                                    break;
+                                }
+                            }
+                        @endphp
 
-                    {{-- =============================================
-               TEMPLATE TAMBAH MENU BARU
-               Salin blok di bawah untuk menu tanpa dropdown:
+                        <li x-data="{ open: {{ $isAdministrationActive ? 'true' : 'false' }} }">
 
-          @php $isXxxActive = Route::is('nama-route'); @endphp
-          <li>
-            <a
-              href="{{ route('nama-route') }}"
-              class="menu-item group {{ $isXxxActive ? 'menu-item-active' : 'menu-item-inactive' }}"
-            >
-              <svg class="{{ $isXxxActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
-                width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path ... />
-              </svg>
-              <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                Nama Menu
-              </span>
-            </a>
-          </li>
-          ============================================= --}}
+                            <a href="#" @click.prevent="open=!open" class="menu-item group"
+                                :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+                                <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 5H20V7H4V5ZM4 11H20V13H4V11ZM4 17H20V19H4V17Z" fill="currentColor" />
+
+                                </svg>
+                                <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                    Administration
+                                </span>
+                                <svg class="menu-item-arrow transition-transform duration-200"
+                                    :class="[
+                                        open ?
+                                        'menu-item-arrow-active rotate-180' :
+                                        'menu-item-arrow-inactive',
+                                        sidebarToggle ? 'lg:hidden' : ''
+                                    ]"
+                                    width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </a>
+
+                            <div x-show="open" x-collapse class="overflow-hidden">
+
+                                <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
+                                    class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
+                                    {{-- Roles --}}
+                                    <li>
+                                        <a href="{{ route('roles.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('roles.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            Roles
+
+                                        </a>
+                                    </li>
+
+                                    {{-- Permissions --}}
+                                    <li>
+                                        <a href="{{ route('permissions.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('permissions.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            Permissions
+                                        </a>
+                                    </li>
+
+                                    {{-- Academy --}}
+                                    <li>
+                                        <a href="{{ route('academies.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('academies.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            Academy
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                        </li>
+                    @endif
+                    {{-- ===== END: Administration ===== --}}
+
 
                 </ul>
             </div>

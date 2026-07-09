@@ -48,39 +48,6 @@
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| Scrollbar Utilities
-|--------------------------------------------------------------------------
-*/
-
-@utility no-scrollbar {
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-@utility custom-scrollbar {
-    &::-webkit-scrollbar {
-        @apply size-1.5;
-    }
-
-    &::-webkit-scrollbar-track {
-        @apply rounded-full;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        @apply rounded-full bg-gray-200;
-    }
-}
-
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #344054;
-}
-
 
 /*
 |--------------------------------------------------------------------------
@@ -104,7 +71,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| TailAdmin Sidebar
+| Sidebar
 |--------------------------------------------------------------------------
 */
 
@@ -168,7 +135,7 @@
 
 ::selection {
     background: var(--color-brand-500);
-    color: white;
+    color: var(--color-white);
 }
 
 

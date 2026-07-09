@@ -62,12 +62,7 @@ class PlayerController extends Controller
 
         } catch (\Exception $e) {
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal membuat player: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal membuat player');
         }
     }
 
@@ -128,12 +123,7 @@ class PlayerController extends Controller
 
         } catch (\Exception $e) {
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal memperbarui player: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal memperbarui player');
         }
     }
 
@@ -155,12 +145,7 @@ class PlayerController extends Controller
 
         } catch (\Exception $e) {
 
-            return redirect()
-                ->route('players.index')
-                ->with(
-                    'error',
-                    'Gagal menghapus player: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal menghapus player', 'players.index');
         }
     }
 

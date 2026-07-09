@@ -73,14 +73,9 @@ class PlayerAccountController extends Controller
 
         } catch (\Exception $e) {
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal membuat akun player: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal membuat akun player');
         }
-    } 
+    }
 
 
     public function edit(Player $player)
@@ -136,12 +131,7 @@ class PlayerAccountController extends Controller
 
         } catch(\Exception $e){
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal update account: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal update account');
 
         }
     }
@@ -176,12 +166,7 @@ class PlayerAccountController extends Controller
 
         } catch(\Exception $e){
 
-            return redirect()
-                ->route('players.show',$player)
-                ->with(
-                    'error',
-                    'Gagal reset password: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal reset password', 'players.show', [$player]);
 
         }
     }
@@ -218,12 +203,7 @@ class PlayerAccountController extends Controller
 
         } catch(\Exception $e){
 
-            return redirect()
-                ->route('players.show',$player)
-                ->with(
-                    'error',
-                    'Gagal mengubah status account: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal mengubah status account', 'players.show', [$player]);
 
         }
     }

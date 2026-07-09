@@ -238,6 +238,15 @@
 
 
 /* Alert */
+/*
+  Catatan: sebelumnya alert pakai warna green/red/yellow/blue yang TIDAK ada
+  di variables.css (@theme), jadi jatuh ke default palette Tailwind, bukan
+  token tema FAOSBall. Sekarang dipetakan ke token yang sudah didefinisikan:
+    - success  -> alert-success (sebelumnya "green")
+    - error    -> alert-danger  (sebelumnya "red")
+    - warning  -> alert-warning (sebelumnya "yellow")
+    - blue-light -> alert-info  (sebelumnya "blue", karena tidak ada token "brand" untuk info state)
+*/
 
 @utility alert {
     @apply mb-6 flex w-full items-center justify-between rounded-xl border p-4;
@@ -256,34 +265,34 @@
 }
 
 @utility alert-success {
-    @apply border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-500/10 dark:text-green-400;
+    @apply border-success-200 bg-success-50 text-success-800 dark:border-success-800 dark:bg-success-500/10 dark:text-success-400;
 
     .alert-icon {
-        @apply bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400;
+        @apply bg-success-100 text-success-600 dark:bg-success-500/20 dark:text-success-400;
     }
 }
 
 @utility alert-danger {
-    @apply border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-500/10 dark:text-red-400;
+    @apply border-error-200 bg-error-50 text-error-800 dark:border-error-800 dark:bg-error-500/10 dark:text-error-400;
 
     .alert-icon {
-        @apply bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400;
+        @apply bg-error-100 text-error-600 dark:bg-error-500/20 dark:text-error-400;
     }
 }
 
 @utility alert-warning {
-    @apply border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-400;
+    @apply border-warning-200 bg-warning-50 text-warning-800 dark:border-warning-800 dark:bg-warning-500/10 dark:text-warning-400;
 
     .alert-icon {
-        @apply bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400;
+        @apply bg-warning-100 text-warning-600 dark:bg-warning-500/20 dark:text-warning-400;
     }
 }
 
 @utility alert-info {
-    @apply border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-500/10 dark:text-blue-400;
+    @apply border-blue-light-200 bg-blue-light-50 text-blue-light-800 dark:border-blue-light-800 dark:bg-blue-light-500/10 dark:text-blue-light-400;
 
     .alert-icon {
-        @apply bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400;
+        @apply bg-blue-light-100 text-blue-light-600 dark:bg-blue-light-500/20 dark:text-blue-light-400;
     }
 }
 

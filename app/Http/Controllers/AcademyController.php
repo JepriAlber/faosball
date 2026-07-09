@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\academy\AcademyFormRequest;
+use App\Http\Requests\Academy\AcademyFormRequest;
 use App\Models\Academy;
 use App\Services\AcademyManagementService;
 
@@ -73,12 +73,7 @@ class AcademyController extends Controller
 
         } catch (\Exception $e) {
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal menambahkan academy: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal menambahkan academy');
         }
     }
 
@@ -148,12 +143,7 @@ class AcademyController extends Controller
 
         } catch (\Exception $e) {
 
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Gagal memperbarui academy: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal memperbarui academy');
         }
     }
 
@@ -180,12 +170,7 @@ class AcademyController extends Controller
 
         } catch (\Exception $e) {
 
-            return redirect()
-                ->route('academies.index')
-                ->with(
-                    'error',
-                    'Gagal menghapus academy: '.$e->getMessage()
-                );
+            return $this->handleException($e, 'Gagal menghapus academy', 'academies.index');
         }
     }
 }

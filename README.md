@@ -1,58 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ⚽ FAOSBall
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **FAOSBall (Football Academy Operating System)** adalah sistem ERP (Enterprise Resource Planning) yang dirancang untuk membantu pengelolaan operasional akademi sepak bola. FAOSBall dibangun menggunakan **Laravel 13** dengan arsitektur **Single Database Multi-Tenant**, sehingga satu aplikasi dapat digunakan oleh banyak academy tanpa mencampurkan data antar academy.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+FAOSBall menyediakan berbagai modul untuk mendukung operasional akademi sepak bola, antara lain:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Academy Management
+- Player Management
+- Coach Management
+- Parent Management
+- Staff Management
+- Team Management
+- Training Management
+- Attendance Management
+- Evaluation Management
+- Payment Management
+- Reporting
+- Role & Permission Management
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Technology Stack
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Component | Technology |
+|-----------|------------|
+| Framework | Laravel 13 |
+| Frontend | Tailwind CSS |
+| Admin Template | TailAdmin |
+| JavaScript | Alpine.js |
+| Authentication | Laravel Breeze |
+| Authorization | Spatie Laravel Permission |
+| Database | MySQL |
+| Storage | Laravel Storage |
+| Version Control | Git |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## Core Architecture
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+FAOSBall dibangun menggunakan beberapa prinsip utama.
+
+- Service Layer Architecture
+- Thin Controller
+- Dependency Injection
+- Single Responsibility Principle (SRP)
+- Reusable Service
+- UUID Primary Key
+- Single Database Multi-Tenant
+- Laravel Storage
+- Database Transaction
+- DRY (Don't Repeat Yourself)
+
+Business logic ditempatkan pada **Service Layer**, sedangkan Controller hanya bertugas menerima request, memanggil Service, dan mengembalikan response.
+
+---
+
+## Installation
+
+Clone repository.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url>
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Masuk ke folder project.
 
-## Contributing
+```bash
+cd faosball
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Install dependency.
 
-## Code of Conduct
+```bash
+composer install
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Salin file environment.
 
-## Security Vulnerabilities
+```bash
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Generate application key.
+
+```bash
+php artisan key:generate
+```
+
+Konfigurasi database pada file `.env`, kemudian jalankan migration dan seeder.
+
+```bash
+php artisan migrate --seed
+```
+
+Build asset frontend.
+
+```bash
+npm run dev
+```
+
+Jalankan aplikasi.
+
+```bash
+php artisan serve
+```
+
+---
+
+## Documentation
+
+Dokumentasi lengkap tersedia pada folder **docs/**.
+
+| Document | Description |
+|----------|-------------|
+| docs/setup.md | Installation & Project Setup |
+| docs/architecture.md | Software Architecture |
+| docs/coding-standard.md | Coding Standard |
+| docs/multi-tenancy.md | Multi-Tenant Architecture |
+| docs/authorization.md | Authorization Architecture |
+| docs/development-guide.md | Development Guide |
+| docs/module-standard.md | Module Standard |
+
+---
+
+## Project Structure
+
+```text
+app/
+├── Http/
+│   ├── Controllers/
+│   └── Requests/
+├── Models/
+├── Providers/
+├── Scopes/
+├── Services/
+└── Traits/
+
+docs/
+
+resources/
+
+routes/
+```
+
+---
+
+## Development Principles
+
+Seluruh module pada FAOSBall wajib mengikuti standar yang telah ditetapkan.
+
+- Business logic berada pada Service.
+- Controller tetap tipis (Thin Controller).
+- Validasi menggunakan Form Request.
+- Model hanya menangani data dan relasi.
+- Seluruh proses kompleks menggunakan `DB::transaction()`.
+- Upload file menggunakan Laravel Storage.
+- Seluruh data tenant mengikuti arsitektur Multi-Tenant.
+- Seluruh authorization menggunakan Spatie Laravel Permission.
+- Seluruh module mengikuti Coding Standard dan Module Standard yang telah ditetapkan.
+
+---
+
+## Roadmap
+
+Status pengembangan module.
+
+- [x] Authentication
+- [x] Academy Management
+- [x] Player Management
+- [ ] Coach Management
+- [ ] Parent Management
+- [ ] Staff Management
+- [ ] Team Management
+- [ ] Training Management
+- [ ] Attendance Management
+- [ ] Evaluation Management
+- [ ] Payment Management
+- [ ] Reporting
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+FAOSBall merupakan perangkat lunak yang dikembangkan khusus untuk kebutuhan Football Academy Operating System. Seluruh hak cipta dan kepemilikan sistem dilindungi sesuai ketentuan yang berlaku.
