@@ -91,4 +91,13 @@ class PermissionPresenter
     {
         return ucfirst(self::action($permission));
     }
+
+    /**
+     * Daftar action yang dikenali sistem, dipakai sebagai opsi datalist
+     * pada form Create Permission.
+     */
+    public static function actions(): array
+    {
+        return ['view', 'create', 'update', 'delete', 'export', 'report'];
+    }
 }

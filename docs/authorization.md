@@ -474,8 +474,12 @@ Permission Management juga menggunakan model bawaan Spatie dengan fitur:
 
 - List Permission
 - Create Permission
-- Update Permission
 - Delete Permission
+
+> Permission tidak memiliki fitur Update. Nama permission dipakai sebagai
+> literal string pada Permission Middleware, Blade `@can()`, dan
+> `RolePermissionSeeder`, sehingga perubahan nama setelah dibuat akan membuat
+> pengecekan akses gagal secara diam-diam tanpa error yang terlihat.
 
 ---
 
