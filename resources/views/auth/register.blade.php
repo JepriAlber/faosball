@@ -3,15 +3,14 @@
 @section('title', 'Sign Up')
 
 @section('content')
-    <div class="relative flex flex-col justify-center w-full min-h-screen dark:bg-gray-900 sm:p-0 lg:flex-row">
+    <div class="auth-split">
 
         {{-- ===== Kolom Kiri: Form Register ===== --}}
-        <div class="flex flex-col flex-1 w-full lg:w-1/2">
+        <div class="auth-column">
 
-            {{-- Back to dashboard (SAMA seperti login style) --}}
-            <div class="w-full max-w-md pt-10 mx-auto px-6">
-                <a href="{{ route('login') }}"
-                    class="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+            {{-- Back to login --}}
+            <div class="auth-back-link-wrapper">
+                <a href="{{ route('login') }}" class="auth-back-link">
                     <svg class="stroke-current mr-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                         viewBox="0 0 20 20" fill="none">
                         <path d="M12.7083 5L7.5 10.2083L12.7083 15.4167" stroke-width="1.5" stroke-linecap="round"
@@ -21,91 +20,109 @@
                 </a>
             </div>
 
-            <div class="flex flex-col justify-center flex-1 w-full max-w-md mx-auto px-6 py-12">
+            <div class="auth-form-container">
 
-                {{-- Title (SAMA STYLE LOGIN) --}}
-                <div class="mb-5 sm:mb-8">
-                    <h1 class="mb-2 font-semibold text-2xl text-gray-800 dark:text-white/90 sm:text-3xl">
+                {{-- Judul --}}
+                <div class="auth-heading-group">
+                    <h1 class="auth-title">
                         Sign Up
                     </h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="auth-subtitle">
                         Buat akun untuk mengakses sistem FAoSBall.
                     </p>
                 </div>
 
-                {{-- Error --}}
-                @if ($errors->any())
-                    <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
-                        <ul class="text-sm text-red-600 dark:text-red-400 list-disc list-inside space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                {{-- FORM --}}
+                {{-- Form Register --}}
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
 
                     {{-- Name --}}
-                    <div class="mb-4">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Name <span class="text-red-500">*</span>
+                    <div class="form-group">
+                        <label class="form-label" for="name">
+                            Name <span class="text-error-500">*</span>
                         </label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Full name"
-                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                        <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                            placeholder="Full name" class="form-input @error('name') form-danger @enderror" />
+                        @error('name')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     {{-- Email --}}
-                    <div class="mb-4">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Email <span class="text-red-500">*</span>
+                    <div class="form-group">
+                        <label class="form-label" for="email">
+                            Email <span class="text-error-500">*</span>
                         </label>
-                        <input type="email" name="email" value="{{ old('email') }}" required
-                            placeholder="nama@example.com"
-                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                            placeholder="nama@example.com" class="form-input @error('email') form-danger @enderror" />
+                        @error('email')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     {{-- Password --}}
-                    <div class="mb-4" x-data="{ showPassword: false }">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Password <span class="text-red-500">*</span>
+                    <div class="form-group" x-data="{ showPassword: false }">
+                        <label class="form-label" for="password">
+                            Password <span class="text-error-500">*</span>
                         </label>
 
                         <div class="relative">
-                            <input :type="showPassword ? 'text' : 'password'" name="password" required
+                            <input id="password" :type="showPassword ? 'text' : 'password'" name="password" required
                                 placeholder="••••••••"
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-12 text-sm text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                                class="form-input pr-12 @error('password') form-danger @enderror" />
 
-                            <button type="button" @click="showPassword = !showPassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                👁
+                            <button type="button" @click="showPassword = !showPassword" class="auth-password-toggle">
+                                <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg x-show="showPassword" style="display:none;" xmlns="http://www.w3.org/2000/svg"
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
                             </button>
                         </div>
+                        @error('password')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     {{-- Confirm Password --}}
                     <div class="mb-6" x-data="{ showPassword: false }">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Confirm Password <span class="text-red-500">*</span>
+                        <label class="form-label" for="password_confirmation">
+                            Confirm Password <span class="text-error-500">*</span>
                         </label>
 
                         <div class="relative">
-                            <input :type="showPassword ? 'text' : 'password'" name="password_confirmation" required
-                                placeholder="••••••••"
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-12 text-sm text-gray-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                            <input id="password_confirmation" :type="showPassword ? 'text' : 'password'"
+                                name="password_confirmation" required placeholder="••••••••"
+                                class="form-input pr-12" />
 
-                            <button type="button" @click="showPassword = !showPassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                👁
+                            <button type="button" @click="showPassword = !showPassword" class="auth-password-toggle">
+                                <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg x-show="showPassword" style="display:none;" xmlns="http://www.w3.org/2000/svg"
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
                             </button>
                         </div>
                     </div>
 
-                    {{-- Submit --}}
-                    <button type="submit"
-                        class="flex items-center justify-center w-full px-4 py-3 text-sm font-semibold text-white transition-colors rounded-lg bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                    {{-- Tombol Submit --}}
+                    <button type="submit" class="btn btn-primary w-full">
                         Create Account
                     </button>
                 </form>
@@ -114,7 +131,7 @@
         </div>
 
         {{-- ===== Kolom Kanan: Branding (hanya tampil di lg ke atas) ===== --}}
-        @include('partials.auth-sidebar')
+        <x-auth-sidebar />
 
     </div>
 @endsection
