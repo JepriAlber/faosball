@@ -473,6 +473,120 @@
 }
 
 
+/* Header */
+
+@utility app-header {
+    @apply sticky top-0 z-99999 flex w-full border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900;
+}
+
+@utility app-header-inner {
+    @apply flex grow flex-col items-center justify-between lg:flex-row lg:px-6;
+}
+
+@utility app-header-topbar {
+    @apply flex w-full items-center justify-between gap-2 border-b border-gray-200 px-3 py-3 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4 dark:border-gray-800;
+}
+
+/*
+  Catatan: `lg:flex lg:justify-end lg:px-0 lg:shadow-none` SENGAJA tidak
+  di-@apply di sini. Elemen ini juga di-toggle Alpine pakai class Tailwind
+  polos `hidden`/`flex` (:class="menuToggle ? 'flex' : 'hidden'"). Kalau
+  `lg:flex` dibungkus ke custom utility ini, urutannya di CSS hasil build
+  bisa muncul SEBELUM rule `.hidden`, sehingga di desktop pun action bar
+  ketutup terus (bug yang sempat terjadi). Simpan varian lg: sebagai class
+  Tailwind langsung di blade supaya Tailwind menaruhnya di urutan yang
+  sudah dijamin benar terhadap toggle hidden/flex.
+*/
+@utility app-header-actionbar {
+    @apply shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4;
+}
+
+@utility header-hamburger-btn {
+    @apply z-99999 flex h-10 w-10 items-center justify-center rounded-lg border-gray-200 text-gray-500 lg:h-11 lg:w-11 lg:border dark:border-gray-800 dark:text-gray-400;
+}
+
+@utility header-menu-btn {
+    @apply z-99999 flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 lg:hidden dark:text-gray-400 dark:hover:bg-gray-800;
+}
+
+@utility header-icon-btn-circle {
+    @apply relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white;
+}
+
+@utility notif-dot {
+    @apply absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400;
+}
+
+@utility notif-dot-ping {
+    @apply absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75;
+}
+
+@utility header-dropdown-panel {
+    @apply shadow-theme-lg absolute mt-[17px] flex flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900;
+}
+
+@utility header-dropdown-header {
+    @apply mb-3 flex items-center justify-between border-b border-gray-100 pb-3;
+}
+
+@utility header-dropdown-list {
+    @apply flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800;
+}
+
+@utility header-dropdown-item {
+    @apply text-theme-sm flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300;
+}
+
+@utility header-dropdown-item-icon {
+    @apply fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300;
+}
+
+@utility header-dropdown-footer-link {
+    @apply text-theme-sm shadow-theme-xs mt-3 flex justify-center rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200;
+}
+
+@utility header-user-trigger {
+    @apply flex items-center text-gray-700 dark:text-gray-400;
+}
+
+@utility header-avatar {
+    @apply mr-3 h-11 w-11 overflow-hidden rounded-full;
+}
+
+@utility header-dropdown-arrow {
+    @apply transition-transform duration-200 stroke-gray-500 dark:stroke-gray-400;
+}
+
+
+/* Layout */
+
+@utility app-body {
+    @apply bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200;
+}
+
+@utility page-wrapper {
+    @apply flex h-screen overflow-hidden;
+}
+
+@utility content-area {
+    @apply relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto;
+}
+
+@utility content-container {
+    @apply mx-auto max-w-screen-2xl p-4 md:p-6;
+}
+
+/*
+  Catatan: `block`/`lg:hidden`/`hidden` SENGAJA tidak di-@apply di sini,
+  karena elemen ini di-toggle Alpine pakai class Tailwind polos
+  (:class="sidebarToggle ? 'block lg:hidden' : 'hidden'"). Lihat catatan
+  di .app-header-actionbar untuk alasan lengkapnya.
+*/
+@utility sidebar-overlay {
+    @apply fixed inset-0 z-9 bg-gray-900/50;
+}
+
+
 /* Loading */
 
 @utility spinner {

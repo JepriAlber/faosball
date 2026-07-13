@@ -26,30 +26,30 @@
     @stack('styles')
 </head>
 
-<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+<body class="app-body">
 
     {{-- ===== Preloader ===== --}}
     @include('partials.preloader')
 
     {{-- ===== Page Wrapper ===== --}}
-    <div class="flex h-screen overflow-hidden">
+    <div class="page-wrapper">
 
         {{-- ===== Sidebar ===== --}}
         @include('partials.sidebar')
 
         {{-- ===== Content Area ===== --}}
-        <div class="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
+        <div class="content-area">
 
             {{-- Overlay mobile saat sidebar terbuka --}}
             <div @click="sidebarToggle = false" :class="sidebarToggle ? 'block lg:hidden' : 'hidden'"
-                class="fixed inset-0 z-[9] bg-gray-900/50"></div>
+                class="sidebar-overlay"></div>
 
             {{-- ===== Header ===== --}}
             @include('partials.header')
 
             {{-- ===== Main Content ===== --}}
             <main>
-                <div class="p-4 mx-auto max-w-screen-2xl md:p-6">
+                <div class="content-container">
 
                     @yield('content')
                 </div>

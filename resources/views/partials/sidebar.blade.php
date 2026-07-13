@@ -1,8 +1,6 @@
-<aside :class="sidebarToggle ? 'translate-x-0 lg:w-[90px]' : '-translate-x-full lg:translate-x-0 lg:w-[290px]'"
-    class="sidebar fixed left-0 top-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 lg:transition-all lg:duration-300 lg:ease-linear dark:border-gray-800 dark:bg-black lg:static">
+<aside :class="sidebarToggle ? 'sidebar-collapsed' : 'sidebar-expanded'" class="sidebar">
     <!-- SIDEBAR HEADER -->
-    <div :class="sidebarToggle ? 'lg:justify-center' : 'justify-start'"
-        class="flex items-center gap-2 pt-8 pb-7 sidebar-header">
+    <div :class="sidebarToggle ? 'lg:justify-center' : 'justify-start'" class="sidebar-header">
         <a href="{{ route('dashboard') }}">
             {{--
         Logo teks: HANYA tampil di desktop (lg ke atas).
@@ -28,13 +26,13 @@
 
             <!-- ===================== MENU GROUP ===================== -->
             <div class="mb-6">
-                <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
+                <h3 class="menu-group-heading">
                     <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
                         MENU
                     </span>
                     {{-- Dots icon saat sidebar collapsed di desktop --}}
                     <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'"
-                        class="mx-auto fill-current menu-group-icon" width="24" height="24" viewBox="0 0 24 24"
+                        class="menu-group-icon" width="24" height="24" viewBox="0 0 24 24"
                         fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd"
                             d="M5.99915 10.2451C6.96564 10.2451 7.74915 11.0286 7.74915 11.9951V12.0051C7.74915 12.9716 6.96564 13.7551 5.99915 13.7551C5.03265 13.7551 4.24915 12.9716 4.24915 12.0051V11.9951C4.24915 11.0286 5.03265 10.2451 5.99915 10.2451ZM17.9991 10.2451C18.9656 10.2451 19.7491 11.0286 19.7491 11.9951V12.0051C19.7491 12.9716 18.9656 13.7551 17.9991 13.7551C17.0326 13.7551 16.2491 12.9716 16.2491 12.0051V11.9951C16.2491 11.0286 17.0326 10.2451 17.9991 10.2451ZM13.7491 11.9951C13.7491 11.0286 12.9656 10.2451 11.9991 10.2451C11.0326 10.2451 10.2491 11.0286 10.2491 11.9951V12.0051C10.2491 12.9716 11.0326 13.7551 11.9991 13.7551C12.9656 13.7551 13.7491 12.9716 13.7491 12.0051V11.9951Z"
@@ -78,7 +76,7 @@
                         {{-- Dropdown sub-menu --}}
                         <div x-show="open" x-collapse class="overflow-hidden">
                             <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
-                                class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
+                                class="menu-dropdown">
                                 <li>
                                     <a href="{{ route('dashboard') }}" class="menu-dropdown-item group"
                                         :class="{{ Route::is('dashboard') ? 'true' : 'false' }} ? 'menu-dropdown-item-active' :
@@ -114,13 +112,13 @@
                     </li>
                     <!-- ===== END: Profile ===== -->
 
-                    <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
+                    <h3 class="menu-group-heading">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
                             football academy
                         </span>
                         {{-- Dots icon saat sidebar collapsed di desktop --}}
                         <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'"
-                            class="mx-auto fill-current menu-group-icon" width="24" height="24"
+                            class="menu-group-icon" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                 d="M5.99915 10.2451C6.96564 10.2451 7.74915 11.0286 7.74915 11.9951V12.0051C7.74915 12.9716 6.96564 13.7551 5.99915 13.7551C5.03265 13.7551 4.24915 12.9716 4.24915 12.0051V11.9951C4.24915 11.0286 5.03265 10.2451 5.99915 10.2451ZM17.9991 10.2451C18.9656 10.2451 19.7491 11.0286 19.7491 11.9951V12.0051C19.7491 12.9716 18.9656 13.7551 17.9991 13.7551C17.0326 13.7551 16.2491 12.9716 16.2491 12.0051V11.9951C16.2491 11.0286 17.0326 10.2451 17.9991 10.2451ZM13.7491 11.9951C13.7491 11.0286 12.9656 10.2451 11.9991 10.2451C11.0326 10.2451 10.2491 11.0286 10.2491 11.9951V12.0051C10.2491 12.9716 11.0326 13.7551 11.9991 13.7551C12.9656 13.7551 13.7491 12.9716 13.7491 12.0051V11.9951Z"
@@ -153,7 +151,7 @@
                                 height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 
                                 <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5Z"
+                                    d="M9,4 L4,6 L4,10 L8,8 L7,20 L17,20 L16,8 L20,10 L20,6 L15,4 Q12,7 9,4 Z"
                                     fill="" />
                             </svg>
 
@@ -178,7 +176,7 @@
                         <div x-show="open" x-collapse class="overflow-hidden">
 
                             <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
-                                class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
+                                class="menu-dropdown">
                                 {{-- Players --}}
                                 <li>
                                     <a href="{{ route('players.index') }}" class="menu-dropdown-item group"
@@ -209,13 +207,13 @@
                     <!-- ===== END: Football Academy ===== -->
 
 
-                    <h3 class="mb-4 text-xs uppercase leading-[20px] text-gray-400">
+                    <h3 class="menu-group-heading">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
                             Administration
                         </span>
                         {{-- Dots icon saat sidebar collapsed di desktop --}}
                         <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'"
-                            class="mx-auto fill-current menu-group-icon" width="24" height="24"
+                            class="menu-group-icon" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                 d="M5.99915 10.2451C6.96564 10.2451 7.74915 11.0286 7.74915 11.9951V12.0051C7.74915 12.9716 6.96564 13.7551 5.99915 13.7551C5.03265 13.7551 4.24915 12.9716 4.24915 12.0051V11.9951C4.24915 11.0286 5.03265 10.2451 5.99915 10.2451ZM17.9991 10.2451C18.9656 10.2451 19.7491 11.0286 19.7491 11.9951V12.0051C19.7491 12.9716 18.9656 13.7551 17.9991 13.7551C17.0326 13.7551 16.2491 12.9716 16.2491 12.0051V11.9951C16.2491 11.0286 17.0326 10.2451 17.9991 10.2451ZM13.7491 11.9951C13.7491 11.0286 12.9656 10.2451 11.9991 10.2451C11.0326 10.2451 10.2491 11.0286 10.2491 11.9951V12.0051C10.2491 12.9716 11.0326 13.7551 11.9991 13.7551C12.9656 13.7551 13.7491 12.9716 13.7491 12.0051V11.9951Z"
@@ -266,7 +264,7 @@
                             <div x-show="open" x-collapse class="overflow-hidden">
 
                                 <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'"
-                                    class="flex flex-col gap-1 mt-2 menu-dropdown pl-9">
+                                    class="menu-dropdown">
                                     {{-- Roles --}}
                                     <li>
                                         <a href="{{ route('roles.index') }}" class="menu-dropdown-item group"
@@ -318,15 +316,13 @@
         <!-- Sidebar Menu -->
 
         <!-- Sign Out -->
-        <div :class="sidebarToggle ? 'lg:hidden' : ''"
-            class="mx-auto mb-10 mt-auto w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center  dark:bg-white/[0.03]">
+        <div :class="sidebarToggle ? 'lg:hidden' : ''" class="sidebar-footer">
             <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Keluar dari akun?
             </p>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit"
-                    class="flex w-full items-center justify-center rounded-lg bg-brand-500 p-3 text-sm font-medium text-white transition-colors hover:bg-brand-600">
+                <button type="submit" class="sidebar-signout-btn">
                     Sign Out
                 </button>
             </form>

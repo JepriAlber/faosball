@@ -7,6 +7,54 @@
 
 /*
 |--------------------------------------------------------------------------
+| Sidebar Container
+|--------------------------------------------------------------------------
+| Base (non-hover) state untuk shell sidebar. Perilaku hover-to-peek saat
+| collapsed tetap diatur terpisah oleh `.sidebar:hover ...` di base.css
+| (unlayered, jadi prioritasnya selalu lebih tinggi dari @utility manapun
+| di sini sehingga tidak akan saling menimpa).
+|--------------------------------------------------------------------------
+*/
+
+@utility sidebar {
+    @apply fixed top-0 left-0 z-9999 flex h-screen w-[290px] flex-col overflow-y-hidden border-r border-gray-200 bg-white px-5 dark:border-gray-800 dark:bg-black lg:static lg:transition-all lg:duration-300 lg:ease-linear;
+}
+
+@utility sidebar-expanded {
+    @apply -translate-x-full lg:translate-x-0 lg:w-[290px];
+}
+
+@utility sidebar-collapsed {
+    @apply translate-x-0 lg:w-[90px];
+}
+
+@utility sidebar-header {
+    @apply flex items-center gap-2 pt-8 pb-7;
+}
+
+@utility sidebar-footer {
+    @apply mx-auto mt-auto mb-10 w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center dark:bg-white/[0.03];
+}
+
+@utility sidebar-signout-btn {
+    @apply flex w-full items-center justify-center rounded-lg bg-brand-500 p-3 text-sm font-medium text-white transition-colors hover:bg-brand-600;
+}
+
+@utility menu-group-heading {
+    @apply mb-4 text-xs text-gray-400 uppercase leading-[20px];
+}
+
+@utility menu-group-icon {
+    @apply mx-auto fill-current;
+}
+
+@utility menu-dropdown {
+    @apply mt-2 flex flex-col gap-1 pl-9;
+}
+
+
+/*
+|--------------------------------------------------------------------------
 | Sidebar Menu
 |--------------------------------------------------------------------------
 */
