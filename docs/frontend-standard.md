@@ -13,6 +13,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Kapan Membuat @utility Baru](#kapan-membuat-utility-baru)
 - [Gotcha: Varian Breakpoint vs Toggle Dinamis](#gotcha-varian-breakpoint-vs-toggle-dinamis)
 - [Konsistensi Warna & Token](#konsistensi-warna--token)
+- [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -84,6 +85,35 @@ Sebelum membuat `@utility` baru, selalu cek: apakah elemen ini juga punya `:clas
 
 ---
 
+## Reusable View dengan Data Dinamis
+
+Kalau sebuah partial/view perlu menampilkan data yang dihitung sendiri (query database, statistik, dsb), gunakan **class-based Blade Component** (`App\View\Components\Xxx`), bukan View Composer.
+
+Contoh yang sudah ada: `App\View\Components\Alert`, `App\View\Components\Breadcrumb`, `App\View\Components\AuthSidebar`. Pola bakunya:
+
+```php
+class AuthSidebar extends Component
+{
+    public int $totalActivePlayers;
+
+    public function __construct(AuthStatsService $authStatsService)
+    {
+        $this->totalActivePlayers = $authStatsService->snapshot()['totalActivePlayers'];
+    }
+
+    public function render(): View
+    {
+        return view('components.auth-sidebar');
+    }
+}
+```
+
+Dipakai di Blade sebagai `<x-auth-sidebar />`. View-nya taruh di `resources/views/components/`, business logic/query tetap di Service (constructor Component cuma manggil Service, sama seperti Controller).
+
+**Kenapa bukan View Composer** (`View::composer(...)` di `AppServiceProvider`): View Composer memang bisa mengikat data ke view tanpa mengubah titik pemanggilan (`@include(...)` tetap sama), tapi asal data jadi tidak terlihat dari sisi pemanggil maupun dari file view itu sendiri — orang harus tahu dulu ada wiring tersembunyi di `AppServiceProvider` untuk nemuin sumbernya. Blade Component lebih eksplisit: tinggal buka file component-nya, langsung ketemu.
+
+---
+
 ## Development Rules
 
 Gunakan:
@@ -91,12 +121,14 @@ Gunakan:
 - `@utility` untuk pola yang berulang atau string Tailwind panjang.
 - Token dari `variables.css` daripada hardcode warna/shadow/z-index.
 - Cek dulu apakah class yang dibutuhkan sudah ada sebelum bikin baru (terutama di `components.css` - card/btn/badge/form/table/modal/avatar/dropdown sudah lengkap).
+- Class-based Blade Component untuk view yang butuh data dinamis/hitung sendiri, bukan View Composer.
 
 Hindari:
 
 - Membungkus varian breakpoint/dark ke `@utility` untuk properti yang juga di-toggle dinamis lewat class Tailwind polos di elemen yang sama (lihat [Gotcha](#gotcha-varian-breakpoint-vs-toggle-dinamis)).
 - Hardcode warna/shadow yang sebenarnya sudah ada tokennya.
 - Membuat `@utility` baru untuk toggle dinamis yang sepele (single property, dipakai sekali).
+- `View::composer()` untuk mengikat data ke partial — pakai Blade Component (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)).
 
 ---
 

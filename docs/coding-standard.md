@@ -21,6 +21,7 @@ Seluruh module wajib mengikuti standar ini agar struktur kode tetap konsisten, m
 - [Controller Standard](#controller-standard)
 - [Service Standard](#service-standard)
 - [Model Standard](#model-standard)
+- [Bahasa Pesan (User-Facing Messages)](#bahasa-pesan-user-facing-messages)
 - [Summary](#summary)
 
 ---
@@ -263,6 +264,34 @@ Model hanya digunakan untuk:
 - UUID Generation
 
 Model tidak boleh berisi business logic.
+
+---
+
+## Bahasa Pesan (User-Facing Messages)
+
+Seluruh pesan yang tampil ke user (validasi, error, status flash message) wajib Bahasa Indonesia.
+
+FAOSBall **tidak** menggunakan sistem file terjemahan Laravel (folder `lang/`, helper `__()`/`trans()`). Pesan Indonesia ditulis langsung sebagai string literal di kode — di `messages()` milik Form Request, atau langsung di argumen `ValidationException::withMessages([...])`/`$request->validate([...], [...])` pada Controller.
+
+Contoh (lihat `app/Http/Requests/Auth/LoginRequest.php`):
+
+```php
+public function messages(): array
+{
+    return [
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Format email tidak valid.',
+    ];
+}
+```
+
+```php
+throw ValidationException::withMessages([
+    'email' => 'Email atau password tidak valid.',
+]);
+```
+
+**Perhatian khusus untuk controller bawaan Laravel Breeze** (`PasswordResetLinkController`, `NewPasswordController`, `ConfirmablePasswordController`, dsb): controller ini secara default memanggil `__($status)` atau `__('auth.password')`, yang tanpa folder `lang/` akan jatuh ke string default Laravel (Bahasa Inggris). Setiap kali membuat/menyentuh controller auth bawaan Breeze, ganti pemanggilan `__()`-nya dengan string Indonesia literal, mengikuti pola yang sama seperti `LoginRequest`. Jangan menambahkan folder `lang/` sebagai solusinya.
 
 ---
 
