@@ -124,6 +124,7 @@ Dokumentasi lengkap tersedia pada folder **docs/**.
 | docs/authorization.md | Authorization Architecture |
 | docs/development-guide.md | Development Guide |
 | docs/module-standard.md | Module Standard |
+| docs/frontend-standard.md | Frontend Standard (CSS/Tailwind/Blade) |
 
 ---
 

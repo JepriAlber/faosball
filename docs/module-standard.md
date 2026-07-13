@@ -189,6 +189,8 @@ Contoh:
 @endcan
 ```
 
+Untuk konvensi penulisan CSS/Tailwind di view (kapan bikin `@utility` baru, struktur file `resources/css/theme`), lihat `docs/frontend-standard.md`.
+
 ---
 
 ## Route Standard

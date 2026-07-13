@@ -199,5 +199,6 @@ Setelah instalasi selesai, lanjutkan dengan membaca dokumentasi berikut:
 3. `docs/authorization.md`
 4. `docs/coding-standard.md`
 5. `docs/development-guide.md`
+6. `docs/frontend-standard.md`
 
 Dokumen tersebut menjelaskan standar arsitektur dan aturan pengembangan yang wajib diikuti pada seluruh module FAOSBall.

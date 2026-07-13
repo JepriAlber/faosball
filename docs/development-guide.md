@@ -287,6 +287,8 @@ Contoh:
 
 Sebagian besar pengguna FAOSBall adalah orang lapangan (Coach, Academy Admin) yang lebih sering mengakses sistem lewat HP/tablet, bukan laptop. Karena itu, setiap View wajib nyaman dipakai di layar kecil, bukan cuma di desktop.
 
+> Untuk konvensi penulisan class CSS/Tailwind itu sendiri (kapan bikin `@utility` baru, jebakan varian breakpoint vs toggle dinamis), lihat `docs/frontend-standard.md`.
+
 Ketentuan:
 
 - Uji tampilan minimal di 3 breakpoint: mobile (`< 640px`), tablet (`md`), dan desktop (`lg` ke atas). Jangan hanya mengecek di layar desktop lalu asumsikan otomatis rapi di HP.
