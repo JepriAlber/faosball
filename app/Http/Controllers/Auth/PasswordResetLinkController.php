@@ -38,8 +38,13 @@ class PasswordResetLinkController extends Controller
         );
 
         return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
+                    ? back()->with('status', 'Kami telah mengirimkan link reset password ke email Anda.')
                     : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+                        ->withErrors([
+                            'email' => match ($status) {
+                                Password::RESET_THROTTLED => 'Mohon tunggu sebelum mencoba lagi.',
+                                default => 'Kami tidak dapat menemukan pengguna dengan email tersebut.',
+                            },
+                        ]);
     }
 }
