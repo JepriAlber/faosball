@@ -320,12 +320,9 @@
             <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Keluar dari akun?
             </p>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="sidebar-signout-btn">
-                    Sign Out
-                </button>
-            </form>
+            <button type="button" @click="$dispatch('logout-confirm')" class="sidebar-signout-btn">
+                Sign Out
+            </button>
         </div>
 
     </div>

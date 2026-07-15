@@ -61,6 +61,9 @@
     </div>
     {{-- ===== Page Wrapper End ===== --}}
 
+    {{-- ===== Modal Konfirmasi Logout ===== --}}
+    <x-modal.logout />
+
     {{-- Stack untuk script tambahan per-halaman --}}
     @stack('scripts')
 

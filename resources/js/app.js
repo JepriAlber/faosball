@@ -4,6 +4,7 @@ import focus from '@alpinejs/focus'
 import deleteModal from './components/delete-modal'
 import resetAkunModal from './components/reset-akun-modal'
 import statusModal from './components/status-modal'
+import logoutModal from './components/logout-modal'
 import rolePermissionForm from './components/role-permission-form';
 
 Alpine.plugin(persist);
@@ -12,6 +13,7 @@ Alpine.plugin(focus);
 Alpine.data('deleteModal', deleteModal)
 Alpine.data('resetAkunModal', resetAkunModal)
 Alpine.data('statusModal', statusModal)
+Alpine.data('logoutModal', logoutModal)
 Alpine.data('rolePermissionForm', rolePermissionForm);
 
 window.Alpine = Alpine;
