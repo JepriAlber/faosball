@@ -32,6 +32,15 @@
             @csrf
             @method('PUT')
 
+            @if ($isSuperAdmin)
+                <div class="form-group">
+                    <label class="form-label">Academy</label>
+                    <p class="form-input bg-gray-50 dark:bg-gray-800">
+                        {{ $role->id_academy ? $role->academy->name : 'Role System' }}
+                    </p>
+                </div>
+            @endif
+
             <div class="form-group">
 
                 <label class="form-label">

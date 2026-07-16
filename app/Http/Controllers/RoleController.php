@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Role\RoleFormRequest;
+use App\Models\Academy;
+use App\Models\Role;
+use App\Services\AcademyService;
 use App\Services\RoleService;
-use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
     protected RoleService $roleService;
+    protected AcademyService $academyService;
 
-    public function __construct(RoleService $roleService)
+    public function __construct(RoleService $roleService, AcademyService $academyService)
     {
         $this->roleService = $roleService;
+        $this->academyService = $academyService;
     }
 
     /**
@@ -26,7 +30,8 @@ class RoleController extends Controller
                 ['label'=>'Administration'],
                 ['label'=>'Role Management']
             ],
-            'roles'=>$this->roleService->paginate()
+            'roles'=>$this->roleService->paginate(),
+            'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
         ]);
     }
 
@@ -46,7 +51,11 @@ class RoleController extends Controller
                     'label'=>'Tambah Role'
                 ]
             ],
-            'permissionGroups'=>$this->roleService->permissionGroups()
+            'permissionGroups'=>$this->roleService->permissionGroups(),
+            'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
+            'academies'=>$this->academyService->isSuperAdmin()
+                ? Academy::orderBy('name')->get()
+                : collect(),
         ]);
     }
 
@@ -75,53 +84,63 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-public function show(Role $role)
-{
-    $data = $this->roleService->detail($role);
+    public function show(Role $role)
+    {
+        $this->authorize('view', $role);
 
-    return view('roles.show', [
-        'title' => 'Detail Role',
-        'breadcrumb' => [
-            [
-                'label' => 'Role Management',
-                'url' => route('roles.index'),
+        $data = $this->roleService->detail($role);
+
+        return view('roles.show', [
+            'title' => 'Detail Role',
+            'breadcrumb' => [
+                [
+                    'label' => 'Role Management',
+                    'url' => route('roles.index'),
+                ],
+                [
+                    'label' => 'Detail Role',
+                ],
             ],
-            [
-                'label' => 'Detail Role',
-            ],
-        ],
-        'role' => $data['role'],
-        'permissionGroups' => $data['permissionGroups'],
-    ]);
-}
+            'role' => $data['role'],
+            'permissionGroups' => $data['permissionGroups'],
+        ]);
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Role $role)
-{
-    return view('roles.edit', [
-        'title' => 'Edit Role',
-        'breadcrumb' => [
-            [
-                'label' => 'Role Management',
-                'url' => route('roles.index'),
+    {
+        $this->authorize('update', $role);
+
+        return view('roles.edit', [
+            'title' => 'Edit Role',
+            'breadcrumb' => [
+                [
+                    'label' => 'Role Management',
+                    'url' => route('roles.index'),
+                ],
+                [
+                    'label' => 'Edit Role',
+                ],
             ],
-            [
-                'label' => 'Edit Role',
-            ],
-        ],
-        'role' => $role,
-        'permissionGroups' => $this->roleService->permissionGroups(),
-        'selectedPermissions' => $role->permissions->pluck('name')->toArray(),
-    ]);
-}
+            'role' => $role,
+            'permissionGroups' => $this->roleService->permissionGroups(),
+            'selectedPermissions' => $role->permissions->pluck('name')->toArray(),
+            'isSuperAdmin' => $this->academyService->isSuperAdmin(),
+            'academies' => $this->academyService->isSuperAdmin()
+                ? Academy::orderBy('name')->get()
+                : collect(),
+        ]);
+    }
 
     /**
      * Update the specified resource.
      */
-    public function update(RoleFormRequest $request,Role $role)
+    public function update(RoleFormRequest $request, Role $role)
     {
+        $this->authorize('update', $role);
+
         try{
 
             $this->roleService->update(
@@ -145,6 +164,8 @@ public function show(Role $role)
      */
     public function destroy(Role $role)
     {
+        $this->authorize('delete', $role);
+
         try{
 
             $this->roleService->delete($role);

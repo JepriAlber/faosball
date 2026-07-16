@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 
 abstract class Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Menangani exception dari Service secara terpusat.
      *

@@ -27,6 +27,27 @@
 
             @csrf
 
+            @if ($isSuperAdmin)
+                <div class="form-group">
+
+                    <label class="form-label">Academy</label>
+
+                    <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror">
+                        <option value="">— Role System —</option>
+                        @foreach ($academies as $academy)
+                            <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
+                                {{ $academy->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @error('id_academy')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+
+                </div>
+            @endif
+
             <div class="form-group">
 
                 <label class="form-label">

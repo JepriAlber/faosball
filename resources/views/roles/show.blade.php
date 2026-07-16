@@ -63,15 +63,26 @@
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
 
                         @forelse ($permissionGroups as $module => $permissions)
-                            <div class="rounded-lg border border-gray-200 dark:border-gray-800">
+                            <div x-data="{ open: true }"
+                                class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
 
-                                <div class="border-b border-gray-100 px-4 py-3 dark:border-gray-800">
+                                <button type="button" @click="open=!open"
+                                    class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left transition hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/5">
+
+                                    <svg class="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200"
+                                        :class="{ 'rotate-90': open }" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+
                                     <h5 class="text-sm font-semibold text-gray-800 dark:text-white">
                                         {{ \Illuminate\Support\Str::headline($module) }}
                                     </h5>
-                                </div>
 
-                                <div class="grid gap-2 p-4">
+                                </button>
+
+                                <div x-show="open" class="grid gap-2 p-4">
 
                                     @foreach ($permissions as $permission)
                                         <div

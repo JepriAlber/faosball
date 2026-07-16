@@ -34,7 +34,9 @@
                 <thead class="table-head">
                     <tr class="table-header-row">
                         <th class="table-header-cell">Role</th>
-                        <th class="table-header-cell">Guard</th>
+                        @if ($isSuperAdmin)
+                            <th class="table-header-cell">Academy</th>
+                        @endif
                         <th class="table-header-cell">Permission</th>
                         <th class="table-header-cell">User</th>
                         <th class="table-header-cell text-center">Aksi</th>
@@ -54,9 +56,15 @@
                                 </div>
                             </td>
 
-                            <td class="table-cell">
-                                <span class="badge badge-secondary">{{ $role->guard_name }}</span>
-                            </td>
+                            @if ($isSuperAdmin)
+                                <td class="table-cell">
+                                    @if ($role->id_academy)
+                                        <span class="badge badge-secondary">{{ $role->academy->name }}</span>
+                                    @else
+                                        <span class="badge badge-primary">Role System</span>
+                                    @endif
+                                </td>
+                            @endif
 
                             <td class="table-cell">
                                 <span class="table-text">{{ $role->permissions_count }} Permission</span>
@@ -146,7 +154,13 @@
                             <span class="table-subtitle">{{ $role->created_at->format('d M Y') }}</span>
                         </div>
 
-                        <span class="badge badge-secondary shrink-0">{{ $role->guard_name }}</span>
+                        @if ($isSuperAdmin)
+                            @if ($role->id_academy)
+                                <span class="badge badge-secondary shrink-0">{{ $role->academy->name }}</span>
+                            @else
+                                <span class="badge badge-primary shrink-0">Role System</span>
+                            @endif
+                        @endif
                     </div>
 
                     <div class="table-card-body">
