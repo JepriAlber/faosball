@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -72,14 +73,54 @@ class AccountService
     }
 
 
-    public function assignRole(User $user,string $role): User
+    /**
+     * Assign role ke user.
+     *
+     * Role wajib berasal dari academy yang sama dengan user
+     * (atau Role System untuk user tanpa academy).
+     */
+    public function assignRole(User $user, Role|string $role): User
     {
         $user->syncRoles([
-            $role
+            $this->resolveRole($user, $role),
         ]);
 
-
         return $user;
+    }
+
+    /**
+     * Terjemahkan nama role menjadi baris Role milik academy user.
+     *
+     * JANGAN diganti dengan Role::findByName(). Method itu mengambil baris
+     * pertama yang cocok tanpa peduli academy. Lihat Bagian 4.2.
+     */
+    protected function resolveRole(User $user, Role|string $role): Role
+    {
+        if ($role instanceof Role) {
+
+            if ($role->id_academy !== $user->id_academy) {
+                throw new \Exception('Role tidak berasal dari academy yang sama dengan user.');
+            }
+
+            return $role;
+        }
+
+        $query = Role::query()
+            ->where('name', $role)
+            ->where('guard_name', config('faos.guard'));
+
+        // Perhatikan: where('id_academy', null) tidak pernah cocok di SQL.
+        $user->id_academy === null
+            ? $query->whereNull('id_academy')
+            : $query->where('id_academy', $user->id_academy);
+
+        $resolved = $query->first();
+
+        if (! $resolved) {
+            throw new \Exception('Role "' . $role . '" tidak ditemukan pada academy user.');
+        }
+
+        return $resolved;
     }
 
 }

@@ -9,7 +9,14 @@ use Illuminate\Support\Str;
 
 class AcademyManagementService
 {
-    
+
+    protected RoleService $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Upload academy logo
      */
@@ -68,7 +75,11 @@ class AcademyManagementService
                 );
             }
 
-            return Academy::create($data);
+            $academy = Academy::create($data);
+
+            $this->roleService->createDefaultRoles($academy);
+
+            return $academy;
         });
     }
 
