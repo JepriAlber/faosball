@@ -18,6 +18,7 @@ Satu aplikasi melayani banyak academy menggunakan satu database. Seluruh data te
 - [Academy Service](#academy-service)
 - [Academy Scope](#academy-scope)
 - [BelongsToAcademy Trait](#belongstoacademy-trait)
+- [Role: Tenant Tanpa BelongsToAcademy](#role-tenant-tanpa-belongstoacademy)
 - [Academy Exception](#academy-exception)
 - [Login Flow](#login-flow)
 - [Login Validation](#login-validation)
@@ -76,13 +77,13 @@ Contoh:
 | players | id_academy |
 | coaches | id_academy |
 | parents | id_academy |
+| roles | id_academy (nullable, lihat [Role: Tenant Tanpa BelongsToAcademy](#role-tenant-tanpa-belongstoacademy)) |
 
 Tabel global tidak menggunakan `id_academy`.
 
 Contoh:
 
 - academies
-- roles
 - permissions
 - role_has_permissions
 - model_has_roles
@@ -118,11 +119,12 @@ Karakteristik:
 - `id_academy != NULL`
 - Hanya dapat mengakses data academy sendiri.
 
-Contoh role:
+Contoh role (dari `config('faos.role_templates')`, dibuat otomatis untuk tiap academy baru):
 
-- Academy Owner
-- Academy Admin
+- Owner
 - Coach
+- Staff
+- Finance
 - Player
 - Parent
 
@@ -247,6 +249,25 @@ Developer tidak perlu mengisi `id_academy` secara manual.
 
 ---
 
+## Role: Tenant Tanpa BelongsToAcademy
+
+`App\Models\Role` (extends `Spatie\Permission\Models\Role`) adalah tabel tenant — punya `id_academy` — tapi **sengaja tidak** memakai trait `BelongsToAcademy` maupun `AcademyScope`. Ini satu-satunya pengecualian pada aturan "seluruh model tenant memakai `BelongsToAcademy`" di atas.
+
+**Kenapa dikecualikan:**
+
+1. **Global scope meracuni cache Spatie lintas tenant.** `PermissionRegistrar` menjalankan `Permission::with('roles')->get()` untuk membangun peta permission, lalu menyimpannya ke **satu cache key bersama** untuk seluruh tenant (`spatie.permission.cache`). Kalau `Role` dipasangi global scope, eager-load `with('roles')` ikut terfilter oleh academy siapa pun yang kebetulan memicu rebuild cache saat itu — role milik academy lain "hilang" dari cache sampai di-flush, dan bug-nya terlihat acak karena bergantung akademi mana yang terakhir memicu rebuild.
+2. **`BelongsToAcademy` melempar exception saat `id_academy` null.** Trait ini selalu mengisi `id_academy` dari user yang login dan menolak kalau `currentId()` null — padahal Super Admin (`id_academy = null`) justru harus bisa membuat Role System maupun role untuk academy manapun.
+
+**Solusi yang dipakai sebagai gantinya:**
+
+- **Local scope** `Role::forCurrentAcademy()` — dipanggil eksplisit oleh `RoleService::paginate()`, bukan otomatis seperti global scope. Super Admin melihat seluruh role; user academy hanya melihat role academy-nya.
+- **`RolePolicy`** — mencegah akses lintas academy lewat URL langsung (mis. `Owner` Academy A membuka `/roles/{id}` milik Academy B), karena middleware permission (`role.view`) cuma memeriksa hak akses fitur, bukan kepemilikan baris data.
+- **`id_academy` diisi eksplisit oleh Service** (`RoleService::resolveAcademyId()`, `RoleService::createDefaultRoles()`), bukan otomatis lewat trait.
+
+**Cara kerja isolasi permission per academy.** Permission tetap **global** (satu baris permission dipakai bersama seluruh sistem). Yang membedakan Academy A dan Academy B adalah **baris `roles`**: masing-masing academy punya baris `Owner` sendiri (id berbeda) dengan kombinasi permission masing-masing di `role_has_permissions`. Spatie mencocokkan permission lewat **primary key role**, bukan nama, jadi dua academy boleh punya role bernama sama tanpa saling memengaruhi hak aksesnya. Detail lengkap ada di komentar `App\Models\Role` dan `App\Policies\RolePolicy`.
+
+---
+
 ## Academy Exception
 
 Apabila academy tidak ditemukan ketika membuat data tenant, proses akan dihentikan dengan exception.
@@ -327,9 +348,10 @@ Seluruh user selain Super Admin tetap mengikuti pemeriksaan permission.
 | Role | Academy Sendiri | Academy Lain |
 |------|:---------------:|:------------:|
 | Super Admin | ✓ | ✓ |
-| Academy Owner | ✓ | ✗ |
-| Academy Admin | ✓ | ✗ |
+| Owner | ✓ | ✗ |
 | Coach | ✓ | ✗ |
+| Staff | ✓ | ✗ |
+| Finance | ✓ | ✗ |
 | Player | ✓ | ✗ |
 | Parent | ✓ | ✗ |
 
@@ -373,4 +395,4 @@ atau biarkan `BelongsToAcademy` mengisi `id_academy` secara otomatis.
 
 ## Summary
 
-FAOSBall menerapkan arsitektur Single Database Multi-Tenant dengan `id_academy` sebagai pemisah data antar academy. `AcademyScope` memfilter seluruh query secara otomatis, `BelongsToAcademy` mengisi `id_academy` saat membuat data baru, dan `AcademyService` menjadi pusat informasi tenant. Dengan pendekatan ini, seluruh module mengikuti mekanisme multi-tenant yang konsisten tanpa perlu menangani isolasi data secara manual.
+FAOSBall menerapkan arsitektur Single Database Multi-Tenant dengan `id_academy` sebagai pemisah data antar academy. `AcademyScope` memfilter seluruh query secara otomatis, `BelongsToAcademy` mengisi `id_academy` saat membuat data baru, dan `AcademyService` menjadi pusat informasi tenant. Dengan pendekatan ini, seluruh module mengikuti mekanisme multi-tenant yang konsisten tanpa perlu menangani isolasi data secara manual. `Role` adalah satu-satunya pengecualian: tetap tenant (punya `id_academy`), tapi memakai local scope + Policy, bukan `BelongsToAcademy`/`AcademyScope`, karena global scope pada `Role` akan meracuni cache Spatie lintas tenant (lihat [Role: Tenant Tanpa BelongsToAcademy](#role-tenant-tanpa-belongstoacademy)).
