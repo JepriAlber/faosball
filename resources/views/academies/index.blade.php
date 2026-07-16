@@ -137,6 +137,98 @@
             </table>
         </div>
 
+        <!-- Card List (mobile & tablet) -->
+        <div class="table-card-list">
+            @forelse ($academies as $academy)
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div class="flex min-w-0 items-center gap-3">
+                            <div class="table-avatar shrink-0">
+                                @if ($academy->logo)
+                                    <img src="{{ asset('storage/' . $academy->logo) }}"
+                                        alt="Logo {{ $academy->name }}" class="h-full w-full object-cover">
+                                @else
+                                    <span class="avatar-placeholder">
+                                        {{ strtoupper(substr($academy->name, 0, 2)) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <a href="{{ route('academies.show', $academy->id_academy) }}"
+                                    class="table-title truncate">
+                                    {{ $academy->name }}
+                                </a>
+                                <span class="table-subtitle truncate">
+                                    {{ $academy->slug }}
+                                </span>
+                            </div>
+                        </div>
+
+                        @if ($academy->status)
+                            <span class="badge badge-success shrink-0">Aktif</span>
+                        @else
+                            <span class="badge badge-danger shrink-0">Nonaktif</span>
+                        @endif
+                    </div>
+
+                    <div class="table-card-body">
+                        <div class="table-card-field">
+                            <span class="table-card-label">Kontak</span>
+                            <span class="table-text">{{ $academy->email }}</span>
+                            <span class="table-subtitle">{{ $academy->phone }}</span>
+                        </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Tagline</span>
+                            <span class="table-description">"{{ $academy->tagline }}"</span>
+                        </div>
+                    </div>
+
+                    <div class="table-card-actions">
+                        <a href="{{ route('academies.show', $academy->id_academy) }}"
+                            class="btn-icon btn-icon-primary" title="Detail">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <a href="{{ route('academies.edit', $academy->id_academy) }}"
+                            class="btn-icon btn-icon-warning" title="Edit">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
+                    </div>
+                </div>
+            @empty
+                <div class="table-card">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            class="text-gray-300 dark:text-gray-700 mb-3">
+                            <path
+                                d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <h4 class="empty-title">Belum ada data Academy</h4>
+                        <p class="empty-description">Tambah academy sekarang</p>
+                        <a href="{{ route('academies.create') }}" class="empty-link">Tambah
+                            sekarang</a>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
         <!-- Pagination -->
         @if ($academies->hasPages())
             <div class="table-footer">

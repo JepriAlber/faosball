@@ -13,6 +13,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Kapan Membuat @utility Baru](#kapan-membuat-utility-baru)
 - [Gotcha: Varian Breakpoint vs Toggle Dinamis](#gotcha-varian-breakpoint-vs-toggle-dinamis)
 - [Konsistensi Warna & Token](#konsistensi-warna--token)
+- [Tabel Responsif: Table Desktop + Card List Mobile/Tablet](#tabel-responsif-table-desktop--card-list-mobiletablet)
 - [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
@@ -85,6 +86,48 @@ Sebelum membuat `@utility` baru, selalu cek: apakah elemen ini juga punya `:clas
 
 ---
 
+## Tabel Responsif: Table Desktop + Card List Mobile/Tablet
+
+### Masalah
+
+Tabel data-dense pada halaman index/list module (players, academies, roles, permissions, dst) memakai `table-wrapper` yang scroll horizontal (`overflow-x-auto`) karena `table` punya `min-w-[1000px]`. Di desktop ini bagus, tapi di tablet/smartphone — yang justru jadi alat kerja utama coach dan staff di lapangan — kolom kanan (Status, Aksi) kepotong dari layar pertama dan user harus geser horizontal untuk melihatnya. UX-nya buruk untuk device yang paling sering dipakai user sistem ini.
+
+### Solusi wajib: dual-render Table (desktop) + Card List (mobile/tablet)
+
+Setiap halaman index/list module yang menampilkan data dalam tabel wajib punya **dua representasi data yang di-render sekaligus oleh server**, ditoggle tampil/sembunyi lewat breakpoint `lg` (1024px) — bukan JavaScript, murni CSS:
+
+1. **Table** (`table-wrapper` > `table`) — tampil hanya di `lg:` ke atas. `table-wrapper` sudah `hidden lg:block` secara default di `components.css`, tidak perlu ditambah apa pun lagi di Blade.
+2. **Card List** (`table-card-list`) — tampil di bawah `lg` (utility-nya sudah include `lg:hidden`), satu `table-card` per baris data.
+
+Class yang tersedia (didefinisikan di `resources/css/theme/components.css`, section "Table Card"):
+
+- `table-card-list` — wrapper `flex flex-col gap-3`, otomatis `lg:hidden`.
+- `table-card` — 1 card per baris data (border + rounded, senada dengan `card`).
+- `table-card-header` — `flex justify-between`, biasanya avatar+judul di kiri (representasi kolom "Info X") dan badge status di kanan (representasi kolom "Status").
+- `table-card-body` — grid 2 kolom untuk field-field sekunder (representasi kolom-kolom lain seperti Profil, Posisi, Kontak, Tagline, dst).
+- `table-card-field` + `table-card-label` — satu field: label kecil di atas (`table-card-label`) + value (pakai `table-text`/`table-subtitle`/`badge` seperti biasa).
+- `table-card-actions` — footer tombol aksi, pakai ulang komponen/icon yang sama persis dengan kolom Aksi di tabel (`btn-icon-*`, `<x-button.delete>`, `@can` guard yang sama).
+
+### Pola implementasi
+
+Card List ditulis sebagai `@forelse` kedua yang looping data yang sama, diletakkan tepat setelah `</div>` penutup `table-wrapper` dan sebelum `table-footer`/pagination. Aturan pentingnya:
+
+- Isi card **wajib merepresentasikan seluruh kolom tabel** — jangan buang informasi hanya karena dipindah ke card, karena tujuan pola ini justru supaya user mobile/tablet tidak kehilangan data yang tersedia di desktop.
+- Empty-state wajib digandakan versi card-nya juga (`<div class="table-card"><div class="empty-state">...</div></div>` di dalam `@empty`), supaya tetap tampil saat data kosong di layar kecil — bukan cuma kosong tanpa keterangan.
+- Guard permission (`@can`) dan disabled-state (mis. tombol delete yang di-disable karena masih dipakai relasi lain) harus identik antara versi table dan versi card.
+
+Contoh lengkap: `resources/views/players/index.blade.php`, `academies/index.blade.php`, `permissions/index.blade.php`, `roles/index.blade.php`.
+
+### Kenapa dual-render, bukan sekadar sembunyi kolom (`hidden md:table-cell`)
+
+Alternatif yang lebih murah adalah menyembunyikan kolom sekunder di breakpoint kecil sambil tetap pakai tabel. Ini **tidak dipakai** karena user tetap kehilangan info (harus buka halaman detail buat lihat kolom yang disembunyikan), dan tombol aksi tetap berdesakan di lebar tablet. Card List memberi kepadatan informasi setara tabel tapi dengan hierarki visual yang lebih jelas di layar sempit.
+
+### Kapan pola ini wajib dipakai
+
+Wajib untuk semua halaman index/list module (baru maupun refactor) yang menampilkan data lewat `table-wrapper` + `table`. Kalau ada tabel index yang sangat sederhana (≤3 kolom pendek, tidak ada kolom yang berpotensi kepotong di layar kecil) dan terasa berlebihan untuk dibuatkan Card List, diskusikan dulu dengan user sebelum melewati pola ini — jangan asumsikan boleh dilewati begitu saja (lihat Aturan Utama di `CLAUDE.md`).
+
+---
+
 ## Reusable View dengan Data Dinamis
 
 Kalau sebuah partial/view perlu menampilkan data yang dihitung sendiri (query database, statistik, dsb), gunakan **class-based Blade Component** (`App\View\Components\Xxx`), bukan View Composer.
@@ -120,8 +163,9 @@ Gunakan:
 
 - `@utility` untuk pola yang berulang atau string Tailwind panjang.
 - Token dari `variables.css` daripada hardcode warna/shadow/z-index.
-- Cek dulu apakah class yang dibutuhkan sudah ada sebelum bikin baru (terutama di `components.css` - card/btn/badge/form/table/modal/avatar/dropdown sudah lengkap).
+- Cek dulu apakah class yang dibutuhkan sudah ada sebelum bikin baru (terutama di `components.css` - card/btn/badge/form/table/table-card/modal/avatar/dropdown sudah lengkap).
 - Class-based Blade Component untuk view yang butuh data dinamis/hitung sendiri, bukan View Composer.
+- Dual-render Table (desktop) + Card List (mobile/tablet) untuk semua halaman index/list module (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).
 
 Hindari:
 
@@ -129,9 +173,10 @@ Hindari:
 - Hardcode warna/shadow yang sebenarnya sudah ada tokennya.
 - Membuat `@utility` baru untuk toggle dinamis yang sepele (single property, dipakai sekali).
 - `View::composer()` untuk mengikat data ke partial — pakai Blade Component (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)).
+- Halaman index/list baru yang hanya mengandalkan tabel dengan scroll horizontal tanpa Card List di mobile/tablet.
 
 ---
 
 ## Summary
 
-FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar.
+FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar. Untuk halaman index/list module, tabel wajib didampingi Card List responsif (`table-card-list`) supaya data tidak kepotong saat diakses lewat tablet/smartphone di lapangan (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).

@@ -191,6 +191,8 @@ Contoh:
 
 Untuk konvensi penulisan CSS/Tailwind di view (kapan bikin `@utility` baru, struktur file `resources/css/theme`), lihat `docs/frontend-standard.md`.
 
+Halaman index/list module yang menampilkan data lewat `table-wrapper` + `table` wajib didampingi Card List responsif (`table-card-list`) supaya kolom tabel tidak kepotong di tablet/smartphone — lihat `docs/frontend-standard.md#tabel-responsif-table-desktop--card-list-mobiletablet`.
+
 ---
 
 ## Route Standard
@@ -277,6 +279,7 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - [ ] UUID digunakan sebagai Primary Key.
 - [ ] `id_academy` ditambahkan pada tabel tenant.
 - [ ] Relasi database telah dibuat.
+- [ ] Index ditambahkan pada `id_academy` dan foreign key lain yang sering dipakai filter/join (lihat `docs/query-performance.md`).
 
 ### Model
 
@@ -295,6 +298,7 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - [ ] Business logic berada pada Service.
 - [ ] Menggunakan `DB::transaction()` jika diperlukan.
 - [ ] Menggunakan `AccountService` jika membuat akun.
+- [ ] Query list memakai `paginate()`, relasi yang dipakai di view di-eager-load (`with()`/`withCount()`) — lihat `docs/query-performance.md`.
 
 ### Controller
 
@@ -305,6 +309,7 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 
 - [ ] Menggunakan folder sesuai nama module.
 - [ ] Menggunakan Blade Permission Directive.
+- [ ] Halaman index/list punya Card List responsif (`table-card-list`) selain tabel, jika datanya ditampilkan dalam tabel.
 
 ### Route
 

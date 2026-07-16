@@ -317,6 +317,8 @@ Seluruh proses berikut berada pada Service:
 - Database Transaction
 - Business Rule Validation
 
+Karena query (termasuk eager loading, pagination) dibentuk di Service, standar performa query (N+1, `with()`/`withCount()`, index database) wajib diikuti di layer ini — lihat `docs/query-performance.md`.
+
 ---
 
 ## Project Structure

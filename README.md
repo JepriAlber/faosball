@@ -125,6 +125,7 @@ Dokumentasi lengkap tersedia pada folder **docs/**.
 | docs/development-guide.md | Development Guide |
 | docs/module-standard.md | Module Standard |
 | docs/frontend-standard.md | Frontend Standard (CSS/Tailwind/Blade) |
+| docs/query-performance.md | Query & Database Performance (N+1, Eager Loading, Index) |
 
 ---
 

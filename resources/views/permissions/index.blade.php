@@ -134,6 +134,84 @@
             </table>
         </div>
 
+        <!-- Card List (mobile & tablet) -->
+        <div class="table-card-list">
+            @forelse($permissions as $permission)
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div class="min-w-0">
+                            <a href="{{ route('permissions.show', $permission) }}"
+                                class="table-title truncate">{{ $permission->name }}</a>
+                            <span class="table-subtitle">{{ $permission->created_at->format('d M Y') }}</span>
+                        </div>
+
+                        <span class="badge {{ \App\Support\PermissionPresenter::badge($permission->name) }} shrink-0">
+                            {{ \App\Support\PermissionPresenter::actionLabel($permission->name) }}
+                        </span>
+                    </div>
+
+                    <div class="table-card-body">
+                        <div class="table-card-field">
+                            <span class="table-card-label">Module</span>
+                            <span class="badge badge-secondary w-fit">
+                                {{ \Illuminate\Support\Str::headline(\App\Support\PermissionPresenter::module($permission->name)) }}
+                            </span>
+                        </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Guard</span>
+                            <span class="badge badge-secondary w-fit">{{ $permission->guard_name }}</span>
+                        </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Role</span>
+                            <span class="table-text">{{ $permission->roles_count }} Role</span>
+                        </div>
+                    </div>
+
+                    <div class="table-card-actions">
+                        @can('permission.view')
+                            <a href="{{ route('permissions.show', $permission) }}"
+                                class="btn-icon btn-icon-primary" title="Detail">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path
+                                        d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                                        stroke="currentColor" stroke-width="1.5" />
+                                    <path
+                                        d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
+                                        stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                            </a>
+                        @endcan
+
+                        @can('permission.delete')
+                            <x-button.delete :action="route('permissions.destroy', $permission)"
+                                :name="$permission->name" :disabled="$permission->roles_count > 0"
+                                reason="Permission masih digunakan oleh role, tidak dapat dihapus." />
+                        @endcan
+                    </div>
+                </div>
+            @empty
+                <div class="table-card">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
+                            class="text-gray-300 dark:text-gray-700 mb-3">
+                            <path
+                                d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
+                                stroke="currentColor" stroke-width="2.5" />
+                        </svg>
+                        <h4 class="empty-title">Belum ada Permission</h4>
+                        <p class="empty-description">Tambahkan permission pertama.</p>
+
+                        @can('permission.create')
+                            <a href="{{ route('permissions.create') }}" class="empty-link">Tambah
+                                Permission</a>
+                        @endcan
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
         @if ($permissions->hasPages())
             <div class="table-footer">
                 {{ $permissions->links() }}
