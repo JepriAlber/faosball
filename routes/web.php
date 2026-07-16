@@ -55,30 +55,37 @@ Route::middleware('auth')->group(function () {
     ->name('players.account.')
     ->group(function(){
 
-        Route::get('/create',
-            [PlayerAccountController::class,'create']
-        )->name('create');
+        Route::middleware('permission:user.create')->group(function () {
 
-        Route::post('/',
-            [PlayerAccountController::class,'store']
-        )->name('store');
- 
-        Route::get('/edit',
-            [PlayerAccountController::class,'edit']
-        )->name('edit');
+            Route::get('/create',
+                [PlayerAccountController::class,'create']
+            )->name('create');
 
-        Route::put('/',
-            [PlayerAccountController::class,'update']
-        )->name('update');
+            Route::post('/',
+                [PlayerAccountController::class,'store']
+            )->name('store');
 
-        
-        Route::patch('/status',
-            [PlayerAccountController::class,'status']
-        )->name('status');
+        });
 
-        Route::patch('/password',
-            [PlayerAccountController::class,'password']
-        )->name('password');
+        Route::middleware('permission:user.update')->group(function () {
+
+            Route::get('/edit',
+                [PlayerAccountController::class,'edit']
+            )->name('edit');
+
+            Route::put('/',
+                [PlayerAccountController::class,'update']
+            )->name('update');
+
+            Route::patch('/status',
+                [PlayerAccountController::class,'status']
+            )->name('status');
+
+            Route::patch('/password',
+                [PlayerAccountController::class,'password']
+            )->name('password');
+
+        });
 
     });
 
@@ -86,11 +93,12 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | Player Management
     |--------------------------------------------------------------------------
-    */ 
-    Route::resource(
-        'players',
-        PlayerController::class
-    );
+    */
+    Route::resource('players', PlayerController::class)
+        ->middlewareFor(['index', 'show'], 'permission:player.view')
+        ->middlewareFor(['create', 'store'], 'permission:player.create')
+        ->middlewareFor(['edit', 'update'], 'permission:player.update')
+        ->middlewareFor('destroy', 'permission:player.delete');
 
     /*
     |--------------------------------------------------------------------------

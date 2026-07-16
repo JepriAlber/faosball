@@ -18,15 +18,17 @@
                 <p class="card-description">Manajemen data pemain akademi sepak bola.</p>
             </div>
 
-            <div class="card-actions">
-                <a href="{{ route('players.create') }}" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                    Tambah Player
-                </a>
-            </div>
+            @can('player.create')
+                <div class="card-actions">
+                    <a href="{{ route('players.create') }}" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        Tambah Player
+                    </a>
+                </div>
+            @endcan
         </div>
 
         <div class="table-wrapper">
@@ -105,50 +107,58 @@
                             <td class="table-cell text-right">
                                 <div class="table-action">
                                     {{-- Detail --}}
-                                    <a href="{{ route('players.show', $player->id_player) }}"
-                                        class="btn-icon btn-icon-primary" title="Detail">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-
-                                            <path
-                                                d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
-                                                stroke="currentColor" stroke-width="1.5" />
-
-                                            <path
-                                                d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
-                                                stroke="currentColor" stroke-width="1.5" />
-                                        </svg>
-                                    </a>
-
-                                    {{-- Edit --}}
-                                    <a href="{{ route('players.edit', $player->id_player) }}"
-                                        class="btn-icon btn-icon-warning" title="Edit">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-
-                                            <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
-                                                stroke="currentColor" stroke-width="1.5" />
-
-                                        </svg>
-                                    </a>
-
-                                    {{-- Create Account --}}
-                                    @if (!$player->id_user)
-                                        <a href="{{ route('players.account.create', $player->id_player) }}"
-                                            class="btn-icon btn-icon-success" title="Buat Akun">
+                                    @can('player.view')
+                                        <a href="{{ route('players.show', $player->id_player) }}"
+                                            class="btn-icon btn-icon-primary" title="Detail">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 
                                                 <path
-                                                    d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
                                                     stroke="currentColor" stroke-width="1.5" />
 
                                                 <path
-                                                    d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                                    d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
                                                     stroke="currentColor" stroke-width="1.5" />
                                             </svg>
                                         </a>
-                                    @endif
+                                    @endcan
+
+                                    {{-- Edit --}}
+                                    @can('player.update')
+                                        <a href="{{ route('players.edit', $player->id_player) }}"
+                                            class="btn-icon btn-icon-warning" title="Edit">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+
+                                                <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
+                                                    stroke="currentColor" stroke-width="1.5" />
+
+                                            </svg>
+                                        </a>
+                                    @endcan
+
+                                    {{-- Create Account --}}
+                                    @can('user.create')
+                                        @if (!$player->id_user)
+                                            <a href="{{ route('players.account.create', $player->id_player) }}"
+                                                class="btn-icon btn-icon-success" title="Buat Akun">
+                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+
+                                                    <path
+                                                        d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                                        stroke="currentColor" stroke-width="1.5" />
+
+                                                    <path
+                                                        d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                                        stroke="currentColor" stroke-width="1.5" />
+                                                </svg>
+                                            </a>
+                                        @endif
+                                    @endcan
 
                                     {{-- Delete --}}
-                                    <x-button.delete :action="route('players.destroy', $player->id_player)" :name="$player->name" />
+                                    @can('player.delete')
+                                        <x-button.delete :action="route('players.destroy', $player->id_player)" :name="$player->name" />
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
@@ -172,9 +182,11 @@
                                     <p class="empty-description">
                                         Tambah player sekarang
                                     </p>
-                                    <a href="{{ route('players.create') }}" class="empty-link">
-                                        Tambah sekarang
-                                    </a>
+                                    @can('player.create')
+                                        <a href="{{ route('players.create') }}" class="empty-link">
+                                            Tambah sekarang
+                                        </a>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
@@ -244,44 +256,52 @@
 
                     <div class="table-card-actions">
                         {{-- Detail --}}
-                        <a href="{{ route('players.show', $player->id_player) }}"
-                            class="btn-icon btn-icon-primary" title="Detail">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path
-                                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
-                                    stroke="currentColor" stroke-width="1.5" />
-                                <path
-                                    d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
-                                    stroke="currentColor" stroke-width="1.5" />
-                            </svg>
-                        </a>
-
-                        {{-- Edit --}}
-                        <a href="{{ route('players.edit', $player->id_player) }}"
-                            class="btn-icon btn-icon-warning" title="Edit">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
-                                    stroke-width="1.5" />
-                            </svg>
-                        </a>
-
-                        {{-- Create Account --}}
-                        @if (!$player->id_user)
-                            <a href="{{ route('players.account.create', $player->id_player) }}"
-                                class="btn-icon btn-icon-success" title="Buat Akun">
+                        @can('player.view')
+                            <a href="{{ route('players.show', $player->id_player) }}"
+                                class="btn-icon btn-icon-primary" title="Detail">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path
-                                        d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                        d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
                                         stroke="currentColor" stroke-width="1.5" />
                                     <path
-                                        d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                        d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
                                         stroke="currentColor" stroke-width="1.5" />
                                 </svg>
                             </a>
-                        @endif
+                        @endcan
+
+                        {{-- Edit --}}
+                        @can('player.update')
+                            <a href="{{ route('players.edit', $player->id_player) }}"
+                                class="btn-icon btn-icon-warning" title="Edit">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
+                                        stroke-width="1.5" />
+                                </svg>
+                            </a>
+                        @endcan
+
+                        {{-- Create Account --}}
+                        @can('user.create')
+                            @if (!$player->id_user)
+                                <a href="{{ route('players.account.create', $player->id_player) }}"
+                                    class="btn-icon btn-icon-success" title="Buat Akun">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path
+                                            d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                            stroke="currentColor" stroke-width="1.5" />
+                                        <path
+                                            d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                            stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                </a>
+                            @endif
+                        @endcan
 
                         {{-- Delete --}}
-                        <x-button.delete :action="route('players.destroy', $player->id_player)" :name="$player->name" />
+                        @can('player.delete')
+                            <x-button.delete :action="route('players.destroy', $player->id_player)" :name="$player->name" />
+                        @endcan
                     </div>
                 </div>
 
@@ -302,9 +322,11 @@
                         <p class="empty-description">
                             Tambah player sekarang
                         </p>
-                        <a href="{{ route('players.create') }}" class="empty-link">
-                            Tambah sekarang
-                        </a>
+                        @can('player.create')
+                            <a href="{{ route('players.create') }}" class="empty-link">
+                                Tambah sekarang
+                            </a>
+                        @endcan
                     </div>
                 </div>
             @endforelse

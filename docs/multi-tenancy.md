@@ -247,6 +247,42 @@ Player::create([
 
 Developer tidak perlu mengisi `id_academy` secara manual.
 
+### Pengecualian: Super Admin membuat data untuk academy pilihan
+
+Super Admin tidak punya academy aktif (`currentId()` selalu `null`), tapi kadang perlu membuat data tenant untuk academy tertentu (mis. Super Admin menambahkan Player untuk Academy B lewat dropdown Academy di form create).
+
+`BelongsToAcademy` mendukung ini: kalau yang membuat data adalah Super Admin **dan** `id_academy` sudah di-set eksplisit sebelum `creating` (lewat mass-assignment, jadi kolom itu wajib ada di `$fillable` model), trait tidak menimpanya. Untuk user academy biasa, `id_academy` **tetap selalu dipaksa** dari academy mereka sendiri, apapun yang dikirim — jalur Super Admin ini tidak membuka celah bagi user biasa untuk membuat data di academy lain.
+
+Pola lengkapnya (dicontohkan di `PlayerService::resolveAcademy()` + `StorePlayerRequest`, sama seperti pola Tahap 3 di `App\Models\Role`):
+
+```php
+protected function resolveAcademy(array $data): Academy
+{
+    if ($this->academyService->isSuperAdmin()) {
+
+        $academy = Academy::find($data['id_academy'] ?? null);
+
+        if (!$academy) {
+            throw new \Exception('Academy tidak ditemukan.');
+        }
+
+        return $academy;
+    }
+
+    $academy = $this->academyService->current();
+
+    if (!$academy) {
+        throw new \Exception('Academy tidak ditemukan.');
+    }
+
+    return $academy;
+}
+```
+
+Lalu `Model::create(['id_academy' => $academy->id_academy, ...])` seperti biasa — `BelongsToAcademy` yang menentukan apakah nilai itu dipertahankan (Super Admin) atau ditimpa (user academy).
+
+Form Request wajib menolak `id_academy` dari user academy (`prohibited`) dan mewajibkannya untuk Super Admin (`required`), persis pola `RoleFormRequest`/`StorePlayerRequest`. View wajib menyembunyikan field Academy sama sekali untuk user academy (bukan cuma `disabled`), dan biasanya dibuat read-only (bukan dropdown) di form edit — data tenant yang sudah dibuat sebaiknya tidak berpindah academy lewat form edit biasa, kecuali memang didiskusikan dulu kebutuhannya (efeknya ke record terkait, mis. akun `User` yang menempel).
+
 ---
 
 ## Role: Tenant Tanpa BelongsToAcademy

@@ -153,15 +153,17 @@
 
                             <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
                                 {{-- Players --}}
-                                <li>
-                                    <a href="{{ route('players.index') }}" class="menu-dropdown-item group"
-                                        :class="{{ Route::is('players.*') ? 'true' : 'false' }}
-                                            ?
-                                            'menu-dropdown-item-active' :
-                                            'menu-dropdown-item-inactive'">
-                                        Players
-                                    </a>
-                                </li>
+                                @can('player.view')
+                                    <li>
+                                        <a href="{{ route('players.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('players.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            Players
+                                        </a>
+                                    </li>
+                                @endcan
 
                                 {{-- Training nanti --}}
                                 {{-- 

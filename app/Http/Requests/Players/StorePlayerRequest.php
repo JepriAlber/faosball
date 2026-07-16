@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Players;
 
 
+use App\Services\AcademyService;
 use Illuminate\Foundation\Http\FormRequest;
 
 
@@ -16,8 +17,17 @@ class StorePlayerRequest extends FormRequest
 
     public function rules(): array
     {
+        $academyService = app(AcademyService::class);
 
         return [
+
+            // Hanya Super Admin yang boleh (dan wajib) memilih academy.
+            // User academy: field ini tidak dirender & ditolak kalau tetap dikirim.
+            'id_academy' => [
+                $academyService->isSuperAdmin() ? 'required' : 'prohibited',
+                'uuid',
+                'exists:academies,id_academy',
+            ],
 
             'name' => [
                 'required',
@@ -113,6 +123,11 @@ class StorePlayerRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'id_academy.required' => 'Academy wajib dipilih.',
+            'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
+            'id_academy.uuid' => 'Academy tidak valid.',
+            'id_academy.exists' => 'Academy tidak ditemukan.',
 
             'name.required' => 'Nama player wajib diisi.',
             'name.string' => 'Nama player harus berupa teks.',

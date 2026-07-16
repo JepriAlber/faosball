@@ -13,6 +13,7 @@ Sebelum mengerjakan tugas apapun di project ini (fitur baru, refactor, bug fix),
    - `docs/module-standard.md` — struktur wajib tiap module baru.
    - `docs/frontend-standard.md` — konvensi CSS/Tailwind v4 (`@theme`/`@utility`), kapan bikin class reusable baru, gotcha varian breakpoint vs toggle dinamis, kapan pakai Blade Component vs View Composer, dan pola Table + Card List responsif untuk halaman index/list.
    - `docs/query-performance.md` — standar query & performa database: N+1, eager loading (`with`/`load`/`withCount`), pagination wajib, index database (terutama `id_academy` karena `AcademyScope`), dan cara deteksi lewat Laravel Debugbar.
+   - `docs/permission-reference.md` — peta module → permission yang benar-benar digerbang di kode (route middleware, `authorize()`, `@can()`), plus module mana yang permission-nya belum ditegakkan. **Wajib diupdate** setiap kali module baru menambahkan permission checking.
 
 ## Aturan Utama
 

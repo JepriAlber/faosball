@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Academy;
 use App\Models\Player;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,35 @@ class PlayerService
     }
 
 
+    /**
+     * Tentukan academy pemilik player baru.
+     *
+     * Super Admin : dari pilihan academy di form (wajib, divalidasi StorePlayerRequest).
+     * User academy: selalu dari academy miliknya sendiri, input form diabaikan.
+     */
+    protected function resolveAcademy(array $data): Academy
+    {
+        if ($this->academyService->isSuperAdmin()) {
+
+            $academy = Academy::find($data['id_academy'] ?? null);
+
+            if (!$academy) {
+                throw new \Exception('Academy tidak ditemukan.');
+            }
+
+            return $academy;
+        }
+
+        $academy = $this->academyService->current();
+
+        if (!$academy) {
+            throw new \Exception('Academy tidak ditemukan.');
+        }
+
+        return $academy;
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | Create Player
@@ -48,13 +78,9 @@ class PlayerService
     {
         return DB::transaction(function () use ($data) {
 
-            $academy = $this->academyService->current();
+            $academy = $this->resolveAcademy($data);
 
-            if (!$academy) {
-                throw new \Exception('Academy tidak ditemukan.');
-            }
-
-            $playerCode = $this->generatePlayerCode();
+            $playerCode = $this->generatePlayerCode($academy);
 
             $photo = null;
 
@@ -111,14 +137,8 @@ class PlayerService
     | Generate Player Code
     |--------------------------------------------------------------------------
     */
-    protected function generatePlayerCode(): string
+    protected function generatePlayerCode(Academy $academy): string
     {
-        $academy = $this->academyService->current();
-
-        if (!$academy) {
-            throw new \Exception('Academy tidak ditemukan.');
-        }
-
         $prefix = strtoupper($academy->code) . now()->format('y');
 
         $lastPlayer = Player::withoutGlobalScopes()

@@ -41,14 +41,25 @@
                     Kembali
                 </a>
 
-                <a href="{{ route('players.edit', $player->id_player) }}" class="btn btn-primary">
-                    Edit Player
-                </a>
+                @can('player.update')
+                    <a href="{{ route('players.edit', $player->id_player) }}" class="btn btn-primary">
+                        Edit Player
+                    </a>
+                @endcan
 
-
-                <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
-                    route-edit="players.account.edit" route-password="players.account.password"
-                    route-status="players.account.status" />
+                @if ($player->user)
+                    @can('user.update')
+                        <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
+                            route-edit="players.account.edit" route-password="players.account.password"
+                            route-status="players.account.status" />
+                    @endcan
+                @else
+                    @can('user.create')
+                        <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
+                            route-edit="players.account.edit" route-password="players.account.password"
+                            route-status="players.account.status" />
+                    @endcan
+                @endif
 
             </div>
 
@@ -381,12 +392,14 @@
                                 Player belum memiliki akun.
                             </p>
 
+                            @can('user.create')
+                                <a href="{{ route('players.account.create', $player) }}"
+                                    class="btn btn-primary w-full">
 
-                            <a href="{{ route('players.account.create', $player) }}" class="btn btn-primary w-full">
+                                    Buat Account
 
-                                Buat Account
-
-                            </a>
+                                </a>
+                            @endcan
 
                         @endif
 

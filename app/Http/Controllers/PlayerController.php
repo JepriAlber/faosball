@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Players\StorePlayerRequest;
 use App\Http\Requests\Players\UpdatePlayerRequest;
+use App\Models\Academy;
 use App\Models\Player;
+use App\Services\AcademyService;
 use App\Services\PlayerService;
 
 class PlayerController extends Controller
 {
     protected PlayerService $playerService;
+    protected AcademyService $academyService;
 
-    public function __construct(PlayerService $playerService)
+    public function __construct(PlayerService $playerService, AcademyService $academyService)
     {
         $this->playerService = $playerService;
+        $this->academyService = $academyService;
     }
 
     public function index()
@@ -42,6 +46,10 @@ class PlayerController extends Controller
                     'label'=>'Create'
                 ]
             ],
+            'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
+            'academies'=>$this->academyService->isSuperAdmin()
+                ? Academy::orderBy('name')->get()
+                : collect(),
         ]);
     }
 
@@ -102,6 +110,7 @@ class PlayerController extends Controller
                 ]
             ],
             'player'=>$player,
+            'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
         ]);
     }
 

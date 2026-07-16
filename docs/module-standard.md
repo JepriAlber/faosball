@@ -243,6 +243,8 @@ Permission dibuat melalui:
 
 Role diberikan melalui `AccountService`.
 
+Setiap permission wajib benar-benar ditegakkan di kode (route `middlewareFor()`, `@can()` di Blade, `$this->authorize()` kalau ada isolasi per-baris seperti `RolePolicy`) — bukan cuma didaftarkan di seeder. Setelah module selesai, tambahkan entry-nya di `docs/permission-reference.md` supaya jelas permission apa mengunci fitur apa.
+
 ---
 
 ## Multi-Tenant Standard
@@ -321,6 +323,8 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - [ ] Permission mengikuti format `module.action`.
 - [ ] Role tidak dibuat secara manual.
 - [ ] Permission tidak dibuat secara manual.
+- [ ] Route pakai `middlewareFor('permission:module.action')` dan tombol/menu di Blade dibungkus `@can()` — bukan cuma terdaftar di seeder.
+- [ ] Entry module ditambahkan ke `docs/permission-reference.md`.
 
 ### Multi-Tenant
 

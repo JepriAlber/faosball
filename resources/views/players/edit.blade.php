@@ -36,6 +36,15 @@
                         <input type="text" value="{{ $player->player_code }}" class="form-input form-disabled" readonly>
                     </div>
 
+                    @if ($isSuperAdmin)
+                        <div class="form-group">
+                            <label class="form-label">Academy</label>
+                            <p class="form-input bg-gray-50 dark:bg-gray-800">
+                                {{ $player->academy->name ?? '-' }}
+                            </p>
+                        </div>
+                    @endif
+
                     <div class="form-group">
                         <label class="form-label">
                             Nama Player <span class="text-error-500">*</span>

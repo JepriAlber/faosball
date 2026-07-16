@@ -15,6 +15,7 @@ class Player extends FaosModel
 
     protected $fillable = [
 
+        'id_academy',
         'id_user',
         'player_code',
         'name',

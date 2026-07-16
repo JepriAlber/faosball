@@ -126,6 +126,7 @@ Dokumentasi lengkap tersedia pada folder **docs/**.
 | docs/module-standard.md | Module Standard |
 | docs/frontend-standard.md | Frontend Standard (CSS/Tailwind/Blade) |
 | docs/query-performance.md | Query & Database Performance (N+1, Eager Loading, Index) |
+| docs/permission-reference.md | Referensi Permission per Module (yang sudah digerbang & yang belum) |
 
 ---
 
