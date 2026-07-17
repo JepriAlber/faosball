@@ -193,6 +193,8 @@ Untuk konvensi penulisan CSS/Tailwind di view (kapan bikin `@utility` baru, stru
 
 Halaman index/list module yang menampilkan data lewat `table-wrapper` + `table` wajib didampingi Card List responsif (`table-card-list`) supaya kolom tabel tidak kepotong di tablet/smartphone — lihat `docs/frontend-standard.md#tabel-responsif-table-desktop--card-list-mobiletablet`.
 
+Halaman index/list yang datanya berpotensi banyak baris wajib punya search/filter lewat `<x-table.toolbar>` (dan `<x-table.tabs>` kalau module punya kolom status dengan sedikit nilai tetap) — lihat `docs/frontend-standard.md#tabs-status--toolbar-filtersearch`. Business logic filter/search/sort-nya di Service, bukan Controller, mengikuti pola `PlayerService::applyFilters()`/`paginate()`.
+
 ---
 
 ## Route Standard
@@ -312,6 +314,7 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - [ ] Menggunakan folder sesuai nama module.
 - [ ] Menggunakan Blade Permission Directive.
 - [ ] Halaman index/list punya Card List responsif (`table-card-list`) selain tabel, jika datanya ditampilkan dalam tabel.
+- [ ] Halaman index/list punya search/filter (`<x-table.toolbar>`, `<x-table.tabs>` jika relevan) kalau datanya berpotensi banyak baris — lihat `docs/frontend-standard.md#tabs-status--toolbar-filtersearch`.
 
 ### Route
 

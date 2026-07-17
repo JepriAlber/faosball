@@ -11,6 +11,7 @@ use App\Services\PlayerCategoryService;
 use App\Services\PlayerPositionService;
 use App\Services\PlayerService;
 use App\Services\PlayerTypeService;
+use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
@@ -34,8 +35,14 @@ class PlayerController extends Controller
         $this->playerPositionService = $playerPositionService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // array_filter membuang value kosong (mis. "Semua Type" -> '') supaya
+        // tidak ikut nyangkut di query string / query filter.
+        $filters = array_filter($request->only([
+            'search', 'status', 'id_player_type', 'id_player_category', 'gender', 'sort',
+        ]));
+
         return view('players.index',[
             'title'=>'Players',
             'breadcrumb'=>[
@@ -43,7 +50,17 @@ class PlayerController extends Controller
                     'label'=>'Players'
                 ]
             ],
-            'players'=>Player::with(['playerType', 'playerCategory', 'primaryPosition', 'secondaryPosition'])->latest()->paginate(10),
+            'players' => $this->playerService->paginate($filters),
+            'statusCounts' => $this->playerService->statusCounts($filters),
+            'filters' => $filters,
+            // Opsi untuk dropdown filter (bukan form create) -- Super Admin
+            // melihat seluruh academy, user academy cukup miliknya sendiri.
+            'playerTypeOptions' => $this->playerTypeService->selectable(
+                $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
+            ),
+            'playerCategoryOptions' => $this->playerCategoryService->selectable(
+                $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
+            ),
         ]);
     }
 

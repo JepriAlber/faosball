@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,5 +30,9 @@ class AppServiceProvider extends ServiceProvider
             }
 
         });
+
+        // Berlaku untuk SELURUH halaman index yang memanggil {{ $x->links() }} --
+        // lihat resources/views/vendor/pagination/faos.blade.php.
+        Paginator::defaultView('vendor.pagination.faos');
     }
 }

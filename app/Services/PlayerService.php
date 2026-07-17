@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Academy;
 use App\Models\Player;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -66,6 +68,94 @@ class PlayerService
         }
 
         return $academy;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | List / Filter Player
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Terapkan filter search/type/category/gender/status ke query.
+     *
+     * $includeStatus = false dipakai oleh statusCounts() -- hitungan tiap tab
+     * status tidak boleh ikut kefilter oleh status tab yang sedang aktif,
+     * supaya angkanya tetap utuh saat user pindah tab.
+     */
+    protected function applyFilters(Builder $query, array $filters, bool $includeStatus = true): void
+    {
+        if (!empty($filters['search'])) {
+
+            $search = $filters['search'];
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nick_name', 'like', "%{$search}%")
+                    ->orWhere('player_code', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['id_player_type'])) {
+            $query->where('id_player_type', $filters['id_player_type']);
+        }
+
+        if (!empty($filters['id_player_category'])) {
+            $query->where('id_player_category', $filters['id_player_category']);
+        }
+
+        if (!empty($filters['gender'])) {
+            $query->where('gender', $filters['gender']);
+        }
+
+        if ($includeStatus && !empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+    }
+
+    /**
+     * Daftar player untuk halaman index, dengan search/filter/sort.
+     */
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = Player::with(['playerType', 'playerCategory', 'primaryPosition', 'secondaryPosition']);
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'oldest' => $query->oldest(),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
+    }
+
+    /**
+     * Jumlah player per status, untuk badge di tabs halaman index.
+     *
+     * Filter lain (search/type/category/gender) tetap diterapkan supaya
+     * angkanya konsisten dengan hasil yang sedang dilihat user, tapi status
+     * itu sendiri SENGAJA tidak difilter -- lihat catatan di applyFilters().
+     */
+    public function statusCounts(array $filters = []): array
+    {
+        $query = Player::query();
+
+        $this->applyFilters($query, $filters, includeStatus: false);
+
+        $counts = $query->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return [
+            'active' => (int) ($counts['active'] ?? 0),
+            'inactive' => (int) ($counts['inactive'] ?? 0),
+            'graduated' => (int) ($counts['graduated'] ?? 0),
+            'left' => (int) ($counts['left'] ?? 0),
+        ];
     }
 
 

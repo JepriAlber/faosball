@@ -31,6 +31,68 @@
             @endcan
         </div>
 
+        @php
+            $allCount = array_sum($statusCounts);
+            $hasActiveFilters = !empty($filters);
+        @endphp
+
+        <div class="border-b border-gray-100 p-4 dark:border-gray-800">
+            <x-table.tabs route="players.index" :active="$filters['status'] ?? ''" :tabs="[
+                '' => ['label' => 'Semua', 'count' => $allCount],
+                'active' => ['label' => 'Aktif', 'count' => $statusCounts['active']],
+                'inactive' => ['label' => 'Nonaktif', 'count' => $statusCounts['inactive']],
+                'graduated' => ['label' => 'Lulus', 'count' => $statusCounts['graduated']],
+                'left' => ['label' => 'Keluar', 'count' => $statusCounts['left']],
+            ]" />
+        </div>
+
+        <x-table.toolbar route="players.index" :filters="$filters" placeholder="Cari nama, nickname, atau kode player...">
+
+            <div class="form-group">
+                <label class="form-label">Urutkan</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Player Type</label>
+                <select name="id_player_type" class="form-select">
+                    <option value="">Semua Type</option>
+                    @foreach ($playerTypeOptions as $type)
+                        <option value="{{ $type->id_player_type }}" @selected(($filters['id_player_type'] ?? '') === $type->id_player_type)>
+                            {{ $type->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kategori Umur</label>
+                <select name="id_player_category" class="form-select">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($playerCategoryOptions as $category)
+                        <option value="{{ $category->id_player_category }}" @selected(($filters['id_player_category'] ?? '') === $category->id_player_category)>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select name="gender" class="form-select">
+                    <option value="">Semua Gender</option>
+                    <option value="male" @selected(($filters['gender'] ?? '') === 'male')>Male</option>
+                    <option value="female" @selected(($filters['gender'] ?? '') === 'female')>Female</option>
+                </select>
+            </div>
+
+        </x-table.toolbar>
+
         <div class="table-wrapper">
             <table class="table">
                 <thead class="table-head">
@@ -198,17 +260,29 @@
                                             stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                             stroke-linejoin="round" />
                                     </svg>
-                                    <h4 class="empty-title">
-                                        Belum ada data Player
-                                    </h4>
-                                    <p class="empty-description">
-                                        Tambah player sekarang
-                                    </p>
-                                    @can('player.create')
-                                        <a href="{{ route('players.create') }}" class="empty-link">
-                                            Tambah sekarang
+                                    @if ($hasActiveFilters)
+                                        <h4 class="empty-title">
+                                            Tidak ada player yang cocok
+                                        </h4>
+                                        <p class="empty-description">
+                                            Coba ubah kata kunci atau filter yang dipakai
+                                        </p>
+                                        <a href="{{ route('players.index') }}" class="empty-link">
+                                            Reset Filter
                                         </a>
-                                    @endcan
+                                    @else
+                                        <h4 class="empty-title">
+                                            Belum ada data Player
+                                        </h4>
+                                        <p class="empty-description">
+                                            Tambah player sekarang
+                                        </p>
+                                        @can('player.create')
+                                            <a href="{{ route('players.create') }}" class="empty-link">
+                                                Tambah sekarang
+                                            </a>
+                                        @endcan
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -368,17 +442,29 @@
                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        <h4 class="empty-title">
-                            Belum ada data Player
-                        </h4>
-                        <p class="empty-description">
-                            Tambah player sekarang
-                        </p>
-                        @can('player.create')
-                            <a href="{{ route('players.create') }}" class="empty-link">
-                                Tambah sekarang
+                        @if ($hasActiveFilters)
+                            <h4 class="empty-title">
+                                Tidak ada player yang cocok
+                            </h4>
+                            <p class="empty-description">
+                                Coba ubah kata kunci atau filter yang dipakai
+                            </p>
+                            <a href="{{ route('players.index') }}" class="empty-link">
+                                Reset Filter
                             </a>
-                        @endcan
+                        @else
+                            <h4 class="empty-title">
+                                Belum ada data Player
+                            </h4>
+                            <p class="empty-description">
+                                Tambah player sekarang
+                            </p>
+                            @can('player.create')
+                                <a href="{{ route('players.create') }}" class="empty-link">
+                                    Tambah sekarang
+                                </a>
+                            @endcan
+                        @endif
                     </div>
                 </div>
             @endforelse
@@ -386,7 +472,7 @@
 
         @if ($players->hasPages())
             <div class="table-footer">
-                {{ $players->links() }}
+                {{ $players->withQueryString()->links() }}
             </div>
         @endif
 

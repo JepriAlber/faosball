@@ -14,6 +14,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Gotcha: Varian Breakpoint vs Toggle Dinamis](#gotcha-varian-breakpoint-vs-toggle-dinamis)
 - [Konsistensi Warna & Token](#konsistensi-warna--token)
 - [Tabel Responsif: Table Desktop + Card List Mobile/Tablet](#tabel-responsif-table-desktop--card-list-mobiletablet)
+- [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)
 - [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
@@ -128,6 +129,53 @@ Wajib untuk semua halaman index/list module (baru maupun refactor) yang menampil
 
 ---
 
+## Tabs Status + Toolbar Filter/Search
+
+### Masalah
+
+Halaman index/list yang datanya sudah banyak (mis. Players) tidak punya cara apapun untuk mencari satu baris tertentu selain scroll manual atau membolak-balik halaman pagination — makin banyak data, makin sulit dipakai, terutama di HP/tablet yang jadi alat kerja utama user (lihat `docs/development-guide.md`).
+
+### Solusi: dua Blade Component reusable + pagination custom
+
+Implementasi pertama ada di `resources/views/players/index.blade.php` — jadikan ini contoh acuan saat menambahkan pola yang sama ke module lain.
+
+**1. `<x-table.tabs>`** (`resources/views/components/table/tabs.blade.php`) — baris tab status dengan angka (count) di tiap tab, dibangun di atas class `tab`/`tab-active` yang sudah ada (dipakai juga oleh tab konten di `players/show.blade.php`), bukan class baru.
+
+```blade
+<x-table.tabs route="players.index" :active="$filters['status'] ?? ''" :tabs="[
+    '' => ['label' => 'Semua', 'count' => $allCount],
+    'active' => ['label' => 'Aktif', 'count' => $statusCounts['active']],
+    ...
+]" />
+```
+
+Tab kosong (`''`) selalu berarti "tanpa filter status". Angka tiap tab **wajib** ikut menghormati filter lain yang sedang aktif (search/type/dst) tapi **tidak** menghormati status tab itu sendiri — supaya angka di tab lain tidak berubah cuma karena user sedang berada di satu tab tertentu. Lihat `PlayerService::statusCounts()` (parameter `includeStatus: false` di `applyFilters()`).
+
+**2. `<x-table.toolbar>`** (`resources/views/components/table/toolbar.blade.php`) — satu `<form method="GET">` berisi input search + tombol "Filter & Sort" yang membuka `dropdown-menu` (class yang sudah ada). Field filter/sort di dalam dropdown **beda-beda tiap module** — komponen ini cuma menyediakan mekanisme search + dropdown-nya lewat slot, bukan field-nya:
+
+```blade
+<x-table.toolbar route="players.index" :filters="$filters" placeholder="Cari nama, nickname, atau kode player...">
+    <div class="form-group">
+        <label class="form-label">Urutkan</label>
+        <select name="sort" class="form-select"> ... </select>
+    </div>
+    {{-- field filter khusus module lain (Type, Category, dst) --}}
+</x-table.toolbar>
+```
+
+**3. Query string sebagai satu-satunya sumber state.** Tidak ada state filter di Alpine/JS — semuanya lewat `GET` + query string (`?search=...&status=...&sort=...`), supaya URL bisa di-share/refresh/bookmark dan tombol Back browser tetap benar. Konsekuensinya:
+- Controller membaca filter lewat `$request->only([...])` lalu `array_filter()` supaya value kosong (mis. `<option value="">Semua Type</option>`) tidak ikut nyangkut di query string.
+- Business logic filter (search/where/sort) **wajib** di Service, bukan Controller — ikuti pola `PlayerService::applyFilters()`/`paginate()`/`statusCounts()`, konsisten dengan Thin Controller di `docs/architecture.md`.
+- `{{ $x->withQueryString()->links() }}` — **wajib**, kalau tidak filter yang aktif hilang saat pindah halaman pagination.
+
+**4. Pagination custom global.** `resources/views/vendor/pagination/faos.blade.php` didaftarkan lewat `Paginator::defaultView()` di `AppServiceProvider::boot()`, jadi otomatis dipakai **seluruh** halaman index yang memanggil `->links()` tanpa perlu disebut satu-satu — module baru tidak perlu melakukan apapun untuk mendapat tampilan pagination ini.
+
+### Kapan pola ini dipakai
+
+Tabs status masuk akal untuk module yang punya kolom status/state dengan sedikit nilai tetap (Player: `active/inactive/graduated/left`). Kalau sebuah module tidak punya kolom seperti itu, cukup pasang `<x-table.toolbar>` saja tanpa `<x-table.tabs>`. Search & filter dropdown (`<x-table.toolbar>`) berlaku untuk semua module dengan data yang berpotensi banyak baris — untuk module master kecil (≤ 1 halaman pagination biasanya) boleh dilewati, diskusikan dulu dengan user kalau ragu.
+
+---
+
 ## Reusable View dengan Data Dinamis
 
 Kalau sebuah partial/view perlu menampilkan data yang dihitung sendiri (query database, statistik, dsb), gunakan **class-based Blade Component** (`App\View\Components\Xxx`), bukan View Composer.
@@ -166,6 +214,7 @@ Gunakan:
 - Cek dulu apakah class yang dibutuhkan sudah ada sebelum bikin baru (terutama di `components.css` - card/btn/badge/form/table/table-card/modal/avatar/dropdown sudah lengkap).
 - Class-based Blade Component untuk view yang butuh data dinamis/hitung sendiri, bukan View Composer.
 - Dual-render Table (desktop) + Card List (mobile/tablet) untuk semua halaman index/list module (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).
+- `<x-table.tabs>`/`<x-table.toolbar>` untuk search/filter/sort di halaman index/list yang datanya berpotensi banyak baris, dengan state lewat query string (GET) dan business logic filter di Service (lihat [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)).
 
 Hindari:
 

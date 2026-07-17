@@ -133,7 +133,7 @@ Aturan wajib untuk migration module baru:
 - `id_academy` **selalu** diberi index (kalau tabelnya tenant-scoped).
 - Foreign key lain yang sering dipakai untuk filter/join (`id_user`, `id_role`, dst) diberi index juga.
 - Kolom yang sering dipakai di `WHERE`/`ORDER BY`/pencarian unik (mis. `player_code`, `slug` pada academies) sudah otomatis ter-index kalau pakai `->unique()` — tidak perlu index ganda.
-- Kalau nanti ada fitur filter/search kombinasi (mis. filter Player berdasarkan `status` + `primary_position` sekaligus), pertimbangkan composite index, tapi diskusikan dulu dengan user sebelum menambah index baru di tabel existing (index menambah biaya di setiap insert/update).
+- Kalau ada fitur filter/search kombinasi, pertimbangkan composite index, tapi diskusikan dulu dengan user sebelum menambah index baru di tabel existing (index menambah biaya di setiap insert/update). Contoh nyata: tabs status di halaman index Player (`docs/frontend-standard.md#tabs-status--toolbar-filtersearch`) selalu mengkombinasikan `WHERE id_academy = ? AND status = ?` (dari `AcademyScope` + filter tab), jadi ditambahkan `players_academy_status_index` pada `(id_academy, status)` — lihat migration `add_status_index_to_players_table`. Kalau module lain menambahkan `<x-table.tabs>` pada kolom selain `status`, evaluasi ulang apakah kombinasi filternya juga butuh composite index serupa.
 
 ---
 
