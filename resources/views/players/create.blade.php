@@ -30,25 +30,93 @@
                 <div>
 
                     @if ($isSuperAdmin)
+
+                        {{-- Academy + Type: dropdown type mengikuti academy yang dipilih --}}
+                        <div x-data="{
+                            academyId: @js(old('id_academy', '')),
+                            playerTypeId: @js(old('id_player_type', '')),
+                            types: @js($playerTypes),
+                            get availableTypes() {
+                                return this.types.filter(type => type.id_academy === this.academyId);
+                            },
+                        }">
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Academy <span class="text-error-500">*</span>
+                                </label>
+
+                                <select name="id_academy" x-model="academyId" @change="playerTypeId = ''"
+                                    class="form-select @error('id_academy') form-danger @enderror" required>
+                                    <option value="">Pilih Academy</option>
+                                    @foreach ($academies as $academy)
+                                        <option value="{{ $academy->id_academy }}">{{ $academy->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                @error('id_academy')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Type Player <span class="text-error-500">*</span>
+                                </label>
+
+                                <select name="id_player_type" x-model="playerTypeId"
+                                    class="form-select @error('id_player_type') form-danger @enderror" required>
+
+                                    <option value="">
+                                        <span x-text="academyId ? 'Pilih Type Player' : 'Pilih Academy dulu'"></span>
+                                    </option>
+
+                                    <template x-for="type in availableTypes" :key="type.id_player_type">
+                                        <option :value="type.id_player_type" x-text="type.name"></option>
+                                    </template>
+
+                                </select>
+
+                                <p x-show="academyId && availableTypes.length === 0" x-cloak class="form-error">
+                                    Academy ini belum punya type player. Buat dulu lewat menu Player Type.
+                                </p>
+
+                                @error('id_player_type')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                        </div>
+
+                    @else
+
+                        {{-- User academy: type otomatis dibatasi academy sendiri --}}
                         <div class="form-group">
                             <label class="form-label">
-                                Academy <span class="text-error-500">*</span>
+                                Type Player <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror"
-                                required>
-                                <option value="">Pilih Academy</option>
-                                @foreach ($academies as $academy)
-                                    <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
-                                        {{ $academy->name }}
+                            <select name="id_player_type"
+                                class="form-select @error('id_player_type') form-danger @enderror" required>
+                                <option value="">Pilih Type Player</option>
+                                @foreach ($playerTypes as $type)
+                                    <option value="{{ $type->id_player_type }}" @selected(old('id_player_type') === $type->id_player_type)>
+                                        {{ $type->name }}
                                     </option>
                                 @endforeach
                             </select>
 
-                            @error('id_academy')
+                            @if ($playerTypes->isEmpty())
+                                <span class="form-error">
+                                    Academy ini belum punya type player. Buat dulu lewat menu Player Type.
+                                </span>
+                            @endif
+
+                            @error('id_player_type')
                                 <span class="form-error">{{ $message }}</span>
                             @enderror
                         </div>
+
                     @endif
 
                     <div class="form-group">

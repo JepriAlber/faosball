@@ -5,6 +5,7 @@ namespace App\Http\Requests\Players;
 
 use App\Services\AcademyService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 
 class StorePlayerRequest extends FormRequest
@@ -19,6 +20,10 @@ class StorePlayerRequest extends FormRequest
     {
         $academyService = app(AcademyService::class);
 
+        $academyId = $academyService->isSuperAdmin()
+            ? $this->input('id_academy')
+            : $academyService->currentId();
+
         return [
 
             // Hanya Super Admin yang boleh (dan wajib) memilih academy.
@@ -27,6 +32,22 @@ class StorePlayerRequest extends FormRequest
                 $academyService->isSuperAdmin() ? 'required' : 'prohibited',
                 'uuid',
                 'exists:academies,id_academy',
+            ],
+
+            // Type WAJIB milik academy yang sama dengan player.
+            //
+            // Rule::exists() memakai query builder mentah -- AcademyScope TIDAK
+            // ikut jalan di sini. Tanpa where('id_academy', ...) eksplisit,
+            // Owner Academy A bisa memasang type milik Academy B lewat POST
+            // yang dikarang. Lihat Bagian 4.2.
+            'id_player_type' => [
+                'required',
+                'uuid',
+                Rule::exists('player_types', 'id_player_type')
+                    ->where(fn ($query) => $query
+                        ->where('id_academy', $academyId)
+                        ->where('status', true)
+                    ),
             ],
 
             'name' => [
@@ -128,6 +149,10 @@ class StorePlayerRequest extends FormRequest
             'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
             'id_academy.uuid' => 'Academy tidak valid.',
             'id_academy.exists' => 'Academy tidak ditemukan.',
+
+            'id_player_type.required' => 'Type player wajib dipilih.',
+            'id_player_type.uuid' => 'Type player tidak valid.',
+            'id_player_type.exists' => 'Type player tidak ditemukan pada academy ini.',
 
             'name.required' => 'Nama player wajib diisi.',
             'name.string' => 'Nama player harus berupa teks.',

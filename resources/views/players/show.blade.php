@@ -303,6 +303,21 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
+                                Type Player
+                            </span>
+
+                            @if ($player->playerType)
+                                <span
+                                    class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }}">
+                                    {{ $player->playerType->name }}
+                                </span>
+                            @else
+                                <span class="table-text">-</span>
+                            @endif
+                        </div>
+
+                        <div>
+                            <span class="mb-1 block text-xs text-gray-400">
                                 Status Player
                             </span>
 

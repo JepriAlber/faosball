@@ -4,6 +4,7 @@ namespace App\Http\Requests\Players;
 
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 
 class UpdatePlayerRequest extends FormRequest
@@ -18,6 +19,20 @@ class UpdatePlayerRequest extends FormRequest
     {
 
         return [
+
+            // Academy player TIDAK berubah lewat form edit, jadi acuannya
+            // diambil dari player yang sedang diedit.
+            //
+            // Sengaja TIDAK memfilter status = true: player yang type-nya sudah
+            // dinonaktifkan harus tetap bisa disimpan tanpa dipaksa ganti type.
+            'id_player_type' => [
+                'required',
+                'uuid',
+                Rule::exists('player_types', 'id_player_type')
+                    ->where(fn ($query) => $query
+                        ->where('id_academy', $this->route('player')->id_academy)
+                    ),
+            ],
 
             'name' => [
                 'required',
@@ -97,6 +112,10 @@ class UpdatePlayerRequest extends FormRequest
     public function messages(): array
     {
         return [
+
+            'id_player_type.required' => 'Type player wajib dipilih.',
+            'id_player_type.uuid' => 'Type player tidak valid.',
+            'id_player_type.exists' => 'Type player tidak ditemukan pada academy ini.',
 
             'name.required' => 'Nama player wajib diisi.',
             'name.string' => 'Nama player harus berupa teks.',

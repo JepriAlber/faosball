@@ -47,6 +47,26 @@
 
                     <div class="form-group">
                         <label class="form-label">
+                            Type Player <span class="text-error-500">*</span>
+                        </label>
+
+                        <select name="id_player_type"
+                            class="form-select @error('id_player_type') form-danger @enderror" required>
+                            <option value="">Pilih Type Player</option>
+                            @foreach ($playerTypes as $type)
+                                <option value="{{ $type->id_player_type }}" @selected(old('id_player_type', $player->id_player_type) === $type->id_player_type)>
+                                    {{ $type->name }}@unless ($type->status) (nonaktif)@endunless
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('id_player_type')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
                             Nama Player <span class="text-error-500">*</span>
                         </label>
 

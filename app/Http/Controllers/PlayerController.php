@@ -8,16 +8,22 @@ use App\Models\Academy;
 use App\Models\Player;
 use App\Services\AcademyService;
 use App\Services\PlayerService;
+use App\Services\PlayerTypeService;
 
 class PlayerController extends Controller
 {
     protected PlayerService $playerService;
     protected AcademyService $academyService;
+    protected PlayerTypeService $playerTypeService;
 
-    public function __construct(PlayerService $playerService, AcademyService $academyService)
-    {
+    public function __construct(
+        PlayerService $playerService,
+        AcademyService $academyService,
+        PlayerTypeService $playerTypeService
+    ) {
         $this->playerService = $playerService;
         $this->academyService = $academyService;
+        $this->playerTypeService = $playerTypeService;
     }
 
     public function index()
@@ -29,7 +35,7 @@ class PlayerController extends Controller
                     'label'=>'Players'
                 ]
             ],
-            'players'=>Player::latest()->paginate(10),
+            'players'=>Player::with('playerType')->latest()->paginate(10),
         ]);
     }
 
@@ -50,6 +56,11 @@ class PlayerController extends Controller
             'academies'=>$this->academyService->isSuperAdmin()
                 ? Academy::orderBy('name')->get()
                 : collect(),
+            // Super Admin: seluruh academy (difilter di sisi Alpine mengikuti academy
+            // yang dipilih). User academy: cukup type miliknya sendiri.
+            'playerTypes' => $this->playerTypeService->selectable(
+                $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
+            ),
         ]);
     }
 
@@ -78,6 +89,7 @@ class PlayerController extends Controller
     {
         $player->load([
             'academy',
+            'playerType',
             'user.roles'
         ]);
 
@@ -111,6 +123,13 @@ class PlayerController extends Controller
             ],
             'player'=>$player,
             'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
+            // Academy player tidak berubah, jadi cukup type milik academy player itu.
+            // includeId dipakai supaya type yang sudah dinonaktifkan tetap muncul kalau
+            // player ini memang sedang memakainya.
+            'playerTypes' => $this->playerTypeService->selectable(
+                $player->id_academy,
+                $player->id_player_type
+            ),
         ]);
     }
 

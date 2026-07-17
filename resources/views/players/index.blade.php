@@ -38,6 +38,7 @@
                         <th class="table-header-cell">Info Player</th>
                         <th class="table-header-cell">Profil</th>
                         <th class="table-header-cell">Posisi</th>
+                        <th class="table-header-cell">Type</th>
                         <th class="table-header-cell">Status</th>
                         <th class="table-header-cell text-center">Aksi</th>
                     </tr>
@@ -92,6 +93,16 @@
                                 <span class="table-subtitle">
                                     {{ $player->secondary_position ?? '-' }}
                                 </span>
+                            </td>
+                            <td class="table-cell">
+                                @if ($player->playerType)
+                                    <span
+                                        class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }}">
+                                        {{ $player->playerType->name }}
+                                    </span>
+                                @else
+                                    <span class="table-subtitle">-</span>
+                                @endif
                             </td>
                             <td class="table-cell">
                                 @if ($player->status)
@@ -166,7 +177,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="5" class="table-empty">
+                            <td colspan="6" class="table-empty">
                                 <div class="empty-state">
                                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" class="text-gray-300 dark:text-gray-700 mb-3">
@@ -251,6 +262,18 @@
                             <span class="table-card-label">Posisi</span>
                             <span class="table-text">{{ $player->primary_position ?? '-' }}</span>
                             <span class="table-subtitle">{{ $player->secondary_position ?? '-' }}</span>
+                        </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Type</span>
+                            @if ($player->playerType)
+                                <span
+                                    class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }} w-fit">
+                                    {{ $player->playerType->name }}
+                                </span>
+                            @else
+                                <span class="table-subtitle">-</span>
+                            @endif
                         </div>
                     </div>
 
