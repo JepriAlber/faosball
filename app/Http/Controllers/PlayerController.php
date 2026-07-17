@@ -7,6 +7,7 @@ use App\Http\Requests\Players\UpdatePlayerRequest;
 use App\Models\Academy;
 use App\Models\Player;
 use App\Services\AcademyService;
+use App\Services\PlayerCategoryService;
 use App\Services\PlayerService;
 use App\Services\PlayerTypeService;
 
@@ -15,15 +16,18 @@ class PlayerController extends Controller
     protected PlayerService $playerService;
     protected AcademyService $academyService;
     protected PlayerTypeService $playerTypeService;
+    protected PlayerCategoryService $playerCategoryService;
 
     public function __construct(
         PlayerService $playerService,
         AcademyService $academyService,
-        PlayerTypeService $playerTypeService
+        PlayerTypeService $playerTypeService,
+        PlayerCategoryService $playerCategoryService
     ) {
         $this->playerService = $playerService;
         $this->academyService = $academyService;
         $this->playerTypeService = $playerTypeService;
+        $this->playerCategoryService = $playerCategoryService;
     }
 
     public function index()
@@ -35,7 +39,7 @@ class PlayerController extends Controller
                     'label'=>'Players'
                 ]
             ],
-            'players'=>Player::with('playerType')->latest()->paginate(10),
+            'players'=>Player::with(['playerType', 'playerCategory'])->latest()->paginate(10),
         ]);
     }
 
@@ -59,6 +63,9 @@ class PlayerController extends Controller
             // Super Admin: seluruh academy (difilter di sisi Alpine mengikuti academy
             // yang dipilih). User academy: cukup type miliknya sendiri.
             'playerTypes' => $this->playerTypeService->selectable(
+                $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
+            ),
+            'playerCategories' => $this->playerCategoryService->selectable(
                 $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
             ),
         ]);
@@ -90,6 +97,7 @@ class PlayerController extends Controller
         $player->load([
             'academy',
             'playerType',
+            'playerCategory',
             'user.roles'
         ]);
 
@@ -129,6 +137,16 @@ class PlayerController extends Controller
             'playerTypes' => $this->playerTypeService->selectable(
                 $player->id_academy,
                 $player->id_player_type
+            ),
+            'playerCategories' => $this->playerCategoryService->selectable(
+                $player->id_academy,
+                $player->id_player_category
+            ),
+            // Saran kategori untuk player ini. Berguna terutama untuk player lama yang
+            // id_player_category-nya masih NULL.
+            'suggestedCategory' => $this->playerCategoryService->suggestFor(
+                $player->birth_date,
+                $player->id_academy
             ),
         ]);
     }

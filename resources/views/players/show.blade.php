@@ -318,6 +318,21 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
+                                Kategori Umur
+                            </span>
+
+                            @if ($player->playerCategory)
+                                <span class="badge badge-secondary">
+                                    {{ $player->playerCategory->name }}
+                                    ({{ $player->playerCategory->min_age }}-{{ $player->playerCategory->max_age }} th)
+                                </span>
+                            @else
+                                <span class="table-text">-</span>
+                            @endif
+                        </div>
+
+                        <div>
+                            <span class="mb-1 block text-xs text-gray-400">
                                 Status Player
                             </span>
 

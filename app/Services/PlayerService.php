@@ -94,6 +94,7 @@ class PlayerService
             $player = Player::create([
                 'id_academy' => $academy->id_academy,
                 'id_player_type' => $data['id_player_type'],
+                'id_player_category' => $data['id_player_category'],
                 'player_code' => $playerCode,
                 'name' => $data['name'],
                 'nick_name' => $data['nick_name'] ?? null,
@@ -193,6 +194,7 @@ class PlayerService
 
             $player->update([
                 'id_player_type'=>$data['id_player_type'],
+                'id_player_category'=>$data['id_player_category'],
                 'name'=>$data['name'],
                 'nick_name'=>$data['nick_name'] ?? null,
                 'birth_date'=>$data['birth_date'],

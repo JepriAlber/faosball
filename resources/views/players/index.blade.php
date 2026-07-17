@@ -39,6 +39,7 @@
                         <th class="table-header-cell">Profil</th>
                         <th class="table-header-cell">Posisi</th>
                         <th class="table-header-cell">Type</th>
+                        <th class="table-header-cell">Kategori</th>
                         <th class="table-header-cell">Status</th>
                         <th class="table-header-cell text-center">Aksi</th>
                     </tr>
@@ -100,6 +101,13 @@
                                         class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }}">
                                         {{ $player->playerType->name }}
                                     </span>
+                                @else
+                                    <span class="table-subtitle">-</span>
+                                @endif
+                            </td>
+                            <td class="table-cell">
+                                @if ($player->playerCategory)
+                                    <span class="badge badge-secondary">{{ $player->playerCategory->name }}</span>
                                 @else
                                     <span class="table-subtitle">-</span>
                                 @endif
@@ -177,7 +185,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="6" class="table-empty">
+                            <td colspan="7" class="table-empty">
                                 <div class="empty-state">
                                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" class="text-gray-300 dark:text-gray-700 mb-3">
@@ -271,6 +279,15 @@
                                     class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }} w-fit">
                                     {{ $player->playerType->name }}
                                 </span>
+                            @else
+                                <span class="table-subtitle">-</span>
+                            @endif
+                        </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Kategori</span>
+                            @if ($player->playerCategory)
+                                <span class="badge badge-secondary w-fit">{{ $player->playerCategory->name }}</span>
                             @else
                                 <span class="table-subtitle">-</span>
                             @endif

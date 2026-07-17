@@ -50,6 +50,23 @@ class StorePlayerRequest extends FormRequest
                     ),
             ],
 
+            // Kategori WAJIB milik academy yang sama dengan player.
+            // Rule::exists() TIDAK kena AcademyScope -- where('id_academy')
+            // eksplisit di bawah ini yang menjaga batas antar academy.
+            // Lihat issue2.md Bagian 4.5.
+            //
+            // Sengaja TIDAK ada validasi "umur harus cocok dengan rentang
+            // kategori". Itu disengaja, bukan kelupaan. Lihat issue2.md Bagian 4.2.
+            'id_player_category' => [
+                'required',
+                'uuid',
+                Rule::exists('player_categories', 'id_player_category')
+                    ->where(fn ($query) => $query
+                        ->where('id_academy', $academyId)
+                        ->where('status', true)
+                    ),
+            ],
+
             'name' => [
                 'required',
                 'string',
@@ -153,6 +170,10 @@ class StorePlayerRequest extends FormRequest
             'id_player_type.required' => 'Type player wajib dipilih.',
             'id_player_type.uuid' => 'Type player tidak valid.',
             'id_player_type.exists' => 'Type player tidak ditemukan pada academy ini.',
+
+            'id_player_category.required' => 'Kategori umur wajib dipilih.',
+            'id_player_category.uuid' => 'Kategori umur tidak valid.',
+            'id_player_category.exists' => 'Kategori umur tidak ditemukan pada academy ini.',
 
             'name.required' => 'Nama player wajib diisi.',
             'name.string' => 'Nama player harus berupa teks.',

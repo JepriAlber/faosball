@@ -67,6 +67,33 @@
 
                     <div class="form-group">
                         <label class="form-label">
+                            Kategori Umur <span class="text-error-500">*</span>
+                        </label>
+
+                        <select name="id_player_category"
+                            class="form-select @error('id_player_category') form-danger @enderror" required>
+                            <option value="">Pilih Kategori Umur</option>
+                            @foreach ($playerCategories as $category)
+                                <option value="{{ $category->id_player_category }}" @selected(old('id_player_category', $player->id_player_category) === $category->id_player_category)>
+                                    {{ $category->name }} ({{ $category->min_age }}-{{ $category->max_age }}
+                                    th)@unless ($category->status) — nonaktif @endunless
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @if ($suggestedCategory && $suggestedCategory->id_player_category !== $player->id_player_category)
+                            <p class="form-helper">
+                                Saran berdasarkan umur pemain: <strong>{{ $suggestedCategory->name }}</strong>
+                            </p>
+                        @endif
+
+                        @error('id_player_category')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
                             Nama Player <span class="text-error-500">*</span>
                         </label>
 
