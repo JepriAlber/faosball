@@ -340,15 +340,19 @@
                                 Status Player
                             </span>
 
-                            @if ($player->user->status)
-                                <span class="badge badge-success">
-                                    Active
-                                </span>
-                            @else
-                                <span class="badge badge-danger">
-                                    Disabled
-                                </span>
-                            @endif
+                            @php
+                                $playerStatusBadge = match ($player->status) {
+                                    'active' => ['label' => 'Aktif', 'class' => 'badge-success'],
+                                    'inactive' => ['label' => 'Nonaktif', 'class' => 'badge-danger'],
+                                    'graduated' => ['label' => 'Lulus', 'class' => 'badge-primary'],
+                                    'left' => ['label' => 'Keluar', 'class' => 'badge-secondary'],
+                                    default => ['label' => '-', 'class' => 'badge-secondary'],
+                                };
+                            @endphp
+
+                            <span class="badge {{ $playerStatusBadge['class'] }}">
+                                {{ $playerStatusBadge['label'] }}
+                            </span>
 
                         </div>
 
