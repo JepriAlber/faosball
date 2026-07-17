@@ -14,6 +14,7 @@ Sumber kebenaran (source of truth) tetap kode — `database/seeders/RolePermissi
 - [Module: Role Management](#module-role-management)
 - [Module: Permission Management](#module-permission-management)
 - [Module: Player Management](#module-player-management)
+- [Module: Player Type](#module-player-type)
 - [Module: Academy Management](#module-academy-management)
 - [Permission Belum Dipakai Module Manapun](#permission-belum-dipakai-module-manapun)
 - [Role Template Default per Academy Baru](#role-template-default-per-academy-baru)
@@ -83,6 +84,27 @@ Nested di `players/{player}/account/*`. Ini **membuat/mengelola record `User`** 
 
 Konsekuensi: role yang punya `player.update` tapi **tidak** punya `user.create`/`user.update` (mis. `Coach`, `Staff` di template default) bisa mengelola data player tapi **tidak bisa** membuatkan/mengubah akun login player.
 
+Catatan tambahan: `players.id_player_type` wajib diisi saat create — divalidasi di `StorePlayerRequest` (dan `UpdatePlayerRequest` saat edit), dibatasi ke type milik academy yang sama dengan player (lihat [Module: Player Type](#module-player-type)).
+
+---
+
+## Module: Player Type
+
+Status: **✅ Implemented** (termasuk Card List mobile/tablet, lihat `docs/frontend-standard.md`).
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `player_type.view` | Lihat daftar player type | `player-types.index` (route middleware) + menu sidebar |
+| `player_type.create` | Tambah type baru | `player-types.create`, `player-types.store` |
+| `player_type.update` | Ubah nama/deskripsi/tagihan/status type | `player-types.edit`, `player-types.update` |
+| `player_type.delete` | Hapus type (kalau tidak dipakai player manapun) | `player-types.destroy` |
+
+Catatan:
+
+- Isolasi antar academy memakai `AcademyScope` (global scope), **bukan** Policy — akses type academy lain menghasilkan **404**, bukan 403. Ini beda dengan module Role.
+- `player_type.view` **tidak** dibutuhkan untuk memilih type saat menambah Player. Dropdown di form Player diisi Service; permission ini hanya menggerbang halaman `/player-types`.
+- `is_billable` adalah kontrak untuk module Payment: filter `where('is_billable', true)`, **jangan** cocokkan nama type.
+
 ---
 
 ## Module: Academy Management
@@ -123,14 +145,16 @@ Permission ini sudah ada di `RolePermissionSeeder` dan sudah masuk beberapa role
 
 Setiap academy baru otomatis dapat 6 role ini dari `config('faos.role_templates')` (`RoleService::createDefaultRoles()`). Ini titik awal saat customize — Owner academy bisa ubah permission tiap role lewat halaman Role Management, tabel di bawah cuma nilai default saat academy dibuat.
 
-| Role | player.* | coach.*/team.*/training.* | attendance.*/evaluation.* | payment.*/report.* | role.* | user.* |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Owner** | view, create, update, delete | penuh | penuh | penuh | penuh | penuh |
-| **Coach** | view | team.view, training penuh | penuh | ✗ | ✗ | ✗ |
-| **Staff** | view, create, update | coach.view, team.view, training.view | view, create, update | ✗ | ✗ | ✗ |
-| **Finance** | ✗ | ✗ | ✗ | penuh | ✗ | ✗ |
-| **Player** | ✗ (lihat data sendiri lewat portal, bukan `player.*`) | ✗ | training.view, attendance.view, evaluation.view | ✗ | ✗ | ✗ |
-| **Parent** | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ (punya `child.*` sendiri) |
+| Role | player.* | player_type.* | coach.*/team.*/training.* | attendance.*/evaluation.* | payment.*/report.* | role.* | user.* |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Owner** | view, create, update, delete | penuh | penuh | penuh | penuh | penuh | penuh |
+| **Coach** | view | ✗ | team.view, training penuh | penuh | ✗ | ✗ | ✗ |
+| **Staff** | view, create, update | ✗ | coach.view, team.view, training.view | view, create, update | ✗ | ✗ | ✗ |
+| **Finance** | ✗ | ✗ | ✗ | ✗ | penuh | ✗ | ✗ |
+| **Player** | ✗ (lihat data sendiri lewat portal, bukan `player.*`) | ✗ | ✗ | training.view, attendance.view, evaluation.view | ✗ | ✗ | ✗ |
+| **Parent** | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ (punya `child.*` sendiri) |
+
+`player_type.*` sengaja hanya diberikan ke **Owner** secara default — mengatur jenis pemain + tagihan adalah keputusan level Owner. Academy bisa memberi role lain akses ini lewat halaman Role Management kalau perlu.
 
 Detail lengkap tiap role: lihat `config/faos.php` bagian `role_templates`.
 
@@ -149,4 +173,4 @@ Wajib diikuti supaya dokumen ini tidak basi:
 
 ## Summary
 
-FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, dan Player Management sudah digerbang penuh** (route + Blade), **Academy Management punya permission tapi belum digerbang sama sekali**, dan sisanya (Coach, Team, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.
+FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, Player Management, dan Player Type sudah digerbang penuh** (route + Blade), **Academy Management punya permission tapi belum digerbang sama sekali**, dan sisanya (Coach, Team, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.
