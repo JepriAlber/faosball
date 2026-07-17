@@ -17,6 +17,7 @@ class Player extends FaosModel
 
         'id_academy',
         'id_user',
+        'id_player_type',
         'player_code',
         'name',
         'nick_name',
@@ -73,6 +74,20 @@ class Player extends FaosModel
             User::class,
             'id_user',
             'id_user'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationship Player Type
+    |--------------------------------------------------------------------------
+    */
+    public function playerType()
+    {
+        return $this->belongsTo(
+            PlayerType::class,
+            'id_player_type',
+            'id_player_type'
         );
     }
 

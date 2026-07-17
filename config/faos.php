@@ -38,6 +38,7 @@ return [
 
         'Owner' => [
             'player.view', 'player.create', 'player.update', 'player.delete',
+            'player_type.view', 'player_type.create', 'player_type.update', 'player_type.delete',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',
@@ -80,6 +81,38 @@ return [
             'child.profile.view',
             'child.training.view',
             'child.payment.view',
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Player Type Template
+    |--------------------------------------------------------------------------
+    | Player Type default yang otomatis dibuat untuk setiap academy baru.
+    |
+    | is_billable = true  -> player dengan type ini ditagih iuran/SPP.
+    | is_billable = false -> tidak ditagih.
+    |
+    | Academy bebas menambah/mengubah type sendiri lewat menu Player Type.
+    | Daftar di sini hanya titik awal saat academy dibuat.
+    */
+
+    'player_type_templates' => [
+
+        'Reguler' => [
+            'description' => 'Pemain reguler yang membayar iuran/SPP penuh.',
+            'is_billable' => true,
+        ],
+
+        'Beasiswa' => [
+            'description' => 'Pemain penerima beasiswa, dibebaskan dari iuran/SPP.',
+            'is_billable' => false,
+        ],
+
+        'Trial' => [
+            'description' => 'Pemain masa percobaan, belum dikenakan iuran/SPP.',
+            'is_billable' => false,
         ],
 
     ],
