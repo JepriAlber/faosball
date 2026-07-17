@@ -119,6 +119,42 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Player Category Template
+    |--------------------------------------------------------------------------
+    | Kelompok umur default yang otomatis dibuat untuk setiap academy baru.
+    |
+    | min_age & max_age bersifat INKLUSIF, dan hanya dipakai untuk MENYARANKAN
+    | kategori saat menambah player -- bukan aturan yang memaksa. Pemain boleh
+    | ditempatkan di kategori yang umurnya di luar rentang ("main naik kelas").
+    |
+    | Academy bebas menambah/mengubah kategori & rentangnya lewat menu
+    | Player Category. Daftar di sini hanya titik awal saat academy dibuat.
+    */
+
+    'player_category_templates' => [
+
+        'U-12' => [
+            'description' => 'Kelompok umur di bawah 12 tahun.',
+            'min_age' => 10,
+            'max_age' => 12,
+        ],
+
+        'U-15' => [
+            'description' => 'Kelompok umur di bawah 15 tahun.',
+            'min_age' => 13,
+            'max_age' => 15,
+        ],
+
+        'U-17' => [
+            'description' => 'Kelompok umur di bawah 17 tahun.',
+            'min_age' => 16,
+            'max_age' => 17,
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Upload Directory
     |--------------------------------------------------------------------------
     */
