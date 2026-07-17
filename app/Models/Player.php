@@ -28,8 +28,8 @@ class Player extends FaosModel
         'height',
         'weight',
         'preferred_foot',
-        'primary_position',
-        'secondary_position',
+        'id_primary_position',
+        'id_secondary_position',
         'join_date',
         'status',
         'photo',
@@ -103,6 +103,29 @@ class Player extends FaosModel
             PlayerCategory::class,
             'id_player_category',
             'id_player_category'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationship Player Position
+    |--------------------------------------------------------------------------
+    */
+    public function primaryPosition()
+    {
+        return $this->belongsTo(
+            PlayerPosition::class,
+            'id_primary_position',
+            'id_player_position'
+        );
+    }
+
+    public function secondaryPosition()
+    {
+        return $this->belongsTo(
+            PlayerPosition::class,
+            'id_secondary_position',
+            'id_player_position'
         );
     }
 
