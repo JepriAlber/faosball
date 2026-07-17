@@ -12,11 +12,16 @@ class AcademyManagementService
 
     protected RoleService $roleService;
     protected PlayerTypeService $playerTypeService;
+    protected PlayerCategoryService $playerCategoryService;
 
-    public function __construct(RoleService $roleService, PlayerTypeService $playerTypeService)
-    {
+    public function __construct(
+        RoleService $roleService,
+        PlayerTypeService $playerTypeService,
+        PlayerCategoryService $playerCategoryService
+    ) {
         $this->roleService = $roleService;
         $this->playerTypeService = $playerTypeService;
+        $this->playerCategoryService = $playerCategoryService;
     }
 
     /**
@@ -81,6 +86,7 @@ class AcademyManagementService
 
             $this->roleService->createDefaultRoles($academy);
             $this->playerTypeService->createDefaultPlayerTypes($academy);
+            $this->playerCategoryService->createDefaultPlayerCategories($academy);
 
             return $academy;
         });
