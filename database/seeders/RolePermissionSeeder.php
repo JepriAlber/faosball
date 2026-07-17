@@ -64,6 +64,12 @@ class RolePermissionSeeder extends Seeder
             'player.update',
             'player.delete',
 
+            // Player Position (master global, Super Admin only)
+            'player_position.view',
+            'player_position.create',
+            'player_position.update',
+            'player_position.delete',
+
             // Player Type
             'player_type.view',
             'player_type.create',
