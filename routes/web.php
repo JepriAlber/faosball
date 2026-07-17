@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
+use App\Http\Controllers\PlayerCategoryController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
@@ -112,6 +113,18 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:player_type.create')
         ->middlewareFor(['edit', 'update'], 'permission:player_type.update')
         ->middlewareFor('destroy', 'permission:player_type.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Player Category Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('player-categories', PlayerCategoryController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:player_category.view')
+        ->middlewareFor(['create', 'store'], 'permission:player_category.create')
+        ->middlewareFor(['edit', 'update'], 'permission:player_category.update')
+        ->middlewareFor('destroy', 'permission:player_category.delete');
 
     /*
     |--------------------------------------------------------------------------
