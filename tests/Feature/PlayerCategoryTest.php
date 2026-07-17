@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Academy;
 use App\Models\Player;
 use App\Models\PlayerCategory;
+use App\Models\PlayerPosition;
 use App\Models\PlayerType;
 use App\Models\Role;
 use App\Models\User;
@@ -104,7 +105,6 @@ class PlayerCategoryTest extends TestCase
             'name' => 'Test Player',
             'birth_date' => '2010-01-01',
             'gender' => 'male',
-            'primary_position' => 'ST',
         ]);
 
         $this->expectException(\Exception::class);
@@ -132,7 +132,6 @@ class PlayerCategoryTest extends TestCase
                 'name' => 'Player Curang',
                 'birth_date' => '2010-01-01',
                 'gender' => 'male',
-                'primary_position' => 'ST',
             ])
             ->assertSessionHasErrors('id_player_category');
 
@@ -251,6 +250,7 @@ class PlayerCategoryTest extends TestCase
         $academy = Academy::factory()->create();
 
         $type = PlayerType::factory()->create(['id_academy' => $academy->id_academy]);
+        $position = PlayerPosition::factory()->create();
 
         $u17 = PlayerCategory::factory()->create([
             'id_academy' => $academy->id_academy,
@@ -263,10 +263,10 @@ class PlayerCategoryTest extends TestCase
             ->post(route('players.store'), [
                 'id_player_type' => $type->id_player_type,
                 'id_player_category' => $u17->id_player_category,   // umur 11 -> kategori U-17
+                'id_primary_position' => $position->id_player_position,
                 'name' => 'Pemain Berbakat',
                 'birth_date' => Carbon::now()->subYears(11)->format('Y-m-d'),
                 'gender' => 'male',
-                'primary_position' => 'ST',
             ])
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('players.index'));

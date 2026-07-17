@@ -88,16 +88,20 @@ class UpdatePlayerRequest extends FormRequest
                 'in:left,right,both'
             ],
 
-            'primary_position' => [
+            // Buang filter status = true (beda dengan StorePlayerRequest):
+            // player yang posisinya sudah dinonaktifkan tetap bisa disimpan
+            // tanpa dipaksa ganti posisi.
+            'id_primary_position' => [
                 'required',
-                'string',
-                'max:20'
+                'uuid',
+                'exists:player_positions,id_player_position',
             ],
 
-            'secondary_position' => [
+            'id_secondary_position' => [
                 'nullable',
-                'string',
-                'max:20'
+                'uuid',
+                'different:id_primary_position',
+                'exists:player_positions,id_player_position',
             ],
 
             'status' => [
@@ -154,11 +158,13 @@ class UpdatePlayerRequest extends FormRequest
 
             'preferred_foot.in' => 'Kaki dominan tidak valid.',
 
-            'primary_position.required' => 'Posisi utama wajib dipilih.',
+            'id_primary_position.required' => 'Posisi utama wajib dipilih.',
+            'id_primary_position.uuid' => 'Posisi utama tidak valid.',
+            'id_primary_position.exists' => 'Posisi utama tidak ditemukan.',
 
-            'primary_position.max' => 'Posisi utama maksimal :max karakter.',
-
-            'secondary_position.max' => 'Posisi kedua maksimal :max karakter.',
+            'id_secondary_position.uuid' => 'Posisi kedua tidak valid.',
+            'id_secondary_position.exists' => 'Posisi kedua tidak ditemukan.',
+            'id_secondary_position.different' => 'Posisi kedua tidak boleh sama dengan posisi utama.',
 
             'status.in' => 'Status player tidak valid.',
 

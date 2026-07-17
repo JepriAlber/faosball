@@ -88,12 +88,15 @@
                                 </span>
                             </td>
                             <td class="table-cell">
-                                <span class="table-text">
-                                    {{ $player->primary_position ?? '-' }}
-                                </span>
-                                <span class="table-subtitle">
-                                    {{ $player->secondary_position ?? '-' }}
-                                </span>
+                                @if ($player->primaryPosition)
+                                    <span class="badge badge-primary">{{ $player->primaryPosition->code }}</span>
+                                @else
+                                    <span class="table-subtitle">-</span>
+                                @endif
+
+                                @if ($player->secondaryPosition)
+                                    <span class="badge badge-secondary">{{ $player->secondaryPosition->code }}</span>
+                                @endif
                             </td>
                             <td class="table-cell">
                                 @if ($player->playerType)
@@ -268,8 +271,17 @@
 
                         <div class="table-card-field">
                             <span class="table-card-label">Posisi</span>
-                            <span class="table-text">{{ $player->primary_position ?? '-' }}</span>
-                            <span class="table-subtitle">{{ $player->secondary_position ?? '-' }}</span>
+                            <div class="flex flex-wrap gap-1">
+                                @if ($player->primaryPosition)
+                                    <span class="badge badge-primary">{{ $player->primaryPosition->code }}</span>
+                                @else
+                                    <span class="table-subtitle">-</span>
+                                @endif
+
+                                @if ($player->secondaryPosition)
+                                    <span class="badge badge-secondary">{{ $player->secondaryPosition->code }}</span>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="table-card-field">

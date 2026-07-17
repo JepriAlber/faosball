@@ -29,7 +29,7 @@
                     </h3>
 
                     <p class="card-description">
-                        {{ $player->primary_position ?? 'Player' }}
+                        {{ $player->primaryPosition->name ?? 'Player' }}
                     </p>
                 </div>
             </div>
@@ -203,20 +203,24 @@
                             </div>
 
                             <div>
-                                <span class="block mb-1 text-xs text-gray-400">
-                                    Posisi Utama
-                                </span>
+                                <span class="block mb-1 text-xs text-gray-400">Posisi Utama</span>
                                 <span class="table-text">
-                                    {{ $player->primary_position ?? '-' }}
+                                    @if ($player->primaryPosition)
+                                        {{ $player->primaryPosition->code }} — {{ $player->primaryPosition->name }}
+                                    @else
+                                        -
+                                    @endif
                                 </span>
                             </div>
 
                             <div>
-                                <span class="block mb-1 text-xs text-gray-400">
-                                    Posisi Kedua
-                                </span>
+                                <span class="block mb-1 text-xs text-gray-400">Posisi Kedua</span>
                                 <span class="table-text">
-                                    {{ $player->secondary_position ?? '-' }}
+                                    @if ($player->secondaryPosition)
+                                        {{ $player->secondaryPosition->code }} — {{ $player->secondaryPosition->name }}
+                                    @else
+                                        -
+                                    @endif
                                 </span>
                             </div>
 

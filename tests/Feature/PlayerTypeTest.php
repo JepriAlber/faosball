@@ -141,7 +141,6 @@ class PlayerTypeTest extends TestCase
             'name' => 'Test Player',
             'birth_date' => '2010-01-01',
             'gender' => 'male',
-            'primary_position' => 'ST',
         ]);
 
         $this->expectException(\Exception::class);
@@ -167,7 +166,6 @@ class PlayerTypeTest extends TestCase
                 'name' => 'Player Curang',
                 'birth_date' => '2010-01-01',
                 'gender' => 'male',
-                'primary_position' => 'ST',
             ])
             ->assertSessionHasErrors('id_player_type');
 
@@ -206,7 +204,6 @@ class PlayerTypeTest extends TestCase
                 'name' => 'Player Curang Super Admin',
                 'birth_date' => '2010-01-01',
                 'gender' => 'male',
-                'primary_position' => 'ST',
             ])
             ->assertSessionHasErrors('id_player_type');
 

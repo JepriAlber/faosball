@@ -104,16 +104,32 @@ class StorePlayerRequest extends FormRequest
                 'nullable',
                 'in:left,right,both'
             ],
-            'primary_position' => [
+
+            /*
+            | PERHATIKAN: TIDAK ada where('id_academy', ...) di sini -- beda
+            | dengan rule id_player_type / id_player_category. Master posisi
+            | global; tabelnya tidak punya kolom id_academy, jadi menambahkannya
+            | akan menghasilkan SQL error "column not found". Lihat issue3.md
+            | Bagian 4.1.
+            */
+            'id_primary_position' => [
                 'required',
-                'string',
-                'max:20'
+                'uuid',
+                Rule::exists('player_positions', 'id_player_position')
+                    ->where(fn ($query) => $query->where('status', true)),
             ],
-            'secondary_position' => [
+
+            // Posisi kedua tidak boleh sama dengan posisi utama. 'nullable'
+            // membuat seluruh rule di bawahnya dilewati kalau field ini memang
+            // dikosongkan.
+            'id_secondary_position' => [
                 'nullable',
-                'string',
-                'max:20'
+                'uuid',
+                'different:id_primary_position',
+                Rule::exists('player_positions', 'id_player_position')
+                    ->where(fn ($query) => $query->where('status', true)),
             ],
+
             'join_date' => [
                 'nullable',
                 'date'
@@ -199,12 +215,13 @@ class StorePlayerRequest extends FormRequest
 
             'preferred_foot.in' => 'Kaki dominan tidak valid.',
 
-            'primary_position.required' => 'Posisi utama wajib dipilih.',
-            'primary_position.string' => 'Posisi utama harus berupa teks.',
-            'primary_position.max' => 'Posisi utama maksimal :max karakter.',
+            'id_primary_position.required' => 'Posisi utama wajib dipilih.',
+            'id_primary_position.uuid' => 'Posisi utama tidak valid.',
+            'id_primary_position.exists' => 'Posisi utama tidak ditemukan.',
 
-            'secondary_position.string' => 'Posisi kedua harus berupa teks.',
-            'secondary_position.max' => 'Posisi kedua maksimal :max karakter.',
+            'id_secondary_position.uuid' => 'Posisi kedua tidak valid.',
+            'id_secondary_position.exists' => 'Posisi kedua tidak ditemukan.',
+            'id_secondary_position.different' => 'Posisi kedua tidak boleh sama dengan posisi utama.',
 
             'join_date.date' => 'Tanggal bergabung tidak valid.',
 

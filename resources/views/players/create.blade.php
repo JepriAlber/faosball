@@ -262,11 +262,21 @@
                             Posisi Utama <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="primary_position" value="{{ old('primary_position') }}"
-                            placeholder="Contoh: Forward, Midfielder"
-                            class="form-input @error('primary_position') form-danger @enderror" required>
+                        <select name="id_primary_position"
+                            class="form-select @error('id_primary_position') form-danger @enderror" required>
+                            <option value="">Pilih Posisi Utama</option>
+                            @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
+                                <optgroup label="{{ $group }}">
+                                    @foreach ($positions as $position)
+                                        <option value="{{ $position->id_player_position }}" @selected(old('id_primary_position') === $position->id_player_position)>
+                                            {{ $position->code }} — {{ $position->name }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
 
-                        @error('primary_position')
+                        @error('id_primary_position')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
                     </div>
@@ -274,8 +284,25 @@
                     <div class="form-group">
                         <label class="form-label">Posisi Kedua</label>
 
-                        <input type="text" name="secondary_position" value="{{ old('secondary_position') }}"
-                            class="form-input">
+                        <select name="id_secondary_position"
+                            class="form-select @error('id_secondary_position') form-danger @enderror">
+                            <option value="">Tidak ada</option>
+                            @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
+                                <optgroup label="{{ $group }}">
+                                    @foreach ($positions as $position)
+                                        <option value="{{ $position->id_player_position }}" @selected(old('id_secondary_position') === $position->id_player_position)>
+                                            {{ $position->code }} — {{ $position->name }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+
+                        <p class="form-helper">Opsional. Tidak boleh sama dengan posisi utama.</p>
+
+                        @error('id_secondary_position')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
                 </div>

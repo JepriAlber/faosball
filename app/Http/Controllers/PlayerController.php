@@ -8,6 +8,7 @@ use App\Models\Academy;
 use App\Models\Player;
 use App\Services\AcademyService;
 use App\Services\PlayerCategoryService;
+use App\Services\PlayerPositionService;
 use App\Services\PlayerService;
 use App\Services\PlayerTypeService;
 
@@ -17,17 +18,20 @@ class PlayerController extends Controller
     protected AcademyService $academyService;
     protected PlayerTypeService $playerTypeService;
     protected PlayerCategoryService $playerCategoryService;
+    protected PlayerPositionService $playerPositionService;
 
     public function __construct(
         PlayerService $playerService,
         AcademyService $academyService,
         PlayerTypeService $playerTypeService,
-        PlayerCategoryService $playerCategoryService
+        PlayerCategoryService $playerCategoryService,
+        PlayerPositionService $playerPositionService
     ) {
         $this->playerService = $playerService;
         $this->academyService = $academyService;
         $this->playerTypeService = $playerTypeService;
         $this->playerCategoryService = $playerCategoryService;
+        $this->playerPositionService = $playerPositionService;
     }
 
     public function index()
@@ -39,7 +43,7 @@ class PlayerController extends Controller
                     'label'=>'Players'
                 ]
             ],
-            'players'=>Player::with(['playerType', 'playerCategory'])->latest()->paginate(10),
+            'players'=>Player::with(['playerType', 'playerCategory', 'primaryPosition', 'secondaryPosition'])->latest()->paginate(10),
         ]);
     }
 
@@ -68,6 +72,7 @@ class PlayerController extends Controller
             'playerCategories' => $this->playerCategoryService->selectable(
                 $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
             ),
+            'playerPositions' => $this->playerPositionService->selectable(),
         ]);
     }
 
@@ -98,6 +103,8 @@ class PlayerController extends Controller
             'academy',
             'playerType',
             'playerCategory',
+            'primaryPosition',
+            'secondaryPosition',
             'user.roles'
         ]);
 
@@ -147,6 +154,12 @@ class PlayerController extends Controller
             'suggestedCategory' => $this->playerCategoryService->suggestFor(
                 $player->birth_date,
                 $player->id_academy
+            ),
+            // Dua argumen supaya posisi yang sudah dinonaktifkan tapi masih
+            // dipakai player ini tetap muncul di dropdown.
+            'playerPositions' => $this->playerPositionService->selectable(
+                $player->id_primary_position,
+                $player->id_secondary_position
             ),
         ]);
     }
