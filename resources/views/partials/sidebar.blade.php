@@ -105,7 +105,7 @@
                     <!-- ===== Menu Item: Football Academy (dengan dropdown) ===== -->
 
                     @php
-                        $footballAcademyRoutes = ['players.*', 'training.*'];
+                        $footballAcademyRoutes = ['players.*', 'player-types.*', 'training.*'];
 
                         $isFootballAcademyActive = false;
 
@@ -161,6 +161,19 @@
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
                                             Players
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Player Types --}}
+                                @can('player_type.view')
+                                    <li>
+                                        <a href="{{ route('player-types.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('player-types.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            Player Types
                                         </a>
                                     </li>
                                 @endcan

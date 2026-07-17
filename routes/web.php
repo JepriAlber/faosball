@@ -4,6 +4,7 @@ use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,18 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:player.create')
         ->middlewareFor(['edit', 'update'], 'permission:player.update')
         ->middlewareFor('destroy', 'permission:player.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Player Type Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('player-types', PlayerTypeController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:player_type.view')
+        ->middlewareFor(['create', 'store'], 'permission:player_type.create')
+        ->middlewareFor(['edit', 'update'], 'permission:player_type.update')
+        ->middlewareFor('destroy', 'permission:player_type.delete');
 
     /*
     |--------------------------------------------------------------------------
