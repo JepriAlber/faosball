@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 
 class PermissionPresenter
@@ -41,11 +42,25 @@ class PermissionPresenter
             'report' => 'Laporan',
         ];
 
+        return ($actions[self::action($permission)] ?? ucfirst(self::action($permission)))
+            . ' '
+            . self::moduleLabel($permission);
+    }
+
+    /**
+     * Label module untuk tampilan.
+     *
+     * Module yang belum terdaftar jatuh ke Str::headline() supaya tetap
+     * terbaca ("player_type" -> "Player Type"), bukan "Player_type".
+     */
+    public static function moduleLabel(string $permission): string
+    {
         $modules = [
             'academy' => 'Academy',
             'role' => 'Role',
             'permission' => 'Permission',
             'player' => 'Player',
+            'player_type' => 'Player Type',
             'coach' => 'Coach',
             'team' => 'Team',
             'training' => 'Training',
@@ -56,20 +71,19 @@ class PermissionPresenter
             'user' => 'User',
         ];
 
-        return ($actions[self::action($permission)] ?? ucfirst(self::action($permission)))
-            . ' '
-            . ($modules[self::module($permission)] ?? ucfirst(self::module($permission)));
+        return $modules[self::module($permission)]
+            ?? Str::headline(self::module($permission));
     }
 
     public static function description(string $permission): string
     {
         return match (self::action($permission)) {
-            'view' => 'Mengizinkan pengguna melihat data ' . strtolower(self::module($permission)) . '.',
-            'create' => 'Mengizinkan pengguna menambahkan data ' . strtolower(self::module($permission)) . '.',
-            'update' => 'Mengizinkan pengguna mengubah data ' . strtolower(self::module($permission)) . '.',
-            'delete' => 'Mengizinkan pengguna menghapus data ' . strtolower(self::module($permission)) . '.',
-            'export' => 'Mengizinkan pengguna mengekspor data ' . strtolower(self::module($permission)) . '.',
-            'report' => 'Mengizinkan pengguna melihat laporan ' . strtolower(self::module($permission)) . '.',
+            'view' => 'Mengizinkan pengguna melihat data ' . strtolower(self::moduleLabel($permission)) . '.',
+            'create' => 'Mengizinkan pengguna menambahkan data ' . strtolower(self::moduleLabel($permission)) . '.',
+            'update' => 'Mengizinkan pengguna mengubah data ' . strtolower(self::moduleLabel($permission)) . '.',
+            'delete' => 'Mengizinkan pengguna menghapus data ' . strtolower(self::moduleLabel($permission)) . '.',
+            'export' => 'Mengizinkan pengguna mengekspor data ' . strtolower(self::moduleLabel($permission)) . '.',
+            'report' => 'Mengizinkan pengguna melihat laporan ' . strtolower(self::moduleLabel($permission)) . '.',
             default => $permission,
         };
     }
