@@ -5,6 +5,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
 use App\Http\Controllers\PlayerCategoryController;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\PlayerPositionController;
 use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -163,6 +164,18 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['index', 'show'], 'permission:permission.view')
         ->middlewareFor(['create', 'store'], 'permission:permission.create')
         ->middlewareFor('destroy', 'permission:permission.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Master: Player Position (global, Super Admin only)
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('player-positions', PlayerPositionController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:player_position.view')
+        ->middlewareFor(['create', 'store'], 'permission:player_position.create')
+        ->middlewareFor(['edit', 'update'], 'permission:player_position.update')
+        ->middlewareFor('destroy', 'permission:player_position.delete');
 
 });
 

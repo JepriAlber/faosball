@@ -330,6 +330,75 @@
                             </div>
 
                         </li>
+
+                        {{-- ===== Menu Item: Master (dengan dropdown) ===== --}}
+                        @php
+                            $masterRoutes = ['player-positions.*'];
+
+                            $isMasterActive = false;
+
+                            foreach ($masterRoutes as $route) {
+                                if (Route::is($route)) {
+                                    $isMasterActive = true;
+                                    break;
+                                }
+                            }
+                        @endphp
+
+                        <li x-data="{ open: {{ $isMasterActive ? 'true' : 'false' }} }">
+
+                            <a href="#" @click.prevent="open=!open" class="menu-item group"
+                                :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+
+                                <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M4 4H10V10H4V4ZM14 4H20V10H14V4ZM4 14H10V20H4V14ZM14 14H20V20H14V14Z"
+                                        fill="currentColor" />
+                                </svg>
+
+                                <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                    Master
+                                </span>
+
+                                <svg class="menu-item-arrow transition-transform duration-200"
+                                    :class="[
+                                        open ?
+                                        'menu-item-arrow-active rotate-180' :
+                                        'menu-item-arrow-inactive',
+                                        sidebarToggle ? 'lg:hidden' : ''
+                                    ]"
+                                    width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                            </a>
+
+                            <div x-show="open" x-collapse class="overflow-hidden">
+
+                                <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
+
+                                    {{-- Posisi Pemain --}}
+                                    @can('player_position.view')
+                                        <li>
+                                            <a href="{{ route('player-positions.index') }}"
+                                                class="menu-dropdown-item group"
+                                                :class="{{ Route::is('player-positions.*') ? 'true' : 'false' }}
+                                                    ?
+                                                    'menu-dropdown-item-active' :
+                                                    'menu-dropdown-item-inactive'">
+                                                Posisi Pemain
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                </ul>
+
+                            </div>
+
+                        </li>
+                        {{-- ===== END: Master ===== --}}
                     @endif
                     {{-- ===== END: Administration ===== --}}
 
