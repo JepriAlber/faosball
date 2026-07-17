@@ -39,6 +39,7 @@ return [
         'Owner' => [
             'player.view', 'player.create', 'player.update', 'player.delete',
             'player_type.view', 'player_type.create', 'player_type.update', 'player_type.delete',
+            'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',

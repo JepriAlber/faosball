@@ -4,9 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Academy;
+use App\Models\PlayerCategory;
 use App\Models\PlayerType;
 use App\Models\Role;
 use App\Services\AccountService;
+use App\Services\PlayerCategoryService;
 use App\Services\PlayerTypeService;
 use App\Services\RoleService;
 use Illuminate\Database\Seeder;
@@ -67,6 +69,12 @@ class RolePermissionSeeder extends Seeder
             'player_type.create',
             'player_type.update',
             'player_type.delete',
+
+            // Player Category
+            'player_category.view',
+            'player_category.create',
+            'player_category.update',
+            'player_category.delete',
 
             // Coach
             'coach.view',
@@ -172,6 +180,10 @@ class RolePermissionSeeder extends Seeder
 
         if (! PlayerType::where('id_academy', $academy->id_academy)->exists()) {
             app(PlayerTypeService::class)->createDefaultPlayerTypes($academy);
+        }
+
+        if (! PlayerCategory::where('id_academy', $academy->id_academy)->exists()) {
+            app(PlayerCategoryService::class)->createDefaultPlayerCategories($academy);
         }
 
         $ownerRole = Role::where('id_academy', $academy->id_academy)

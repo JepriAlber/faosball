@@ -61,6 +61,7 @@ class PermissionPresenter
             'permission' => 'Permission',
             'player' => 'Player',
             'player_type' => 'Player Type',
+            'player_category' => 'Player Category',
             'coach' => 'Coach',
             'team' => 'Team',
             'training' => 'Training',
