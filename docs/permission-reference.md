@@ -16,6 +16,7 @@ Sumber kebenaran (source of truth) tetap kode — `database/seeders/RolePermissi
 - [Module: Player Management](#module-player-management)
 - [Module: Player Type](#module-player-type)
 - [Module: Player Category](#module-player-category)
+- [Module: Player Position (Master Global)](#module-player-position-master-global)
 - [Module: Academy Management](#module-academy-management)
 - [Permission Belum Dipakai Module Manapun](#permission-belum-dipakai-module-manapun)
 - [Role Template Default per Academy Baru](#role-template-default-per-academy-baru)
@@ -85,7 +86,7 @@ Nested di `players/{player}/account/*`. Ini **membuat/mengelola record `User`** 
 
 Konsekuensi: role yang punya `player.update` tapi **tidak** punya `user.create`/`user.update` (mis. `Coach`, `Staff` di template default) bisa mengelola data player tapi **tidak bisa** membuatkan/mengubah akun login player.
 
-Catatan tambahan: `players.id_player_type` wajib diisi saat create — divalidasi di `StorePlayerRequest` (dan `UpdatePlayerRequest` saat edit), dibatasi ke type milik academy yang sama dengan player (lihat [Module: Player Type](#module-player-type)). `players.id_player_category` wajib diisi dengan cara yang sama (lihat [Module: Player Category](#module-player-category)).
+Catatan tambahan: `players.id_player_type` wajib diisi saat create — divalidasi di `StorePlayerRequest` (dan `UpdatePlayerRequest` saat edit), dibatasi ke type milik academy yang sama dengan player (lihat [Module: Player Type](#module-player-type)). `players.id_player_category` wajib diisi dengan cara yang sama (lihat [Module: Player Category](#module-player-category)). `players.id_primary_position` wajib diisi saat create; `id_secondary_position` opsional dan tidak boleh sama dengan posisi utama (lihat [Module: Player Position](#module-player-position-master-global)) — berbeda dengan Type/Category, validasi posisi **tidak** difilter `id_academy` karena datanya global.
 
 ---
 
@@ -124,6 +125,27 @@ Catatan:
 - Isolasi antar academy memakai `AcademyScope` (global scope), **bukan** Policy — akses kategori academy lain menghasilkan **404**, bukan 403. Sama seperti Player Type.
 - `player_category.view` **tidak** dibutuhkan untuk memilih kategori saat menambah Player. Dropdown di form Player diisi Service; permission ini hanya menggerbang halaman `/player-categories`.
 - `min_age`/`max_age` **hanya untuk menyarankan** kategori dari `birth_date`. Sistem **tidak pernah menolak** player yang umurnya di luar rentang — "main naik kelas" adalah hal normal di sepak bola (lihat `issue2.md` Bagian 4.2).
+
+---
+
+## Module: Player Position (Master Global)
+
+Status: **✅ Implemented** (termasuk Card List mobile/tablet, lihat `docs/frontend-standard.md`).
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `player_position.view` | Lihat master posisi | `player-positions.index` (route middleware) + menu sidebar Master |
+| `player_position.create` | Tambah posisi baru | `player-positions.create`, `player-positions.store` |
+| `player_position.update` | Ubah kode/nama/kelompok/urutan/status | `player-positions.edit`, `player-positions.update` |
+| `player_position.delete` | Hapus posisi (kalau tidak dipakai player manapun) | `player-positions.destroy` |
+
+Catatan — module ini **berbeda total** dari Player Type & Player Category walau namanya mirip:
+
+- Ini **master data global** — tabel `player_positions` tidak punya `id_academy`, dibaca seluruh academy, **CRUD-nya khusus Super Admin**.
+- `player_position.*` **sengaja tidak ada di `role_templates` manapun** — termasuk Owner. Itu yang membuatnya Super-Admin-only, sama seperti `permission.*` dan `academy.*`.
+- Akses dari role academy ditolak dengan **403** (dari middleware permission), **bukan 404** seperti module tenant (Player Type/Category) yang mengandalkan `AcademyScope`.
+- `player_position.view` **tidak** dibutuhkan untuk memilih posisi saat menambah Player — dropdown diisi Service, sama seperti module tenant lainnya.
+- Posisi dipakai di **dua** kolom Player (`id_primary_position` dan `id_secondary_position`), jadi guard hapus wajib memeriksa dua-duanya (lihat `issue3.md` Bagian 4.2), dan hitungan "dipakai N player" wajib `withoutGlobalScopes()` karena `Player` sendiri masih memakai `AcademyScope` (lihat `issue3.md` Bagian 4.3).
 
 ---
 
@@ -176,6 +198,8 @@ Setiap academy baru otomatis dapat 6 role ini dari `config('faos.role_templates'
 
 `player_type.*` dan `player_category.*` sengaja hanya diberikan ke **Owner** secara default — mengatur jenis/kelompok umur pemain adalah keputusan level Owner. Academy bisa memberi role lain akses ini lewat halaman Role Management kalau perlu.
 
+`player_position.*` **tidak diberikan ke role manapun**, termasuk Owner — tidak seperti `player_type.*`/`player_category.*` yang bisa didelegasikan Owner ke role lain lewat Role Management, `player_position.*` memang tidak boleh didelegasikan sama sekali karena datanya dipakai bersama seluruh academy, bukan milik satu academy.
+
 Detail lengkap tiap role: lihat `config/faos.php` bagian `role_templates`.
 
 ---
@@ -193,4 +217,4 @@ Wajib diikuti supaya dokumen ini tidak basi:
 
 ## Summary
 
-FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, Player Management, Player Type, dan Player Category sudah digerbang penuh** (route + Blade), **Academy Management punya permission tapi belum digerbang sama sekali**, dan sisanya (Coach, Team, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.
+FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, Player Management, Player Type, Player Category, dan Player Position sudah digerbang penuh** (route + Blade), **Academy Management punya permission tapi belum digerbang sama sekali**, dan sisanya (Coach, Team, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.

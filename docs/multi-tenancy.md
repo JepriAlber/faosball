@@ -88,6 +88,7 @@ Contoh:
 - role_has_permissions
 - model_has_roles
 - model_has_permissions
+- `player_positions` — master posisi pemain. Global (tanpa `id_academy`), dibaca seluruh academy, CRUD khusus Super Admin. Bandingkan dengan `player_types` & `player_categories` yang justru tabel tenant.
 
 ---
 
