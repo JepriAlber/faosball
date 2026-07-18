@@ -30,6 +30,32 @@
             </div>
         </div>
 
+        @php
+            $hasActiveFilters = !empty($filters);
+        @endphp
+
+        <div class="border-b border-gray-100 p-4 dark:border-gray-800">
+            <x-table.tabs route="academies.index" :active="$filters['status'] ?? ''" :tabs="[
+                '' => ['label' => 'Semua', 'count' => $statusCounts['active'] + $statusCounts['inactive']],
+                'active' => ['label' => 'Aktif', 'count' => $statusCounts['active']],
+                'inactive' => ['label' => 'Nonaktif', 'count' => $statusCounts['inactive']],
+            ]" />
+        </div>
+
+        <x-table.toolbar route="academies.index" :filters="$filters" placeholder="Cari nama, kode, email, atau telepon academy...">
+
+            <div class="form-group">
+                <label class="form-label">Urutkan</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                </select>
+            </div>
+
+        </x-table.toolbar>
+
         <!-- Table Content -->
         <div class="table-wrapper">
             <table class="table">
@@ -125,10 +151,16 @@
                                             stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                             stroke-linejoin="round" />
                                     </svg>
-                                    <h4 class="empty-title">Belum ada data Academy</h4>
-                                    <p class="empty-description">Tambah academy sekarang</p>
-                                    <a href="{{ route('academies.create') }}" class="empty-link">Tambah
-                                        sekarang</a>
+                                    @if ($hasActiveFilters)
+                                        <h4 class="empty-title">Tidak ada academy yang cocok</h4>
+                                        <p class="empty-description">Coba ubah kata kunci atau filter yang dipakai</p>
+                                        <a href="{{ route('academies.index') }}" class="empty-link">Reset Filter</a>
+                                    @else
+                                        <h4 class="empty-title">Belum ada data Academy</h4>
+                                        <p class="empty-description">Tambah academy sekarang</p>
+                                        <a href="{{ route('academies.create') }}" class="empty-link">Tambah
+                                            sekarang</a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -220,10 +252,16 @@
                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        <h4 class="empty-title">Belum ada data Academy</h4>
-                        <p class="empty-description">Tambah academy sekarang</p>
-                        <a href="{{ route('academies.create') }}" class="empty-link">Tambah
-                            sekarang</a>
+                        @if ($hasActiveFilters)
+                            <h4 class="empty-title">Tidak ada academy yang cocok</h4>
+                            <p class="empty-description">Coba ubah kata kunci atau filter yang dipakai</p>
+                            <a href="{{ route('academies.index') }}" class="empty-link">Reset Filter</a>
+                        @else
+                            <h4 class="empty-title">Belum ada data Academy</h4>
+                            <p class="empty-description">Tambah academy sekarang</p>
+                            <a href="{{ route('academies.create') }}" class="empty-link">Tambah
+                                sekarang</a>
+                        @endif
                     </div>
                 </div>
             @endforelse
@@ -232,7 +270,7 @@
         <!-- Pagination -->
         @if ($academies->hasPages())
             <div class="table-footer">
-                {{ $academies->links() }}
+                {{ $academies->withQueryString()->links() }}
             </div>
         @endif
     </div>

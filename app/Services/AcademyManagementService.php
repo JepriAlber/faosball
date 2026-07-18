@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Academy;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -63,7 +65,84 @@ class AcademyManagementService
         return Str::slug($name);
     }
 
-    
+
+    /*
+    |--------------------------------------------------------------------------
+    | List / Filter Academy
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Terapkan filter search/status ke query.
+     *
+     * $includeStatus = false dipakai oleh statusCounts() -- hitungan tiap tab
+     * status tidak boleh ikut kefilter oleh status tab yang sedang aktif,
+     * supaya angkanya tetap utuh saat user pindah tab. Sama seperti pola di
+     * PlayerService::applyFilters().
+     */
+    protected function applyFilters(Builder $query, array $filters, bool $includeStatus = true): void
+    {
+        if (!empty($filters['search'])) {
+
+            $search = $filters['search'];
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($includeStatus && isset($filters['status']) && $filters['status'] !== '') {
+            $query->where('status', $filters['status'] === 'active');
+        }
+    }
+
+    /**
+     * Daftar academy untuk halaman index, dengan search/filter/sort.
+     */
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = Academy::query();
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'oldest' => $query->oldest(),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
+    }
+
+    /**
+     * Jumlah academy per status, untuk badge di tabs halaman index.
+     *
+     * Cuma dua state (boolean), jadi cukup dua query where()->count() --
+     * tidak perlu groupBy seperti PlayerService::statusCounts() yang punya
+     * 4 nilai enum.
+     */
+    public function statusCounts(array $filters = []): array
+    {
+        $countFor = function (bool $status) use ($filters) {
+
+            $query = Academy::query();
+
+            $this->applyFilters($query, $filters, includeStatus: false);
+
+            return $query->where('status', $status)->count();
+        };
+
+        return [
+            'active' => $countFor(true),
+            'inactive' => $countFor(false),
+        ];
+    }
+
+
     /**
      * Create academy
      */
