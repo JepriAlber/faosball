@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
+    loaded: true,
     darkMode: $persist(false).as('darkMode')
 }" :class="{ 'dark': darkMode }">
 
