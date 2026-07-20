@@ -18,6 +18,20 @@
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
+
+                @if ($player->user)
+                    @can('user.update')
+                        <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
+                            route-edit="players.account.edit" route-password="players.account.password"
+                            route-status="players.account.status" />
+                    @endcan
+                @else
+                    @can('user.create')
+                        <x-account.dropdown :model="$player" :user="$player->user" route-create="players.account.create"
+                            route-edit="players.account.edit" route-password="players.account.password"
+                            route-status="players.account.status" />
+                    @endcan
+                @endif
             </div>
         </div>
 
@@ -287,5 +301,8 @@
         </form>
 
     </div>
+
+    <x-modal.reset-password />
+    <x-modal.status />
 
 @endsection
