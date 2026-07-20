@@ -17,6 +17,7 @@ class Academy extends Model
 
 
     protected $fillable = [
+        'id_owner_user',
         'name',
         'code',
         'slug',
@@ -25,7 +26,14 @@ class Academy extends Model
         'address',
         'tagline',
         'status',
+        'subscription_type',
+        'subscription_fee',
+        'subscription_started_at',
+        'subscription_ends_at',
         'logo',
+        'logo_sidebar',
+        'logo_favicon',
+        'primary_color',
         'description',
     ];
 
@@ -34,13 +42,22 @@ class Academy extends Model
     {
         return [
             'status' => 'boolean',
+            'subscription_fee' => 'decimal:2',
+            'subscription_started_at' => 'date',
+            'subscription_ends_at' => 'date',
         ];
+    }
+
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'id_owner_user');
     }
 
 
     protected static function boot()
     {
-        parent::boot(); 
+        parent::boot();
 
         static::creating(function ($model){
 

@@ -25,7 +25,7 @@
 }
 
 @utility card-actions {
-    @apply flex items-center gap-3;
+    @apply flex flex-wrap items-center gap-3;
 }
 
 

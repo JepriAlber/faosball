@@ -25,17 +25,26 @@ FAOSBall menyediakan berbagai modul untuk mendukung operasional akademi sepak bo
 
 ## Technology Stack
 
-| Component | Technology |
-|-----------|------------|
-| Framework | Laravel 13 |
-| Frontend | Tailwind CSS |
-| Admin Template | TailAdmin |
-| JavaScript | Alpine.js |
-| Authentication | Laravel Breeze |
-| Authorization | Spatie Laravel Permission |
-| Database | MySQL |
-| Storage | Laravel Storage |
-| Version Control | Git |
+> Versi di bawah adalah versi yang **benar-benar terpasang** (dari `composer.lock`/`package-lock.json`), bukan cuma batas constraint di `composer.json`/`package.json`. Update tabel ini setiap kali dependency inti ditambah/di-upgrade, supaya jadi rujukan cepat tanpa perlu buka lock file.
+
+| Layer | Component | Technology | Version |
+|-------|-----------|------------|---------|
+| Runtime | Bahasa | PHP | `^8.3` (terpasang 8.4.20) |
+| Backend | Framework | Laravel | `^13.8` (terpasang 13.15.0) |
+| Backend | Authentication scaffolding | Laravel Breeze | 2.4.2 |
+| Backend | Authorization (role & permission) | Spatie Laravel Permission | 8.0.0 |
+| Backend | Image processing (server-side resize, driver GD) | Intervention Image | `^4.2` (terpasang 4.2.0) |
+| Backend | REPL/tinker | Laravel Tinker | 3.0.2 |
+| Backend (dev only) | Query debugging | Laravel Debugbar (barryvdh) | 4.4.0 |
+| Database | Produksi | MySQL | — |
+| Database | Automated testing (`phpunit.xml`) | SQLite (in-memory) | — |
+| Storage | File upload (logo, dsb) | Laravel Storage (disk `public`) | — |
+| Frontend | Build tool | Vite | 8.1.0 (`laravel-vite-plugin` 3.1.0) |
+| Frontend | CSS framework | Tailwind CSS | 4.3.1 |
+| Frontend | Admin template | TailAdmin | — |
+| Frontend | Reactivity/interaktivitas | Alpine.js | 3.15.12 |
+| Frontend | Crop gambar sebelum upload (client-side) | Cropper.js | 1.6.2 |
+| Tooling | Version control | Git | — |
 
 ---
 
@@ -141,7 +150,10 @@ app/
 ├── Providers/
 ├── Scopes/
 ├── Services/
-└── Traits/
+├── Support/
+├── Traits/
+└── View/
+    └── Components/
 
 docs/
 

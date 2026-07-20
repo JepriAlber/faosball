@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Academy\AcademyFormRequest;
 use App\Models\Academy;
 use App\Services\AcademyManagementService;
+use Illuminate\Http\Request;
 
 class AcademyController extends Controller
 {
@@ -20,8 +21,10 @@ class AcademyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filters = array_filter($request->only(['search', 'status', 'sort']));
+
         return view('academies.index',[
             'title'=>'Manajemen Academy',
             'breadcrumb'=>[
@@ -29,7 +32,10 @@ class AcademyController extends Controller
                     'label'=>'Manajemen Academy'
                 ]
             ],
-            'academies'=>Academy::latest()->paginate(10)
+            'academies' => $this->academyManagementService->paginate($filters),
+            'statusCounts' => $this->academyManagementService->statusCounts($filters),
+            'filters' => $filters,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 
@@ -49,7 +55,8 @@ class AcademyController extends Controller
                 [
                     'label'=>'Tambah Academy'
                 ]
-            ]
+            ],
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 
@@ -83,6 +90,8 @@ class AcademyController extends Controller
      */
     public function show(Academy $academy)
     {
+        $academy->load('owner');
+
         return view('academies.show',[
             'title'=>'Detail Academy',
             'breadcrumb'=>[
@@ -94,7 +103,9 @@ class AcademyController extends Controller
                     'label'=>'Detail Academy'
                 ]
             ],
-            'academy'=>$academy
+            'academy'=>$academy,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
+            'subscriptionStatus' => $this->academyManagementService->subscriptionStatus($academy),
         ]);
     }
 
@@ -115,7 +126,8 @@ class AcademyController extends Controller
                     'label'=>'Edit Academy'
                 ]
             ],
-            'academy'=>$academy
+            'academy'=>$academy,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 

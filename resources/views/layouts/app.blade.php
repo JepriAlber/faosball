@@ -17,10 +17,13 @@
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('assets/images/logo/kantinit-favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ app(\App\Services\AcademyService::class)->faviconUrl() }}">
 
     {{-- Vite: CSS & JS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Override warna brand per academy aktif (kalau primary_color sudah diset) --}}
+    <x-academy-theme />
 
     {{-- Stack untuk CSS tambahan per-halaman --}}
     @stack('styles')

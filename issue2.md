@@ -1,57 +1,39 @@
-# Brief: Module Player Category (Kelompok Umur U-12 / U-15 / U-17)
+# Brief: Module Academy Account (Buat & Kelola Akun Owner saat Tambah Academy)
 
 > **Untuk**: Programmer junior / AI agent
-> **Prasyarat**: Baca `CLAUDE.md`, `README.md`, dan `docs/` dulu. Terutama `docs/multi-tenancy.md`, `docs/permission-reference.md`, `docs/development-guide.md`, dan `docs/frontend-standard.md`.
->
-> ## ⛔ WAJIB: `issue.md` (Module Player Type) HARUS SELESAI & MERGED DULU
->
-> Brief ini **tidak bisa dikerjakan paralel** dengan `issue.md`. Alasannya konkret, bukan formalitas:
->
-> - Migration Tahap 1 memakai `->after('id_player_type')` — kolom itu dibuat oleh `issue.md`.
-> - Tahap 10 **menulis ulang** blok Alpine di `players/create.blade.php` yang dibuat `issue.md`. Kalau dua brief dikerjakan bersamaan, blok itu pasti konflik dan salah satunya akan hilang diam-diam.
-> - Tahap 6 mengandalkan `PermissionPresenter::moduleLabel()` yang dibuat `issue.md`.
->
-> Kalau `issue.md` belum selesai, **berhenti di sini.**
-
-> **Cara pakai brief ini**: Kerjakan **Tahap 1 → 12 berurutan**. Jangan lompat. Setiap tahap punya blok **✅ Cek dulu** — jangan lanjut sebelum blok itu lulus.
+> **Prasyarat**: Baca `CLAUDE.md`, `README.md`, dan `docs/` dulu. Terutama `docs/multi-tenancy.md`, `docs/authorization.md`, `docs/permission-reference.md`, `docs/module-standard.md`, dan `docs/frontend-standard.md`. Baca juga `issue.md` (brief Academy Subscription + Academy Profile) karena brief ini menempel langsung di atas module yang dibangun di sana — jangan kerjakan brief ini sebelum `issue.md` selesai.
+> **Cara pakai brief ini**: Kerjakan **Tahap 1 → 11 berurutan**. Jangan lompat. Setiap tahap punya blok **✅ Cek dulu** — jangan lanjut sebelum blok itu lulus.
 > Kalau cuma mau eksekusi, cukup baca Bagian 0–3 lalu langsung ke Tahap 1. Bagian 4 (alasan teknis) boleh dibaca belakangan, **tapi aturannya tetap tidak boleh dilanggar**.
 
 ---
 
 ## 0. Aturan Emas
 
-Sebelas larangan ini bukan preferensi gaya. Alasan lengkapnya di **Bagian 4**.
+Delapan larangan ini bukan preferensi gaya. Masing-masing sudah diverifikasi akan bikin bug atau celah nyata. Alasan lengkapnya di **Bagian 4**.
 
 | ❌ Jangan | Kenapa singkatnya | Detail |
 |----------|-------------------|--------|
-| **Menolak player yang umurnya di luar rentang kategori** | "Main naik kelas" itu normal di sepak bola. Validasi keras = sistem menolak kenyataan. | [4.2](#42-kenapa-umur-tidak-divalidasi-keras-terhadap-kategori) |
-| Menghitung kategori on-the-fly tanpa menyimpannya | Kategori berubah sendiri saat ulang tahun, riwayat hilang | [4.1](#41-kenapa-kategori-disimpan-bukan-dihitung-terus-dari-birth_date) |
-| `->orderBy()` lupa di query saran kategori | Rentang tumpang tindih → saran beda-beda tiap request | [4.3](#43-kenapa-saran-kategori-wajib-orderby) |
-| `cascadeOnDelete` pada FK `players.id_player_category` | Hapus 1 kategori → **seluruh player** kategori itu ikut terhapus | [4.4](#44-cascadeondelete--hapus-kategori-hapus-semua-playernya) |
-| `Rule::exists('player_categories', ...)` **tanpa** `where('id_academy', ...)` | Owner A bisa pasang kategori milik Academy B lewat POST | [4.5](#45-ruleexists-tidak-kena-academyscope) |
-| Lupa validasi `max_age >= min_age` | Rentang terbalik tidak pernah cocok siapa pun, diam-diam | [Tahap 7](#tahap-7--playercategoryformrequest) |
-| Membuat `PlayerCategory` dengan `id_academy` = `NULL` | **Tidak ada "kategori system"**, sama seperti PlayerType | [2](#2-cara-kerja-solusi) |
-| `unique('name')` global di tabel `player_categories` | Academy B tidak bisa punya "U-12" kalau A sudah punya | [Tahap 1](#tahap-1--migration) |
-| Bikin Policy untuk PlayerCategory | **Tidak perlu.** Global scope sudah bikin 404. | `issue.md` Bagian 4.3 |
-| `$player->playerCategory->name` di Blade tanpa `@if` | Player lama `id_player_category`-nya `NULL` → error 500 | [4.6](#46-kenapa-id_player_category-nullable-di-db-tapi-required-di-form-request) |
-| Membuat folder `lang/` | Pesan Indonesia di-hardcode | `docs/coding-standard.md` |
+| Pakai nama field `email`/`password` polos di `AcademyFormRequest` untuk akun Owner | `AcademyFormRequest` **sudah** punya field `email` — itu email kontak academy (telepon/alamat/email kantor), bukan email login. Kalau dipakai ulang, submit form akan tabrakan: satu input, dua makna berbeda | [4.1](#41-kenapa-field-akun-dinamai-owner_email--owner_password-bukan-email--password) |
+| Gerbang route `academies/{academy}/account/*` pakai permission `user.*` (niru persis Player Account) | `user.create`/`user.update` **sudah** default dimiliki role Owner (lihat `config('faos.role_templates')`) — supaya Owner bisa bikin akun login untuk player-nya sendiri. Kalau dipakai ulang di sini, Owner academy manapun bisa lolos middleware ke rute pembuatan/pengubahan akun Owner **academy lain** (walau ujungnya masih ke-block di `AcademyController` — tapi rute account ini berdiri sendiri, tidak menumpang gate itu) | [4.2](#42-kenapa-permission-academyaccount-pakai-academyupdate-bukan-user-atau-permission-baru) |
+| Lupa mengisi `id_owner_user` di baris `academies` setelah `User` Owner berhasil dibuat | `AccountService::create()` cuma membuat `User` + assign role — **tidak** tahu-menahu soal `Academy`. Kalau langkah update `id_owner_user` kelupaan, `$academy->owner` akan selalu `null` walau akunnya sebetulnya ada, dan halaman Detail Academy tidak akan bisa menampilkan/mengelola akun itu | [Tahap 3](#tahap-3--academymanagementservicecreate) |
+| Asumsikan akun Owner yang baru dibuat otomatis bisa langsung login | `LoginRequest` mengecek **dua status terpisah**: `$user->status` (akun) **dan** `$academy->status` (academy). Academy baru defaultnya `status = false` (lihat `AcademyManagementService::create()`) kecuali Super Admin eksplisit toggle Aktif. Kalau lupa, Owner dapat pesan "Academy sedang tidak aktif." walau akunnya valid | [4.3](#43-kenapa-membuat-akun-owner-tidak-otomatis-berarti-bisa-login) |
+| Taruh logic pembuatan `User` Owner di `AcademyController` | Melanggar Thin Controller (`docs/architecture.md`). Logic penciptaan Owner **wajib** di `AcademyManagementService::create()`, persis pola `PlayerService::create()` untuk `create_account` | [Tahap 3](#tahap-3--academymanagementservicecreate) |
+| Buat `User` Owner sebelum `RoleService::createDefaultRoles()` selesai jalan | Role `Owner` untuk academy itu **belum ada** sebelum `createDefaultRoles()` dipanggil — `AccountService::assignRole()` akan lempar exception "Role tidak ditemukan pada academy user." kalau urutannya kebalik | [Tahap 3](#tahap-3--academymanagementservicecreate) |
+| Pisahkan `Academy::create()` dan pembuatan `User` Owner ke dua transaksi berbeda (atau tanpa transaksi sama sekali) | Kalau email Owner ternyata sudah dipakai (`unique:users,email` lolos di validasi tapi race condition, atau kasus lain), Academy yang sudah kadung tersimpan jadi "yatim" — ada tapi tanpa Owner dan tidak bisa dibatalkan otomatis. Satu `DB::transaction()` yang sama, bukan dua terpisah | [Tahap 3](#tahap-3--academymanagementservicecreate) |
+| Bikin `AcademyAccountController` mewarisi/menumpang `AcademyController` yang sudah ada | Sama seperti alasan Academy Profile terpisah dari Academy Management di `issue.md` (`2d`) — sub-resource `account` punya permission & tanggung jawab beda dari CRUD utama `Academy`, harus jadi Controller & Form Request sendiri | [Tahap 6](#tahap-6--academyaccountcontroller-baru) |
 
 ---
 
 ## 1. Tujuan
 
-Setiap academy mengelompokkan pemainnya berdasarkan **umur**: U-12, U-15, U-17.
+Saat ini (setelah `issue.md` selesai), alur Super Admin menambah academy baru **tidak** menyertakan pembuatan akun login untuk pemilik academy tersebut. Owner baru harus dibuatkan akunnya secara manual lewat jalur lain (mis. Role Management + tinker), yang gampang salah dan tidak konsisten dengan pola yang **sudah ada** di module Player: form Tambah Player sudah punya toggle "Buat Akun Player" yang langsung membuatkan akun login di request yang sama (lihat `PlayerService::create()` → `if (!empty($data['create_account']))`), plus jalur terpisah untuk buat/edit akun belakangan (`PlayerAccountController`).
 
-```text
-Academy A                          Academy B
-├── U-12  (10-12 th)               ├── U-10  (8-10 th)     ← bebas bikin sendiri
-├── U-15  (13-15 th)               ├── U-12  (11-12 th)    ← rentang boleh beda
-└── U-17  (16-17 th)               └── U-15  (13-15 th)
-```
+**Scope brief ini**: meniru pola itu persis untuk `Academy`:
 
-**Aturan inti**: Setiap Player **wajib** punya satu Player Category. Setiap Player Category **wajib** milik satu Academy.
+1. Form **Tambah Academy** (`academies.create`) dapat toggle "Buat Akun Owner" — kalau diaktifkan, Super Admin mengisi email & password, dan begitu academy tersimpan, satu akun `User` dengan role **Owner** langsung ikut dibuat dan terhubung ke academy itu.
+2. Kalau academy dibuat **tanpa** toggle itu (atau akunnya nanti perlu diganti/direset), tersedia sub-halaman terpisah `academies/{academy}/account/*` (create/edit/reset password/aktif-nonaktifkan) — persis pola `players/{player}/account/*`.
 
-**Kegunaan utamanya** ada di module **Template Latihan** nanti: coach membuat template latihan per kelompok umur (latihan U-12 beda dengan U-17). Module ini adalah fondasinya.
+**Bukan** scope brief ini: mengubah alur registrasi Owner mandiri (self-service sign up), mengizinkan Owner mengganti emailnya sendiri (itu ranah Academy Profile di `issue.md`, kalau memang dibutuhkan nanti didiskusikan terpisah), atau menambah role selain Owner lewat jalur ini.
 
 ---
 
@@ -59,52 +41,46 @@ Academy A                          Academy B
 
 Baca sampai paham. Kalau bagian ini tidak nyantol, sisa brief akan terasa acak.
 
-### 2a. 80% module ini SAMA PERSIS dengan Player Type
+### 2a. Kenapa perlu kolom baru `id_owner_user` di `academies`
 
-`PlayerCategory` adalah kembaran struktural `PlayerType` (yang kamu baru selesaikan di `issue.md`):
+Pola yang sudah ada di `Player` menyimpan relasi ke akun login lewat kolom `id_user` langsung di tabel `players` (lihat `database/migrations/2026_06_25_163827_create_players_table.php`) — **bukan** dicari ulang lewat role setiap saat. Alasannya: satu `Player` = maksimal satu akun, jadi FK langsung adalah cara paling murah & tidak ambigu untuk tahu "akun mana yang terhubung ke baris ini".
 
-| Hal | Sama dengan PlayerType? |
-|-----|------------------------|
-| `extends FaosModel` (UUID + `BelongsToAcademy` + `AcademyScope`) | ✅ Sama persis |
-| `id_academy` wajib, tidak ada "kategori system" | ✅ Sama persis |
-| Unique `(id_academy, name)` | ✅ Sama persis |
-| Isolasi lewat global scope → 404, **tanpa Policy** | ✅ Sama persis |
-| Guard: tidak bisa dihapus kalau masih dipakai player | ✅ Sama persis |
-| Kolom `status` untuk menonaktifkan | ✅ Sama persis |
-| Template default academy baru dari `config/faos.php` | ✅ Sama persis |
-| FK `nullOnDelete` di `players` | ✅ Sama persis |
+`Academy` butuh pola yang sama, tapi **tidak boleh** dicari lewat "user pertama yang punya role Owner di academy ini" — karena:
+- Satu academy nanti bisa punya lebih dari satu user dengan role Owner (Super Admin bebas menambah lewat Role Management), jadi "yang mana Owner utama" jadi ambigu.
+- Query "cari user pertama dengan role X di academy Y" jauh lebih mahal (join ke tabel pivot Spatie) dibanding satu kolom FK langsung.
 
-**Karena itu**: setiap kali brief ini bilang *"tiru module Player Type"*, buka file `player-types` / `PlayerTypeService` / `PlayerTypeFormRequest` yang **sudah ada**, dan tiru apa adanya. Jangan mengarang pola baru.
+Solusinya: tambahkan kolom `id_owner_user` (uuid, nullable) ke tabel `academies`, mengarah ke `users.id_user` — persis pola `players.id_user`, cuma arah penamaannya dibalik supaya jelas maksudnya ("akun Owner milik academy ini"), bukan `id_user` polos yang bisa disalahartikan sebagai "academy ini milik user".
 
-### 2b. 20% sisanya yang BEDA — dan ini inti brief
+### 2b. Kenapa field akun dinamai `owner_email` / `owner_password`, bukan `email` / `password`
 
-| Beda | PlayerType | PlayerCategory |
-|------|-----------|----------------|
-| Kolom khas | `is_billable` (boolean) | **`min_age` + `max_age`** (integer) |
-| Asal nilai | Murni keputusan manusia | **Turunan dari `birth_date`** — sistem bisa menyarankan |
-| Urutan tampil | `latest()` | **`orderBy('min_age')`** — U-12 harus tampil sebelum U-17, bukan urut tanggal dibuat |
-| Bantuan di form | Tidak ada | **Saran otomatis dari umur**, boleh ditimpa coach |
+`AcademyFormRequest` **sudah** memvalidasi `email` sebagai email kontak academy (required, dipakai di halaman Detail Academy sebagai info kontak — lihat Tahap 4 di `issue.md`). Kalau field akun Owner juga dinamai `email`, satu `<input name="email">` di halaman yang sama akan menimpa nilai yang lain tergantung urutan render — form HTML tidak punya namespace. Makanya field baru **wajib** pakai prefix `owner_`: `owner_email`, `owner_password`, `owner_password_confirmation`. Ini beda dengan Player, yang form Tambah Player-nya tidak punya field `email` bawaan sama sekali, jadi `email`/`password` polos aman dipakai di sana.
 
-### 2c. Kategori DISIMPAN, saran hanya bantuan
-
-Ini keputusan paling penting di module ini:
+### 2c. Urutan pembuatan (di dalam satu `DB::transaction()`)
 
 ```text
-birth_date: 2015-05-16
-     │
-     ▼  (Service / Alpine menghitung: umur 11)
-     │
-     ▼  (cocokkan ke min_age <= 11 <= max_age)
-SARAN: U-12
-     │
-     ▼
-Coach boleh TERIMA (U-12) atau TIMPA (mis. pilih U-15 untuk pemain berbakat)
-     │
-     ▼
-players.id_player_category  ← YANG DISIMPAN adalah pilihan coach, bukan hasil hitungan
+1. Academy::create()                        -- academy tersimpan, id_academy ada
+2. RoleService::createDefaultRoles($academy) -- role "Owner" utk academy ini ada
+3. (kalau create_account) AccountService::create(..., 'Owner')
+                                              -- User dibuat, role Owner ter-assign
+4. (kalau create_account) $academy->update(['id_owner_user' => $user->id_user])
 ```
 
-Sistem **tidak pernah** memaksa. Kalau coach memilih kategori yang tidak cocok dengan umur, sistem cuma **memberi tahu**, tidak menolak. Lihat [4.2](#42-kenapa-umur-tidak-divalidasi-keras-terhadap-kategori).
+Urutan 2 sebelum 3 **wajib** — `AccountService::assignRole()` mencari baris `Role` bernama "Owner" **milik academy yang baru dibuat itu**, dan baris itu baru ada setelah langkah 2 selesai.
+
+### 2d. Kenapa permission `academy.update`, bukan `user.*` atau permission baru
+
+Player Account sengaja pakai permission `user.*` yang **terpisah** dari `player.*`, supaya role tertentu (Coach, Staff) bisa mengelola data player tapi **tidak otomatis** bisa membuat akun login-nya — pemisahan itu berguna karena Player Management memang didelegasikan ke banyak role.
+
+Academy Management **tidak** didelegasikan ke role manapun sama sekali — sudah, dan tetap, Super-Admin-only (lihat `issue.md` → `2c`, `4.4`). Karena satu-satunya pihak yang pernah menyentuh rute ini adalah Super Admin (yang lolos segalanya lewat `Gate::before()`), menambah permission baru (mis. `academy_account.manage`) tidak memberi manfaat pemisahan apapun — cuma menambah satu baris permission yang tidak pernah dipakai bedakan siapa-boleh-apa. Pakai `academy.update` yang sudah ada, sudah Super-Admin-only, dan sudah dikenal `docs/permission-reference.md`.
+
+### 2e. Dua status yang terpisah: akun Owner vs academy
+
+| | Dikontrol lewat | Efek kalau `false` |
+|---|---|---|
+| `users.status` | Toggle Aktif/Nonaktif di `AcademyAccountController::status()` (Tahap 6) | Login ditolak: "Akun Anda sedang dinonaktifkan." |
+| `academies.status` | Toggle Aktif/Nonaktif di form Tambah/Edit Academy (`issue.md`, sudah ada) | Login ditolak: "Academy sedang tidak aktif." (kecuali user itu Super Admin) |
+
+Keduanya independen. Supaya Owner yang baru dibuat **bisa langsung login**, Super Admin harus memastikan **kedua-duanya** aktif — akun (otomatis `true` dari `AccountService::create()`) **dan** academy (`status` di form Tambah Academy, defaultnya `false` kalau tidak dicentang — lihat `AcademyManagementService::create()`). Brief ini **tidak** mengubah default academy jadi otomatis aktif hanya karena toggle akun dicentang — dua keputusan itu independen dan Super Admin harus tetap sadar menentukan keduanya (lihat [4.3](#43-kenapa-membuat-akun-owner-tidak-otomatis-berarti-bisa-login)).
 
 ---
 
@@ -114,45 +90,37 @@ Kerangka lengkap. Kalau sebuah file tidak ada di tabel ini, **jangan disentuh**.
 
 | File | Aksi | Tahap |
 |------|------|-------|
-| `database/migrations/…_create_player_categories_table.php` | 🆕 Baru | 1 |
-| `database/migrations/…_add_id_player_category_to_players_table.php` | 🆕 Baru | 1 |
-| `app/Models/PlayerCategory.php` | 🆕 Baru | 2 |
-| `app/Models/Player.php` | ✏️ Tambah fillable + relasi | 2 |
-| `config/faos.php` | ✏️ Tambah `player_category_templates` | 3 |
-| `app/Services/PlayerCategoryService.php` | 🆕 Baru | 4 |
-| `app/Services/AcademyManagementService.php` | ✏️ Tambah 1 dependency + 1 baris | 5 |
-| `database/seeders/RolePermissionSeeder.php` | ✏️ Tambah 4 permission | 6 |
-| `config/faos.php` | ✏️ Tambah `player_category.*` ke `role_templates` Owner | 6 |
-| `app/Support/PermissionPresenter.php` | ✏️ Tambah 1 baris ke `$modules` | 6 |
-| `app/Http/Requests/PlayerCategory/PlayerCategoryFormRequest.php` | 🆕 Baru | 7 |
-| `app/Http/Controllers/PlayerCategoryController.php` | 🆕 Baru | 8 |
-| `routes/web.php` | ✏️ Tambah resource `player-categories` | 8 |
-| `resources/views/player-categories/{index,create,edit}.blade.php` | 🆕 Baru | 9 |
-| `resources/views/partials/sidebar.blade.php` | ✏️ Tambah menu | 9 |
-| `app/Services/PlayerService.php` | ✏️ Simpan `id_player_category` | 10 |
-| `app/Http/Requests/Players/{Store,Update}PlayerRequest.php` | ✏️ Validasi `id_player_category` | 10 |
-| `app/Http/Controllers/PlayerController.php` | ✏️ Kirim `$playerCategories` + `$suggestedCategory` | 10 |
-| `resources/views/players/{index,create,edit,show}.blade.php` | ✏️ Ubah | 10 |
-| `database/factories/PlayerCategoryFactory.php` | 🆕 Baru | 11 |
-| `tests/Feature/PlayerCategoryTest.php` | 🆕 Baru | 11 |
-| `docs/permission-reference.md` | ✏️ Ubah | 12 |
-| **`app/Traits/BelongsToAcademy.php`**, **`app/Scopes/AcademyScope.php`** | 🚫 **Jangan sentuh** | — |
-| **`app/Models/PlayerType.php`**, **`app/Services/PlayerTypeService.php`** | 🚫 **Jangan sentuh** | — |
-| **`resources/views/player-types/*`** | 🚫 **Jangan sentuh** | — |
-| **`app/Http/Controllers/PlayerAccountController.php`** | 🚫 **Jangan sentuh** | — |
+| `database/migrations/…_add_id_owner_user_to_academies_table.php` | 🆕 Baru | 1 |
+| `app/Models/Academy.php` | ✏️ Tambah fillable `id_owner_user` + relasi `owner()` | 2 |
+| `app/Models/User.php` | ✏️ Tambah relasi `ownedAcademy()` (opsional, untuk kebutuhan lain) | 2 |
+| `app/Services/AcademyManagementService.php` | ✏️ Ubah `create()`, inject `AccountService` | 3 |
+| `app/Http/Requests/Academy/AcademyFormRequest.php` | ✏️ Tambah rules `create_account`, `owner_email`, `owner_password` | 4 |
+| `resources/views/academies/create.blade.php` | ✏️ Tambah toggle "Buat Akun Owner" | 5 |
+| `app/Http/Controllers/AcademyAccountController.php` | 🆕 Baru | 6 |
+| `app/Http/Requests/Academy/StoreAcademyAccountRequest.php` | 🆕 Baru | 7 |
+| `app/Http/Requests/Academy/UpdateAcademyAccountRequest.php` | 🆕 Baru | 7 |
+| `routes/web.php` | ✏️ Tambah nested route `academies/{academy}/account/*` | 8 |
+| `resources/views/academies/show.blade.php` | ✏️ Tambah `<x-account.dropdown>` | 9 |
+| `resources/views/academies/account/create.blade.php` | 🆕 Baru | 9 |
+| `resources/views/academies/account/edit.blade.php` | 🆕 Baru | 9 |
+| `app/Http/Controllers/AcademyController.php` | ✏️ `show()` eager-load relasi `owner` | 9 |
+| `tests/Feature/AcademyAccountTest.php` | 🆕 Baru | 10 |
+| `docs/permission-reference.md` | ✏️ Tambah sub-section "Sub-module: Academy Account" | 11 |
+| **`app/Services/AccountService.php`** | 🚫 **Jangan sentuh** — sudah generik (menerima `id_academy`, `role` apapun), dipakai ulang apa adanya, sama seperti `PlayerService` memakainya | — |
+| **`resources/views/components/account/dropdown.blade.php`** | 🚫 **Jangan sentuh** — komponen ini sudah generik (`:model`, `:user`, route props), dipakai ulang apa adanya | — |
+| **`app/Http/Controllers/AcademyProfileController.php`, module Academy Profile (`issue.md` Tahap 12–18)** | 🚫 **Jangan sentuh** — beda total, itu self-service Owner mengubah profilnya sendiri, brief ini murni Super Admin membuatkan akun Owner | — |
 
 ---
 
 ## Tahap 1 — Migration
 
-**Tujuan**: tabel `player_categories` ada, dan `players` punya kolom `id_player_category`.
+**Tujuan**: `academies` punya kolom `id_owner_user`, nullable, FK ke `users`.
 
 ```bash
-php artisan make:migration create_player_categories_table
-php artisan make:migration add_id_player_category_to_players_table
+php artisan make:migration add_id_owner_user_to_academies_table --table=academies
 ```
 
-### 1a. `…_create_player_categories_table.php`
+Isi filenya:
 
 ```php
 <?php
@@ -165,243 +133,100 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('player_categories', function (Blueprint $table) {
+        Schema::table('academies', function (Blueprint $table) {
 
             /*
             |--------------------------------------------------------------------------
-            | Primary Key
+            | Owner Account
             |--------------------------------------------------------------------------
+            | Nullable -- academy boleh ada tanpa akun Owner (dibuat belakangan lewat
+            | AcademyAccountController). Arah relasi SENGAJA dari academies ke users,
+            | bukan sebaliknya, supaya "akun Owner mana yang aktif untuk academy ini"
+            | selalu jelas lewat satu FK langsung -- pola yang sama dengan
+            | players.id_user. Lihat issue2.md Bagian 2a.
             */
-            $table->uuid('id_player_category')->primary();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Tenant
-            |--------------------------------------------------------------------------
-            | TIDAK nullable. Tidak ada konsep "kategori system" -- setiap kategori
-            | wajib milik satu academy, sama seperti player_types.
-            */
-            $table->uuid('id_academy');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Category Information
-            |--------------------------------------------------------------------------
-            */
-            $table->string('name', 50);
-
-            $table->text('description')->nullable();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Rentang Umur (inklusif)
-            |--------------------------------------------------------------------------
-            | Dipakai HANYA untuk MENYARANKAN kategori saat menambah player.
-            | Bukan aturan yang memaksa: pemain berbakat boleh "main naik kelas"
-            | ke kategori yang umurnya di luar rentang ini. Lihat Bagian 4.2.
-            |
-            | Academy bebas menentukan rentangnya sendiri lewat form.
-            */
-            $table->unsignedTinyInteger('min_age');
-            $table->unsignedTinyInteger('max_age');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Status
-            |--------------------------------------------------------------------------
-            | Kategori nonaktif tidak muncul di dropdown Player baru, tapi player
-            | lama yang sudah memakainya tetap utuh.
-            */
-            $table->boolean('status')->default(true);
-
-            $table->timestamps();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Index
-            |--------------------------------------------------------------------------
-            */
-            $table->index('id_academy');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Unique
-            |--------------------------------------------------------------------------
-            | Dua academy BOLEH punya "U-12" masing-masing (dengan rentang umur
-            | yang boleh berbeda pula). Satu academy TIDAK BOLEH punya dua "U-12".
-            */
-            $table->unique(['id_academy', 'name'], 'player_categories_academy_name_unique');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Foreign Key
-            |--------------------------------------------------------------------------
-            */
-            $table->foreign('id_academy')
-                ->references('id_academy')
-                ->on('academies')
-                ->cascadeOnDelete();
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('player_categories');
-    }
-};
-```
-
-> `unsignedTinyInteger` menampung 0–255 — lebih dari cukup untuk umur, dan otomatis menolak umur negatif di level database.
-
-### 1b. `…_add_id_player_category_to_players_table.php`
-
-```php
-<?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    public function up(): void
-    {
-        Schema::table('players', function (Blueprint $table) {
-
-            // Nullable di level DATABASE, tapi WAJIB di Form Request.
-            // Player lama (sebelum module ini) belum punya kategori.
-            // Lihat Bagian 4.6.
-            //
-            // after('id_player_type') -> kolom itu dibuat oleh issue.md.
-            // Kalau baris ini error "column not found", berarti issue.md
-            // belum dikerjakan. Berhenti, selesaikan issue.md dulu.
-            $table->uuid('id_player_category')
+            $table->uuid('id_owner_user')
                 ->nullable()
-                ->after('id_player_type');
+                ->after('id_academy');
 
-            $table->index('id_player_category');
+            $table->index('id_owner_user');
 
-            // nullOnDelete, BUKAN cascadeOnDelete. Lihat Bagian 4.4.
-            $table->foreign('id_player_category')
-                ->references('id_player_category')
-                ->on('player_categories')
+            $table->foreign('id_owner_user')
+                ->references('id_user')
+                ->on('users')
                 ->nullOnDelete();
         });
     }
 
     public function down(): void
     {
-        Schema::table('players', function (Blueprint $table) {
-            $table->dropForeign(['id_player_category']);
-            $table->dropIndex(['id_player_category']);
-            $table->dropColumn('id_player_category');
+        Schema::table('academies', function (Blueprint $table) {
+            $table->dropForeign(['id_owner_user']);
+            $table->dropColumn('id_owner_user');
         });
     }
 };
 ```
 
+> `academies` tidak punya kolom `id_academy` sebagai kolom biasa di posisi umum (dia primary key), jadi `->after('id_academy')` di sini merujuk ke primary key `id_academy` yang memang jadi kolom pertama tabel ini — cek dengan `php artisan db:table academies` kalau ragu urutannya.
+
 **✅ Cek dulu**
 
 ```bash
 php artisan migrate
-php artisan db:table player_categories
-php artisan db:table players
+php artisan db:table academies
 ```
 
-- `player_categories` harus punya index `player_categories_academy_name_unique`.
-- `players` harus punya `id_player_category` dengan FK **`on delete set null`** — kalau tertulis `cascade`, **ULANGI**.
+- Harus ada kolom `id_owner_user`, nullable, tipe uuid/char(36).
+- Foreign key ke `users.id_user` dengan `on delete: set null`.
 
 ---
 
 ## Tahap 2 — Model
 
-### 2a. `app/Models/PlayerCategory.php` — file baru
+**Tujuan**: `Academy` tahu kolom & relasi barunya, tanpa logic tambahan.
 
-Tiru `app/Models/PlayerType.php` (sudah ada), ganti bagian yang khas:
+`app/Models/Academy.php` — tambahkan ke `$fillable`:
 
 ```php
-<?php
+protected $fillable = [
+    'id_owner_user',
+    'name',
+    'code',
+    'slug',
+    'phone',
+    'email',
+    'address',
+    'tagline',
+    'status',
+    'subscription_type',
+    'subscription_fee',
+    'subscription_started_at',
+    'subscription_ends_at',
+    'logo',
+    'description',
+];
+```
 
-namespace App\Models;
+Tambahkan relasi (di bawah `casts()`, sebelum `boot()`):
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
-/**
- * PlayerCategory extends FaosModel, jadi otomatis dapat:
- * - UUID primary key
- * - BelongsToAcademy (AcademyScope + isi id_academy saat creating)
- *
- * Sama seperti PlayerType, model ini MEMANG BOLEH pakai global scope --
- * larangan global scope hanya berlaku untuk App\Models\Role, karena alasan
- * cache Spatie. Lihat issue.md Bagian 4.3.
- */
-class PlayerCategory extends FaosModel
+```php
+public function owner()
 {
-    use HasFactory;
-
-    protected $table = 'player_categories';
-    protected $primaryKey = 'id_player_category';
-
-    protected $fillable = [
-        // id_academy wajib fillable supaya Super Admin bisa memilih academy.
-        'id_academy',
-        'name',
-        'description',
-        'min_age',
-        'max_age',
-        'status',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'min_age' => 'integer',
-            'max_age' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    public function academy(): BelongsTo
-    {
-        return $this->belongsTo(Academy::class, 'id_academy', 'id_academy');
-    }
-
-    public function players(): HasMany
-    {
-        return $this->hasMany(Player::class, 'id_player_category', 'id_player_category');
-    }
+    return $this->belongsTo(User::class, 'id_owner_user');
 }
 ```
 
-> `'min_age' => 'integer'` bukan hiasan. Tanpa cast, nilainya bisa terbaca sebagai **string** `"10"` di JSON yang dikirim ke Alpine, lalu `age >= "10"` di JS jadi perbandingan yang membingungkan. Cast ini yang bikin saran kategori di Tahap 10 bekerja benar.
-
-### 2b. `app/Models/Player.php` — ubah
-
-Tambah ke `$fillable`, **tepat di bawah `'id_player_type'`**:
+`app/Models/User.php` — tambahkan relasi kebalikannya (dipakai kalau nanti butuh "academy mana yang dimiliki user ini", bukan dipakai wajib di brief ini, tapi konsisten dengan relasi `academy()` yang sudah ada di file yang sama):
 
 ```php
-'id_player_category',
-```
-
-Tambah relasi di bawah relasi `playerType()`:
-
-```php
-/*
-|--------------------------------------------------------------------------
-| Relationship Player Category
-|--------------------------------------------------------------------------
-*/
-public function playerCategory()
+public function ownedAcademy()
 {
-    return $this->belongsTo(
-        PlayerCategory::class,
-        'id_player_category',
-        'id_player_category'
-    );
+    return $this->hasOne(Academy::class, 'id_owner_user');
 }
 ```
+
+> **Jangan tambahkan apapun selain ini ke Model.** Tidak ada accessor `hasOwner()`, tidak ada logic status di sini — itu tetap di Service/Controller kalau dibutuhkan.
 
 **✅ Cek dulu**
 
@@ -410,358 +235,464 @@ php artisan tinker
 ```
 
 ```php
-(new \App\Models\PlayerCategory)->getKeyName();   // "id_player_category"
-in_array('id_academy', (new \App\Models\PlayerCategory)->getFillable());  // true
+(new \App\Models\Academy)->getFillable();
+// harus memuat 'id_owner_user'
+
+(new \App\Models\Academy)->owner();
+// tidak error, instance BelongsTo
 ```
 
 ---
 
-## Tahap 3 — Template kategori di `config/faos.php`
+## Tahap 3 — `AcademyManagementService::create()`
 
-Tambahkan **tepat setelah** blok `'player_type_templates'`:
+**Tujuan**: satu toggle `create_account` di payload → academy **dan** akun Owner-nya sama-sama tersimpan, atau sama-sama batal.
 
-```php
-/*
-|--------------------------------------------------------------------------
-| Player Category Template
-|--------------------------------------------------------------------------
-| Kelompok umur default yang otomatis dibuat untuk setiap academy baru.
-|
-| min_age & max_age bersifat INKLUSIF, dan hanya dipakai untuk MENYARANKAN
-| kategori saat menambah player -- bukan aturan yang memaksa. Pemain boleh
-| ditempatkan di kategori yang umurnya di luar rentang ("main naik kelas").
-|
-| Academy bebas menambah/mengubah kategori & rentangnya lewat menu
-| Player Category. Daftar di sini hanya titik awal saat academy dibuat.
-*/
-
-'player_category_templates' => [
-
-    'U-12' => [
-        'description' => 'Kelompok umur di bawah 12 tahun.',
-        'min_age' => 10,
-        'max_age' => 12,
-    ],
-
-    'U-15' => [
-        'description' => 'Kelompok umur di bawah 15 tahun.',
-        'min_age' => 13,
-        'max_age' => 15,
-    ],
-
-    'U-17' => [
-        'description' => 'Kelompok umur di bawah 17 tahun.',
-        'min_age' => 16,
-        'max_age' => 17,
-    ],
-
-],
-```
-
-> ⚠️ **Rentang di atas adalah usulan awal yang masuk akal, BELUM dikonfirmasi ke pemilik produk.** Istilah "U-12" secara harfiah berarti *under 12* (≤ 11 tahun), tapi banyak akademi memakainya sebagai label kelompok yang berisi anak **sampai** 12 tahun. Tanyakan dulu ke pemilik produk kalau ragu — angkanya gampang diubah di config ini, dan academy juga bisa mengubahnya sendiri lewat form.
-
-**✅ Cek dulu**
-
-```bash
-php artisan config:clear
-php artisan tinker
-```
-
-```php
-array_keys(config('faos.player_category_templates'));   // ["U-12","U-15","U-17"]
-config('faos.player_category_templates.U-12.max_age');  // 12
-```
-
----
-
-## Tahap 4 — `PlayerCategoryService`
-
-`app/Services/PlayerCategoryService.php` — **file baru**. Strukturnya meniru `PlayerTypeService`, dengan satu method tambahan yang khas module ini: `suggestFor()`.
-
-```php
-<?php
-
-namespace App\Services;
-
-use App\Models\Academy;
-use App\Models\PlayerCategory;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
-
-class PlayerCategoryService
-{
-    protected AcademyService $academyService;
-
-    public function __construct(AcademyService $academyService)
-    {
-        $this->academyService = $academyService;
-    }
-
-    /**
-     * Daftar kategori untuk halaman index.
-     *
-     * Tidak perlu filter id_academy manual: PlayerCategory memakai
-     * BelongsToAcademy -> AcademyScope.
-     *
-     * orderBy('min_age') -- BUKAN latest(). Kelompok umur harus tampil urut
-     * umur (U-12, U-15, U-17), bukan urut tanggal dibuat.
-     */
-    public function paginate(?int $perPage = null)
-    {
-        return PlayerCategory::with('academy')
-            ->withCount('players')
-            ->orderBy('min_age')
-            ->paginate($perPage ?? config('faos.pagination.default'));
-    }
-
-    /**
-     * Daftar kategori untuk dropdown di form Player.
-     *
-     * $academyId null  -> seluruh academy (Super Admin di form CREATE Player,
-     *                     karena academy-nya baru dipilih di form yang sama).
-     * $includeId       -> form EDIT Player: kategori yang sedang dipakai player
-     *                     tetap ikut walau sudah dinonaktifkan.
-     */
-    public function selectable(?string $academyId = null, ?string $includeId = null): Collection
-    {
-        return PlayerCategory::query()
-            ->when($academyId, fn ($query) => $query->where('id_academy', $academyId))
-            ->where(function ($query) use ($includeId) {
-
-                $query->where('status', true);
-
-                if ($includeId) {
-                    $query->orWhere('id_player_category', $includeId);
-                }
-            })
-            ->orderBy('min_age')
-            ->get();
-    }
-
-    /**
-     * Saran kategori berdasarkan umur pemain.
-     *
-     * INI HANYA SARAN. Hasilnya dipakai untuk mengisi dropdown di form,
-     * dan coach bebas menimpanya. Tidak ada satupun tempat yang boleh
-     * MEMAKSA player memakai hasil method ini. Lihat Bagian 4.2.
-     *
-     * orderBy('min_age') WAJIB: kalau academy membuat rentang yang tumpang
-     * tindih (mis. U-12 = 10-12 dan U-13 = 12-13), umur 12 cocok ke dua-duanya.
-     * Tanpa orderBy, database bebas mengembalikan yang mana saja -- sarannya
-     * jadi berubah-ubah tanpa sebab. Lihat Bagian 4.3.
-     */
-    public function suggestFor(Carbon|string|null $birthDate, string $academyId): ?PlayerCategory
-    {
-        if (! $birthDate) {
-            return null;
-        }
-
-        $age = Carbon::parse($birthDate)->age;
-
-        return PlayerCategory::query()
-            ->where('id_academy', $academyId)
-            ->where('status', true)
-            ->where('min_age', '<=', $age)
-            ->where('max_age', '>=', $age)
-            ->orderBy('min_age')
-            ->first();
-    }
-
-    /**
-     * Tentukan id_academy untuk kategori baru.
-     *
-     * User academy : otomatis dari academy miliknya, input form DIABAIKAN.
-     * Super Admin  : dari pilihan academy di form (wajib).
-     */
-    protected function resolveAcademyId(array $data): ?string
-    {
-        if (! $this->academyService->isSuperAdmin()) {
-            return $this->academyService->currentId();
-        }
-
-        return $data['id_academy'] ?? null;
-    }
-
-    public function create(array $data): PlayerCategory
-    {
-        return DB::transaction(function () use ($data) {
-
-            return PlayerCategory::create([
-                'id_academy' => $this->resolveAcademyId($data),
-                'name' => $data['name'],
-                'description' => $data['description'] ?? null,
-                'min_age' => $data['min_age'],
-                'max_age' => $data['max_age'],
-                'status' => $data['status'] ?? true,
-            ]);
-        });
-    }
-
-    public function update(PlayerCategory $playerCategory, array $data): PlayerCategory
-    {
-        return DB::transaction(function () use ($playerCategory, $data) {
-
-            // id_academy sengaja TIDAK ikut diubah.
-            // Kategori tidak dapat berpindah academy -- player yang memakainya
-            // akan ikut "pindah" secara tidak sengaja.
-            $playerCategory->update([
-                'name' => $data['name'],
-                'description' => $data['description'] ?? null,
-                'min_age' => $data['min_age'],
-                'max_age' => $data['max_age'],
-                'status' => $data['status'] ?? true,
-            ]);
-
-            return $playerCategory;
-        });
-    }
-
-    public function delete(PlayerCategory $playerCategory): bool
-    {
-        return DB::transaction(function () use ($playerCategory) {
-
-            // FK players.id_player_category memang nullOnDelete, tapi itu cuma
-            // jaring pengaman terakhir. Kalau kategori dihapus begitu saja,
-            // player-nya diam-diam kehilangan kelompok umur.
-            // Kategori yang sudah tidak dipakai: nonaktifkan, jangan dihapus.
-            if ($playerCategory->players()->exists()) {
-                throw new \Exception('Kategori masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan kategori ini kalau sudah tidak dipakai.');
-            }
-
-            return $playerCategory->delete();
-        });
-    }
-
-    /**
-     * Buat kategori default untuk academy baru dari
-     * config('faos.player_category_templates').
-     */
-    public function createDefaultPlayerCategories(Academy $academy): void
-    {
-        foreach (config('faos.player_category_templates') as $name => $attributes) {
-
-            PlayerCategory::create([
-                'id_academy' => $academy->id_academy,
-                'name' => $name,
-                'description' => $attributes['description'] ?? null,
-                'min_age' => $attributes['min_age'],
-                'max_age' => $attributes['max_age'],
-                'status' => true,
-            ]);
-        }
-    }
-}
-```
-
-**✅ Cek dulu**: `php artisan tinker` → `app(\App\Services\PlayerCategoryService::class)` tidak error.
-
----
-
-## Tahap 5 — `AcademyManagementService`
-
-Di `app/Services/AcademyManagementService.php`, **tambahkan** dependency ketiga (jangan hapus dua yang sudah ada):
+Tambahkan `AccountService` sebagai dependency baru di constructor:
 
 ```php
 protected RoleService $roleService;
 protected PlayerTypeService $playerTypeService;
 protected PlayerCategoryService $playerCategoryService;
+protected AccountService $accountService;
 
 public function __construct(
     RoleService $roleService,
     PlayerTypeService $playerTypeService,
-    PlayerCategoryService $playerCategoryService
+    PlayerCategoryService $playerCategoryService,
+    AccountService $accountService
 ) {
     $this->roleService = $roleService;
     $this->playerTypeService = $playerTypeService;
     $this->playerCategoryService = $playerCategoryService;
+    $this->accountService = $accountService;
 }
 ```
 
-Di method `create()`, tambahkan **satu baris**:
+Jangan lupa tambahkan `use App\Services\AccountService;`? **Tidak perlu** — `AccountService` satu namespace (`App\Services`) dengan `AcademyManagementService`, tidak butuh `use` tambahan.
+
+Ubah method `create()` yang sudah ada:
 
 ```php
-$academy = Academy::create($data);
+public function create(array $data): Academy
+{
+    return DB::transaction(function () use ($data) {
 
-$this->roleService->createDefaultRoles($academy);
-$this->playerTypeService->createDefaultPlayerTypes($academy);
-$this->playerCategoryService->createDefaultPlayerCategories($academy);
+        $data['code'] = strtoupper($data['code']);
+        $data['slug'] = $this->generateSlug($data['name']);
+        $data['status'] = $data['status'] ?? false;
 
-return $academy;
+        if (isset($data['logo'])) {
+            $data['logo'] = $this->uploadLogo(
+                $data['logo'],
+                $data['code']
+            );
+        }
+
+        $academy = Academy::create($data);
+
+        $this->roleService->createDefaultRoles($academy);
+        $this->playerTypeService->createDefaultPlayerTypes($academy);
+        $this->playerCategoryService->createDefaultPlayerCategories($academy);
+
+        if (!empty($data['create_account'])) {
+
+            $owner = $this->accountService->create([
+                'id_academy' => $academy->id_academy,
+                'name' => $academy->name,
+                'email' => $data['owner_email'],
+                'password' => $data['owner_password'],
+            ], 'Owner');
+
+            $academy->update([
+                'id_owner_user' => $owner->id_user,
+            ]);
+        }
+
+        return $academy;
+    });
+}
 ```
 
-**✅ Cek dulu**: `php artisan tinker` → `app(\App\Services\AcademyManagementService::class)` tidak error.
-
----
-
-## Tahap 6 — Permission
-
-### 6a. `database/seeders/RolePermissionSeeder.php`
-
-Di array `$permissions`, tambahkan **tepat setelah blok `// Player Type`**:
-
-```php
-            // Player Category
-            'player_category.view',
-            'player_category.create',
-            'player_category.update',
-            'player_category.delete',
-```
-
-### 6b. `config/faos.php` → `role_templates`
-
-Di template **`Owner`** saja, setelah baris `player_type.*`:
-
-```php
-'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
-```
-
-> Sama seperti Player Type: role lain sengaja tidak diberi. Coach/Staff **tetap bisa** memilih kategori saat menambah player tanpa permission ini — dropdown diisi Service, permission hanya menggerbang halaman `/player-categories`.
-
-### 6c. `app/Support/PermissionPresenter.php`
-
-Cuma **satu baris**. Di dalam array `$modules` milik `moduleLabel()` (dibuat di `issue.md`), tambahkan setelah `'player_type'`:
-
-```php
-            'player_category' => 'Player Category',
-```
-
-> Sebenarnya tanpa baris ini pun tampilannya sudah benar — `moduleLabel()` punya fallback `Str::headline()` yang mengubah `player_category` → "Player Category". Baris ini ditambahkan supaya array `$modules` tetap jadi daftar lengkap module yang dikenal sistem, bukan karena ada yang rusak.
+> Perhatikan urutan: `createDefaultRoles()` **wajib** dipanggil sebelum blok `create_account` — role "Owner" untuk academy ini baru ada setelah baris itu jalan. Kalau dibalik, `AccountService::assignRole()` lempar exception "Role tidak ditemukan pada academy user."
+>
+> Nama akun Owner otomatis diambil dari `$academy->name` (bukan field terpisah) — pola yang sama dengan `PlayerService::create()` yang memakai `$player->name` untuk nama akun. Kalau Super Admin ingin nama akun beda dari nama academy, itu bisa diubah belakangan lewat `AcademyAccountController::update()` (Tahap 6).
 
 **✅ Cek dulu**
 
 ```bash
-php artisan migrate:fresh --seed
 php artisan tinker
 ```
 
 ```php
-\App\Support\PermissionPresenter::label('player_category.view');
-// "Lihat Player Category"
+$svc = app(\App\Services\AcademyManagementService::class);
 
-\App\Models\User::where('email','owner@faosacademy.com')->first()->can('player_category.view');
-// true
+$academy = $svc->create([
+    'name' => 'Academy Tes',
+    'code' => 'TES',
+    'phone' => '08123',
+    'email' => 'academy@tes.com',
+    'address' => 'Jl. Tes',
+    'tagline' => 'Tagline',
+    'status' => true,
+    'subscription_type' => 'monthly',
+    'subscription_fee' => 100000,
+    'subscription_started_at' => now(),
+    'subscription_ends_at' => now()->addMonth(),
+    'create_account' => true,
+    'owner_email' => 'owner@tes.com',
+    'owner_password' => 'password123',
+]);
 
-\App\Models\PlayerCategory::orderBy('min_age')->pluck('name');
-// ["U-12","U-15","U-17"]  <- urut umur, bukan urut dibuat
+$academy->fresh()->id_owner_user;
+// harus tidak null
+
+$academy->fresh()->owner->email;
+// harus: "owner@tes.com"
+
+$academy->fresh()->owner->hasRole('Owner');
+// harus: true
+
+// Ulangi tanpa create_account:
+$academy2 = $svc->create([... /* data sama, code beda */, 'create_account' => false]);
+$academy2->fresh()->id_owner_user;
+// harus: null
 ```
 
 ---
 
-## Tahap 7 — `PlayerCategoryFormRequest`
+## Tahap 4 — `AcademyFormRequest`
 
-`app/Http/Requests/PlayerCategory/PlayerCategoryFormRequest.php` — **file baru**. Tiru `PlayerTypeFormRequest`, ganti bagian `is_billable` dengan `min_age`/`max_age`:
+**Tujuan**: field toggle & akun Owner tervalidasi, **tanpa** menabrak field `email` academy yang sudah ada.
+
+Tambahkan ke `rules()`, di bagian paling bawah (sebelum `description`, urutan tidak wajib tapi biar rapi taruh setelah `logo`):
+
+```php
+'create_account' => [
+    'nullable',
+    'boolean',
+],
+
+'owner_email' => [
+    'required_if:create_account,1',
+    'nullable',
+    'email',
+    'max:255',
+    'unique:users,email',
+],
+
+'owner_password' => [
+    'required_if:create_account,1',
+    'nullable',
+    'string',
+    'min:8',
+    'confirmed',
+],
+```
+
+> `unique:users,email` di sini **tidak** butuh `->ignore()` — beda dengan `code` di rule yang sudah ada (yang perlu `ignore($this->academy?->id_academy, 'id_academy')` untuk kasus edit). Form ini cuma dipakai di `academies.create` (halaman edit academy **tidak** boleh membuat/mengganti akun Owner lewat sini — itu tugas `AcademyAccountController`), jadi tidak pernah ada academy lama yang perlu di-ignore.
+
+Tambahkan ke `messages()`:
+
+```php
+'owner_email.required_if' => 'Email akun Owner wajib diisi.',
+'owner_email.email' => 'Format email akun Owner tidak valid.',
+'owner_email.unique' => 'Email sudah digunakan oleh akun lain.',
+
+'owner_password.required_if' => 'Password akun Owner wajib diisi.',
+'owner_password.min' => 'Password akun Owner minimal :min karakter.',
+'owner_password.confirmed' => 'Konfirmasi password akun Owner tidak sesuai.',
+```
+
+**✅ Cek dulu**
+
+- Submit form `academies.create` dengan toggle akun **mati** dan `owner_email`/`owner_password` kosong → **lolos** validasi (karena `required_if` cuma aktif kalau `create_account=1`).
+- Submit dengan toggle **aktif** tapi `owner_email` kosong → **ditolak**, pesan "Email akun Owner wajib diisi."
+- Submit dengan `owner_email` yang sudah dipakai user lain → ditolak, "Email sudah digunakan oleh akun lain."
+
+---
+
+## Tahap 5 — View: `create.blade.php` (toggle "Buat Akun Owner")
+
+**Tujuan**: UI toggle identik pola dengan `resources/views/players/create.blade.php` (lihat blok "Buat Akun Player" di file itu), disesuaikan nama field.
+
+Tambahkan blok ini di `resources/views/academies/create.blade.php`, sebelum tombol submit form:
+
+```blade
+<div class="form-group">
+
+    <label class="form-label">
+        Buat Akun Owner
+    </label>
+
+    <div x-data="{ createAccount: false }">
+
+        <input type="hidden" name="create_account" :value="createAccount ? 1 : 0">
+
+        <label class="flex cursor-pointer items-center">
+
+            <input type="checkbox" class="sr-only" @change="createAccount=!createAccount">
+
+            <div class="form-toggle" :class="createAccount && 'form-toggle-active'">
+                <span class="form-toggle-dot" :class="createAccount && 'form-toggle-checked'">
+                </span>
+            </div>
+
+            <span class="ml-3 text-sm text-gray-500" x-text="createAccount ? 'Aktif' : 'Nonaktif'">
+            </span>
+
+        </label>
+
+        <div x-show="createAccount" x-transition class="mt-4 space-y-3">
+
+            <div>
+                <input type="email" name="owner_email" value="{{ old('owner_email') }}"
+                    placeholder="Email akun Owner" class="form-input @error('owner_email') form-danger @enderror">
+
+                @error('owner_email')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div>
+                <input type="password" name="owner_password" placeholder="Password"
+                    class="form-input @error('owner_password') form-danger @enderror">
+
+                @error('owner_password')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div>
+                <input type="password" name="owner_password_confirmation" placeholder="Konfirmasi Password"
+                    class="form-input">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+> Ingatkan (lihat `2e`): toggle ini **cuma** mengontrol pembuatan akun. Kalau Super Admin ingin academy ini langsung bisa diakses Owner-nya, toggle **Status Academy** (field `status`, sudah ada dari `issue.md`) harus **ikut** diaktifkan — dua toggle terpisah, jangan diasumsikan salah satunya otomatis mengaktifkan yang lain.
+
+**✅ Cek dulu**
+
+- Buka `/academies/create` → toggle "Buat Akun Owner" nonaktif secara default, field email/password **tersembunyi**.
+- Klik toggle → field email/password/konfirmasi **muncul** (transisi Alpine).
+- Submit dengan toggle aktif + data lengkap → academy tersimpan, `php artisan tinker` → `Academy::latest()->first()->owner` bukan `null`.
+
+---
+
+## Tahap 6 — `AcademyAccountController` (baru)
+
+**Tujuan**: sub-resource `academies/{academy}/account/*` — create/store untuk academy yang belum punya akun Owner, edit/update/password/status untuk yang sudah. Isi & struktur **disalin persis** dari `app/Http/Controllers/PlayerAccountController.php`, diganti `Player` → `Academy`, `player.id_user` → `academy.id_owner_user`, role hardcode `'Player'` → `'Owner'`.
 
 ```php
 <?php
 
-namespace App\Http\Requests\PlayerCategory;
+namespace App\Http\Controllers;
 
-use App\Services\AcademyService;
+use App\Http\Requests\Academy\StoreAcademyAccountRequest;
+use App\Http\Requests\Academy\UpdateAcademyAccountRequest;
+use App\Models\Academy;
+use App\Services\AccountService;
+use Illuminate\Support\Facades\DB;
+
+class AcademyAccountController extends Controller
+{
+    protected AccountService $accountService;
+
+    public function __construct(AccountService $accountService)
+    {
+        $this->accountService = $accountService;
+    }
+
+    public function create(Academy $academy)
+    {
+        if ($academy->id_owner_user) {
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with('error', 'Academy sudah memiliki akun Owner.');
+        }
+
+        return view('academies.account.create', [
+            'title' => 'Buat Akun Owner',
+            'academy' => $academy,
+            'breadcrumb' => [
+                ['label' => 'Manajemen Academy', 'url' => route('academies.index')],
+                ['label' => $academy->name, 'url' => route('academies.show', $academy)],
+                ['label' => 'Buat Akun Owner'],
+            ],
+        ]);
+    }
+
+    public function store(StoreAcademyAccountRequest $request, Academy $academy)
+    {
+        try {
+
+            if ($academy->id_owner_user) {
+                return redirect()
+                    ->route('academies.show', $academy)
+                    ->with('error', 'Academy sudah memiliki akun Owner.');
+            }
+
+            DB::transaction(function () use ($request, $academy) {
+
+                $user = $this->accountService->create([
+                    'id_academy' => $academy->id_academy,
+                    'name' => $academy->name,
+                    'email' => $request->email,
+                    'password' => $request->password,
+                ], 'Owner');
+
+                $academy->update([
+                    'id_owner_user' => $user->id_user,
+                ]);
+            });
+
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with('success', 'Akun Owner berhasil dibuat.');
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e, 'Gagal membuat akun Owner');
+        }
+    }
+
+    public function edit(Academy $academy)
+    {
+        if (!$academy->owner) {
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with('error', 'Academy belum memiliki akun Owner.');
+        }
+
+        return view('academies.account.edit', [
+            'title' => 'Edit Akun Owner',
+            'academy' => $academy,
+            'user' => $academy->owner,
+            'breadcrumb' => [
+                ['label' => 'Manajemen Academy', 'url' => route('academies.index')],
+                ['label' => $academy->name, 'url' => route('academies.show', $academy)],
+                ['label' => 'Edit Akun Owner'],
+            ],
+        ]);
+    }
+
+    public function update(UpdateAcademyAccountRequest $request, Academy $academy)
+    {
+        try {
+
+            if (!$academy->owner) {
+                return redirect()
+                    ->route('academies.show', $academy)
+                    ->with('error', 'Academy belum memiliki akun Owner.');
+            }
+
+            $this->accountService->update(
+                $academy->owner,
+                $request->validated()
+            );
+
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with('success', 'Akun Owner berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e, 'Gagal update akun Owner');
+        }
+    }
+
+    public function password(Academy $academy)
+    {
+        try {
+
+            if (!$academy->owner) {
+                return redirect()
+                    ->route('academies.show', $academy)
+                    ->with('error', 'Academy belum memiliki akun Owner.');
+            }
+
+            $newPassword = $this->accountService->generatePassword();
+
+            $this->accountService->resetPassword(
+                $academy->owner,
+                $newPassword
+            );
+
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with('success', 'Password berhasil direset. Password baru: ' . $newPassword);
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e, 'Gagal reset password', 'academies.show', [$academy]);
+        }
+    }
+
+    public function status(Academy $academy)
+    {
+        try {
+
+            if (!$academy->owner) {
+                return redirect()
+                    ->route('academies.show', $academy)
+                    ->with('error', 'Academy belum memiliki akun Owner.');
+            }
+
+            $status = !$academy->owner->status;
+
+            $this->accountService->changeStatus(
+                $academy->owner,
+                $status
+            );
+
+            return redirect()
+                ->route('academies.show', $academy)
+                ->with(
+                    'success',
+                    $status
+                        ? 'Akun Owner berhasil diaktifkan.'
+                        : 'Akun Owner berhasil dinonaktifkan.'
+                );
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e, 'Gagal mengubah status akun Owner', 'academies.show', [$academy]);
+        }
+    }
+}
+```
+
+> Kenapa cek `$academy->id_owner_user` di `create()`/`store()` tapi `!$academy->owner` (relasi, bukan kolom) di `edit()`/`update()`/`password()`/`status()`? Konsisten dengan pola `PlayerAccountController` (`$player->id_user` vs `!$player->user`) — cek kolom cukup untuk "sudah ada atau belum" (tidak perlu query tambahan), sedangkan aksi lain butuh **objek** `User`-nya, jadi pakai relasi (`$academy->owner` — Eloquent otomatis lazy-load sekali, di-reuse untuk sisa method).
+
+**✅ Cek dulu** — tunda sampai Tahap 8 (route) selesai, tidak bisa dites lewat browser sebelum route ada. Cek sintaks dulu dengan:
+
+```bash
+php artisan route:list --name=academies.account
+# harus error "route not defined" -- normal, lanjut ke Tahap 7 & 8 dulu
+```
+
+---
+
+## Tahap 7 — Form Request baru: `StoreAcademyAccountRequest` & `UpdateAcademyAccountRequest`
+
+**Tujuan**: validasi identik pola `StorePlayerAccountRequest`/`UpdatePlayerAccountRequest`.
+
+`app/Http/Requests/Academy/StoreAcademyAccountRequest.php`:
+
+```php
+<?php
+
+namespace App\Http\Requests\Academy;
+
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class PlayerCategoryFormRequest extends FormRequest
+class StoreAcademyAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -770,974 +701,559 @@ class PlayerCategoryFormRequest extends FormRequest
 
     public function rules(): array
     {
-        $academyService = app(AcademyService::class);
-
-        $academyId = $academyService->isSuperAdmin()
-            ? $this->input('id_academy')
-            : $academyService->currentId();
-
         return [
-            'id_academy' => [
-                $academyService->isSuperAdmin() ? 'required' : 'prohibited',
-                'uuid',
-                'exists:academies,id_academy',
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email',
             ],
-
-            'name' => [
+            'password' => [
                 'required',
                 'string',
-                'max:50',
-                Rule::unique('player_categories', 'name')
-                    ->where(fn ($query) => $query->where('id_academy', $academyId))
-                    ->ignore($this->route('player_category')?->id_player_category, 'id_player_category'),
+                'min:8',
+                'confirmed',
             ],
-
-            'description' => ['nullable', 'string'],
-
-            'min_age' => ['required', 'integer', 'min:0', 'max:99'],
-
-            // gte:min_age -- WAJIB. Rentang terbalik (min 15, max 12) tidak akan
-            // pernah cocok dengan umur siapa pun, dan kegagalannya diam-diam:
-            // kategori itu sekadar tidak pernah tersaran, tanpa error apapun.
-            'max_age' => ['required', 'integer', 'min:0', 'max:99', 'gte:min_age'],
-
-            'status' => ['required', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'id_academy.required' => 'Academy wajib dipilih.',
-            'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
-            'id_academy.uuid' => 'Academy tidak valid.',
-            'id_academy.exists' => 'Academy tidak ditemukan.',
+            'email.required' => 'Email akun Owner wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh akun lain.',
 
-            'name.required' => 'Nama kategori wajib diisi.',
-            'name.string' => 'Nama kategori harus berupa teks.',
-            'name.max' => 'Nama kategori maksimal :max karakter.',
-            'name.unique' => 'Nama kategori sudah digunakan pada academy ini.',
-
-            'description.string' => 'Deskripsi harus berupa teks.',
-
-            'min_age.required' => 'Umur minimal wajib diisi.',
-            'min_age.integer' => 'Umur minimal harus berupa angka.',
-            'min_age.min' => 'Umur minimal tidak valid.',
-            'min_age.max' => 'Umur minimal maksimal :max tahun.',
-
-            'max_age.required' => 'Umur maksimal wajib diisi.',
-            'max_age.integer' => 'Umur maksimal harus berupa angka.',
-            'max_age.min' => 'Umur maksimal tidak valid.',
-            'max_age.max' => 'Umur maksimal maksimal :max tahun.',
-            'max_age.gte' => 'Umur maksimal tidak boleh lebih kecil dari umur minimal.',
-
-            'status.required' => 'Status wajib ditentukan.',
-            'status.boolean' => 'Status tidak valid.',
+            'password.required' => 'Password akun Owner wajib diisi.',
+            'password.min' => 'Password minimal :min karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
         ];
     }
 }
 ```
 
-Catatan:
-- `->ignore(..., 'id_player_category')` — parameter kedua **wajib**, primary key tabel ini bukan `id`.
-- Nama parameter route dari `Route::resource('player-categories', ...)` adalah `player_category`.
-
----
-
-## Tahap 8 — Controller + Route
-
-### 8a. `app/Http/Controllers/PlayerCategoryController.php` — file baru
-
-Tiru `PlayerTypeController` **apa adanya**, ganti seluruh `PlayerType` → `PlayerCategory`, `player-types` → `player-categories`, `playerType` → `playerCategory`, dan teks flash message:
-
-- `'Player category berhasil ditambahkan.'`
-- `'Player category berhasil diperbarui.'`
-- `'Player category berhasil dihapus.'`
-- `'Gagal menambahkan player category'` / `'Gagal memperbarui player category'` / `'Gagal menghapus player category'`
-
-Judul & breadcrumb:
-
-```php
-'title' => 'Player Category',
-'breadcrumb' => [
-    ['label' => 'Players', 'url' => route('players.index')],
-    ['label' => 'Player Category'],
-],
-```
-
-> Sama seperti PlayerType: **tidak ada `$this->authorize()` dan tidak ada Policy**. Route model binding `PlayerCategory $playerCategory` sudah kena `AcademyScope` → academy lain dapat **404**. Test nomor 2 di Tahap 11 membuktikannya.
-
-### 8b. `routes/web.php`
-
-Tambahkan **tepat di bawah** blok `Route::resource('player-types', ...)`:
-
-```php
-    /*
-    |--------------------------------------------------------------------------
-    | Player Category Management
-    |--------------------------------------------------------------------------
-    */
-    Route::resource('player-categories', PlayerCategoryController::class)
-        ->except(['show'])
-        ->middlewareFor('index', 'permission:player_category.view')
-        ->middlewareFor(['create', 'store'], 'permission:player_category.create')
-        ->middlewareFor(['edit', 'update'], 'permission:player_category.update')
-        ->middlewareFor('destroy', 'permission:player_category.delete');
-```
-
-Tambah import:
-
-```php
-use App\Http\Controllers\PlayerCategoryController;
-```
-
-**✅ Cek dulu**
-
-```bash
-php artisan route:list --name=player-categories
-```
-
-6 route, masing-masing dengan middleware `permission:player_category.*` yang sesuai. **Tidak boleh** ada `player-categories.show`.
-
----
-
-## Tahap 9 — View Player Category
-
-`resources/views/player-categories/`. **Tiru `resources/views/player-types/`** (sudah ada) — struktur tabel + Card List responsif wajib ikut (`docs/frontend-standard.md`).
-
-### 9a. `index.blade.php`
-
-Kolom: **Kategori** (nama + deskripsi) · **Academy** (Super Admin saja) · **Rentang Umur** · **Status** · **Player** · **Aksi**.
-
-Yang khas module ini — ganti kolom "Tagihan" milik player-types dengan:
-
-```blade
-{{-- Rentang Umur --}}
-<span class="table-text">
-    {{ $playerCategory->min_age }}–{{ $playerCategory->max_age }} tahun
-</span>
-```
-
-Sisanya (Status, Player count, tombol Aksi, tombol delete dengan `:disabled`) sama persis dengan `player-types/index.blade.php`.
-
-### 9b. `create.blade.php` & `edit.blade.php`
-
-Tiru `player-types/create.blade.php` & `edit.blade.php`. **Ganti** blok toggle `is_billable` dengan dua input umur:
-
-```blade
-<div class="form-row grid-cols-2">
-
-    <div class="form-group">
-        <label class="form-label">
-            Umur Minimal <span class="text-error-500">*</span>
-        </label>
-
-        <input type="number" name="min_age" value="{{ old('min_age') }}" min="0" max="99"
-            class="form-input @error('min_age') form-danger @enderror" required>
-
-        @error('min_age')
-            <span class="form-error">{{ $message }}</span>
-        @enderror
-    </div>
-
-    <div class="form-group">
-        <label class="form-label">
-            Umur Maksimal <span class="text-error-500">*</span>
-        </label>
-
-        <input type="number" name="max_age" value="{{ old('max_age') }}" min="0" max="99"
-            class="form-input @error('max_age') form-danger @enderror" required>
-
-        @error('max_age')
-            <span class="form-error">{{ $message }}</span>
-        @enderror
-    </div>
-
-</div>
-
-<p class="form-helper">
-    Rentang ini dipakai untuk <strong>menyarankan</strong> kategori saat menambah player,
-    berdasarkan tanggal lahirnya. Pemain tetap boleh ditempatkan di kategori yang
-    umurnya di luar rentang ini.
-</p>
-```
-
-Di `edit.blade.php`, nilai awalnya `old('min_age', $playerCategory->min_age)` dan `old('max_age', $playerCategory->max_age)`.
-
-Toggle `status` tetap ada, tiru dari `player-types` (pola hidden input + Alpine — **jangan** checkbox polos, lihat catatan di `issue.md` Tahap 9b).
-
-### 9c. Menu sidebar
-
-`resources/views/partials/sidebar.blade.php` — di grup **Football Academy**, **setelah** menu Player Types:
-
-```blade
-{{-- Player Categories --}}
-@can('player_category.view')
-    <li>
-        <a href="{{ route('player-categories.index') }}" class="menu-dropdown-item group"
-            :class="{{ Route::is('player-categories.*') ? 'true' : 'false' }}
-                ?
-                'menu-dropdown-item-active' :
-                'menu-dropdown-item-inactive'">
-            Player Categories
-        </a>
-    </li>
-@endcan
-```
-
-Tambahkan `'player-categories.*'` ke `$footballAcademyRoutes`:
-
-```php
-$footballAcademyRoutes = ['players.*', 'player-types.*', 'player-categories.*', 'training.*'];
-```
-
-**✅ Cek dulu**: login Super Admin → `/player-categories` menampilkan U-12, U-15, U-17 **urut umur**. Cek di DevTools 375px: berubah jadi Card List.
-
----
-
-## Tahap 10 — Integrasi ke Module Player
-
-**Tujuan**: setiap player wajib punya kategori, disarankan otomatis dari umur, tapi tetap bisa ditimpa coach.
-
-### 10a. `StorePlayerRequest`
-
-Tambah rule **tepat setelah** rule `id_player_type` yang sudah ada:
-
-```php
-            // Kategori WAJIB milik academy yang sama dengan player.
-            // Rule::exists() TIDAK kena AcademyScope -- where('id_academy')
-            // eksplisit di bawah ini yang menjaga batas antar academy.
-            // Lihat Bagian 4.5.
-            //
-            // Sengaja TIDAK ada validasi "umur harus cocok dengan rentang
-            // kategori". Itu disengaja, bukan kelupaan. Lihat Bagian 4.2.
-            'id_player_category' => [
-                'required',
-                'uuid',
-                Rule::exists('player_categories', 'id_player_category')
-                    ->where(fn ($query) => $query
-                        ->where('id_academy', $academyId)
-                        ->where('status', true)
-                    ),
-            ],
-```
-
-`messages()`:
-
-```php
-            'id_player_category.required' => 'Kategori umur wajib dipilih.',
-            'id_player_category.uuid' => 'Kategori umur tidak valid.',
-            'id_player_category.exists' => 'Kategori umur tidak ditemukan pada academy ini.',
-```
-
-### 10b. `UpdatePlayerRequest`
-
-```php
-            // Sengaja TIDAK memfilter status = true: player yang kategorinya
-            // sudah dinonaktifkan harus tetap bisa disimpan.
-            'id_player_category' => [
-                'required',
-                'uuid',
-                Rule::exists('player_categories', 'id_player_category')
-                    ->where(fn ($query) => $query
-                        ->where('id_academy', $this->route('player')->id_academy)
-                    ),
-            ],
-```
-
-`messages()`: sama dengan 10a.
-
-### 10c. `PlayerService`
-
-Di `create()` dan `update()`, tambahkan **satu baris** ke array (setelah `'id_player_type'`):
-
-```php
-'id_player_category' => $data['id_player_category'],
-```
-
-### 10d. `PlayerController`
-
-Tambah import + dependency keempat:
-
-```php
-use App\Services\PlayerCategoryService;
-```
-
-```php
-public function __construct(
-    PlayerService $playerService,
-    AcademyService $academyService,
-    PlayerTypeService $playerTypeService,
-    PlayerCategoryService $playerCategoryService
-) {
-    // ... assign semuanya
-}
-```
-
-`index()` — eager load supaya tidak N+1 (`docs/query-performance.md`):
-
-```php
-'players' => Player::with(['playerType', 'playerCategory'])->latest()->paginate(10),
-```
-
-`create()` — tambahkan:
-
-```php
-'playerCategories' => $this->playerCategoryService->selectable(
-    $this->academyService->isSuperAdmin() ? null : $this->academyService->currentId()
-),
-```
-
-`edit()` — tambahkan dua hal. Perhatikan `suggestedCategory`: di form edit, `birth_date` sudah diketahui server, jadi sarannya dihitung di **Service**, bukan di JS:
-
-```php
-'playerCategories' => $this->playerCategoryService->selectable(
-    $player->id_academy,
-    $player->id_player_category
-),
-
-// Saran kategori untuk player ini. Berguna terutama untuk player lama yang
-// id_player_category-nya masih NULL.
-'suggestedCategory' => $this->playerCategoryService->suggestFor(
-    $player->birth_date,
-    $player->id_academy
-),
-```
-
-`show()` — tambahkan `'playerCategory'` ke `load()`:
-
-```php
-$player->load([
-    'academy',
-    'playerType',
-    'playerCategory',
-    'user.roles'
-]);
-```
-
-### 10e. `players/create.blade.php` — bagian tersulit
-
-`issue.md` membuat blok `x-data` pada sebuah `<div>` yang membungkus Academy + Type, plus blok `@else` terpisah untuk user academy. **Blok itu diganti total** di sini, karena sekarang saran kategori butuh `birth_date` yang letaknya di luar `<div>` tersebut.
-
-**Langkah 1** — pindahkan `x-data` ke tag `<form>`, dan **hapus** `x-data` lama yang ada di `<div>` pembungkus Academy+Type:
-
-```blade
-<form action="{{ route('players.store') }}" method="POST" enctype="multipart/form-data"
-    x-data="{
-        isSuperAdmin: @js($isSuperAdmin),
-        academyId: @js(old('id_academy', '')),
-        birthDate: @js(old('birth_date', '')),
-        playerTypeId: @js(old('id_player_type', '')),
-        playerCategoryId: @js(old('id_player_category', '')),
-        types: @js($playerTypes),
-        categories: @js($playerCategories),
-
-        // Super Admin: saring sesuai academy yang dipilih di form ini.
-        // User academy: Controller sudah menyaringnya, pakai apa adanya.
-        get availableTypes() {
-            return this.isSuperAdmin
-                ? this.types.filter(type => type.id_academy === this.academyId)
-                : this.types;
-        },
-
-        get availableCategories() {
-            return this.isSuperAdmin
-                ? this.categories.filter(category => category.id_academy === this.academyId)
-                : this.categories;
-        },
-
-        get age() {
-            if (! this.birthDate) return null;
-            const birth = new Date(this.birthDate);
-            if (isNaN(birth)) return null;
-            const today = new Date();
-            let age = today.getFullYear() - birth.getFullYear();
-            const monthDiff = today.getMonth() - birth.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-                age--;
-            }
-            return age;
-        },
-
-        get suggestedCategory() {
-            if (this.age === null) return null;
-            return this.availableCategories.find(
-                category => this.age >= category.min_age && this.age <= category.max_age
-            ) ?? null;
-        },
-
-        get selectedCategory() {
-            return this.categories.find(
-                category => category.id_player_category === this.playerCategoryId
-            ) ?? null;
-        },
-
-        // Peringatan lunak, TIDAK memblokir simpan. Lihat Bagian 4.2.
-        get ageOutsideRange() {
-            const category = this.selectedCategory;
-            if (! category || this.age === null) return false;
-            return this.age < category.min_age || this.age > category.max_age;
-        },
-
-        applySuggestion() {
-            this.playerCategoryId = this.suggestedCategory
-                ? this.suggestedCategory.id_player_category
-                : '';
-        },
-    }">
-```
-
-**Langkah 2** — input `birth_date` yang sudah ada, tambahkan `x-model` + auto-saran. Sarannya **hanya** terpasang otomatis kalau coach belum memilih apa pun, supaya pilihan manualnya tidak tertimpa saat ia membetulkan tanggal lahir:
-
-```blade
-<input type="date" name="birth_date" x-model="birthDate"
-    @change="if (! playerCategoryId) applySuggestion()"
-    class="form-input @error('birth_date') form-danger @enderror">
-```
-
-**Langkah 3** — dropdown Academy (Super Admin saja). Reset Type **dan** Kategori saat academy berganti:
-
-```blade
-@if ($isSuperAdmin)
-    <div class="form-group">
-        <label class="form-label">
-            Academy <span class="text-error-500">*</span>
-        </label>
-
-        <select name="id_academy" x-model="academyId"
-            @change="playerTypeId = ''; playerCategoryId = ''"
-            class="form-select @error('id_academy') form-danger @enderror" required>
-            <option value="">Pilih Academy</option>
-            @foreach ($academies as $academy)
-                <option value="{{ $academy->id_academy }}">{{ $academy->name }}</option>
-            @endforeach
-        </select>
-
-        @error('id_academy')
-            <span class="form-error">{{ $message }}</span>
-        @enderror
-    </div>
-@endif
-```
-
-**Langkah 4** — dropdown Type. Sekarang **satu blok untuk semua** (tidak ada lagi `@if/@else` seperti di `issue.md`), karena `availableTypes` sudah menangani kedua kasus:
-
-```blade
-<div class="form-group">
-    <label class="form-label">
-        Type Player <span class="text-error-500">*</span>
-    </label>
-
-    <select name="id_player_type" x-model="playerTypeId"
-        class="form-select @error('id_player_type') form-danger @enderror" required>
-        <option value="">Pilih Type Player</option>
-        <template x-for="type in availableTypes" :key="type.id_player_type">
-            <option :value="type.id_player_type" x-text="type.name"></option>
-        </template>
-    </select>
-
-    <p x-show="isSuperAdmin && academyId && availableTypes.length === 0" x-cloak class="form-error">
-        Academy ini belum punya type player. Buat dulu lewat menu Player Type.
-    </p>
-
-    @error('id_player_type')
-        <span class="form-error">{{ $message }}</span>
-    @enderror
-</div>
-```
-
-**Langkah 5** — dropdown Kategori, lengkap dengan saran dan peringatan lunak:
-
-```blade
-<div class="form-group">
-    <label class="form-label">
-        Kategori Umur <span class="text-error-500">*</span>
-    </label>
-
-    <select name="id_player_category" x-model="playerCategoryId"
-        class="form-select @error('id_player_category') form-danger @enderror" required>
-        <option value="">Pilih Kategori Umur</option>
-        <template x-for="category in availableCategories" :key="category.id_player_category">
-            <option :value="category.id_player_category"
-                x-text="`${category.name} (${category.min_age}-${category.max_age} th)`"></option>
-        </template>
-    </select>
-
-    {{-- Saran: tampil hanya kalau ada saran DAN belum dipilih --}}
-    <p x-show="suggestedCategory && suggestedCategory.id_player_category !== playerCategoryId"
-        x-cloak class="form-helper">
-        Saran untuk umur <span x-text="age"></span> tahun:
-        <button type="button" class="link-primary font-medium" @click="applySuggestion()">
-            <span x-text="suggestedCategory?.name"></span> — pakai saran ini
-        </button>
-    </p>
-
-    {{-- Peringatan LUNAK: memberi tahu, tidak memblokir. Lihat Bagian 4.2. --}}
-    <p x-show="ageOutsideRange" x-cloak class="form-helper text-warning-500">
-        Umur pemain (<span x-text="age"></span> th) di luar rentang kategori ini
-        (<span x-text="selectedCategory?.min_age"></span>–<span x-text="selectedCategory?.max_age"></span> th).
-        Ini diperbolehkan — pastikan memang disengaja.
-    </p>
-
-    <p x-show="isSuperAdmin && academyId && availableCategories.length === 0" x-cloak class="form-error">
-        Academy ini belum punya kategori umur. Buat dulu lewat menu Player Category.
-    </p>
-
-    @error('id_player_category')
-        <span class="form-error">{{ $message }}</span>
-    @enderror
-</div>
-```
-
-> **Kenapa `@js($playerCategories)` cukup, tanpa mapping manual?** Collection Eloquent ter-serialize jadi JSON lengkap dengan `id_player_category`, `id_academy`, `name`, `min_age`, `max_age`. Cast `'min_age' => 'integer'` di Tahap 2 yang memastikan nilainya angka, bukan string — tanpa itu, `age >= category.min_age` di JS jadi perbandingan string yang menyesatkan.
->
-> **Jangan** melakukan mapping/filter di Blade dengan `@php` — itu business logic di Blade (`docs/development-guide.md`).
-
-### 10f. `players/edit.blade.php`
-
-Jauh lebih sederhana — academy player tidak berubah, dan sarannya sudah dihitung server. Tambahkan **setelah** dropdown Type Player yang sudah ada:
-
-```blade
-<div class="form-group">
-    <label class="form-label">
-        Kategori Umur <span class="text-error-500">*</span>
-    </label>
-
-    <select name="id_player_category" class="form-select @error('id_player_category') form-danger @enderror" required>
-        <option value="">Pilih Kategori Umur</option>
-        @foreach ($playerCategories as $category)
-            <option value="{{ $category->id_player_category }}" @selected(old('id_player_category', $player->id_player_category) === $category->id_player_category)>
-                {{ $category->name }} ({{ $category->min_age }}-{{ $category->max_age }} th)@unless ($category->status) — nonaktif @endunless
-            </option>
-        @endforeach
-    </select>
-
-    @if ($suggestedCategory && $suggestedCategory->id_player_category !== $player->id_player_category)
-        <p class="form-helper">
-            Saran berdasarkan umur pemain: <strong>{{ $suggestedCategory->name }}</strong>
-        </p>
-    @endif
-
-    @error('id_player_category')
-        <span class="form-error">{{ $message }}</span>
-    @enderror
-</div>
-```
-
-### 10g. `players/index.blade.php`
-
-Tambah kolom **Kategori** setelah kolom **Type**, di **kedua** representasi.
-
-`<thead>`:
-
-```blade
-<th class="table-header-cell">Kategori</th>
-```
-
-`<tbody>`:
-
-```blade
-<td class="table-cell">
-    @if ($player->playerCategory)
-        <span class="badge badge-secondary">{{ $player->playerCategory->name }}</span>
-    @else
-        <span class="table-subtitle">-</span>
-    @endif
-</td>
-```
-
-Card List — tambah field di `table-card-body`:
-
-```blade
-<div class="table-card-field">
-    <span class="table-card-label">Kategori</span>
-    @if ($player->playerCategory)
-        <span class="badge badge-secondary w-fit">{{ $player->playerCategory->name }}</span>
-    @else
-        <span class="table-subtitle">-</span>
-    @endif
-</div>
-```
-
-> `@if ($player->playerCategory)` **wajib** — player lama `id_player_category`-nya `NULL`.
-
-### 10h. `players/show.blade.php`
-
-Di panel **Informasi Academy**, setelah blok "Type Player":
-
-```blade
-<div>
-    <span class="mb-1 block text-xs text-gray-400">
-        Kategori Umur
-    </span>
-
-    @if ($player->playerCategory)
-        <span class="badge badge-secondary">
-            {{ $player->playerCategory->name }}
-            ({{ $player->playerCategory->min_age }}-{{ $player->playerCategory->max_age }} th)
-        </span>
-    @else
-        <span class="table-text">-</span>
-    @endif
-</div>
-```
-
-**✅ Cek dulu**
-
-1. Login Owner → `/players/create` → isi Tanggal Lahir dengan tanggal ~11 tahun lalu → dropdown **Kategori Umur** otomatis terisi **U-12**.
-2. Ganti kategori manual ke **U-17** → muncul peringatan kuning "di luar rentang", tapi **tetap bisa disimpan**. Kalau ditolak, ULANGI — lihat Bagian 4.2.
-3. Login Super Admin → `/players/create` → ganti Academy → dropdown Type **dan** Kategori ikut berubah.
-4. `/players` → kolom Kategori tampil, cek juga di 375px.
-
----
-
-## Tahap 11 — Test
-
-### 11a. `database/factories/PlayerCategoryFactory.php` — file baru
+`app/Http/Requests/Academy/UpdateAcademyAccountRequest.php`:
 
 ```php
 <?php
 
-namespace Database\Factories;
+namespace App\Http\Requests\Academy;
 
-use App\Models\PlayerCategory;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-/**
- * @extends Factory<PlayerCategory>
- */
-class PlayerCategoryFactory extends Factory
+class UpdateAcademyAccountRequest extends FormRequest
 {
-    protected $model = PlayerCategory::class;
+    public function authorize(): bool
+    {
+        return true;
+    }
 
-    public function definition(): array
+    public function rules(): array
     {
         return [
-            'name' => 'U-' . fake()->unique()->numberBetween(8, 21),
-            'description' => fake()->sentence(),
-            'min_age' => 10,
-            'max_age' => 12,
-            'status' => true,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')
+                    ->ignore($this->academy->id_owner_user, 'id_user'),
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama akun wajib diisi.',
+            'name.max' => 'Nama maksimal :max karakter.',
+
+            'email.required' => 'Email akun wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan akun lain.',
         ];
     }
 }
 ```
 
-> `id_academy` sengaja **tidak** diisi factory — wajib di-pass eksplisit tiap test.
+> `$this->academy` di `UpdateAcademyAccountRequest` tersedia otomatis lewat route model binding — nama variabel di closure/route **wajib** `{academy}` (bukan `{id}` atau nama lain), sama seperti `$this->player` di `UpdatePlayerAccountRequest` bergantung pada parameter route `{player}`.
 
-### 11b. `tests/Feature/PlayerCategoryTest.php` — file baru
+**✅ Cek dulu**
 
-Tiru struktur `tests/Feature/PlayerTypeTest.php` (sudah ada). Wajib menulis **9 skenario**:
-
-| # | Skenario | Assert kunci |
-|---|----------|--------------|
-| 1 | Dua academy boleh punya kategori dengan nama sama | "U-12" di A & B → `assertSame(2, ...)` tanpa exception |
-| 2 | Isolasi URL | `actingAs($ownerA)->get(route('player-categories.edit', $categoryB))` → `assertNotFound()` (**404**, bukan 403) |
-| 3 | Kategori yang dipakai player tidak bisa dihapus | `PlayerCategoryService::delete()` → `expectException(\Exception::class)` |
-| 4 | **Create player dengan kategori academy lain ditolak** | `assertSessionHasErrors('id_player_category')` + player **tidak** tercipta |
-| 5 | Academy baru dapat 3 kategori default lengkap `min_age`/`max_age` | Bandingkan dengan `config('faos.player_category_templates')` |
-| 6 | `suggestFor()` benar sesuai umur, dan `null` kalau tidak ada yang cocok | Umur 11 → U-12; umur 30 → `assertNull()` |
-| 7 | `suggestFor()` deterministik saat rentang tumpang tindih | Dua kategori yang sama-sama memuat umur 12 → yang `min_age` terkecil yang menang, **konsisten** tiap dipanggil |
-| 8 | **"Main naik kelas" TIDAK ditolak** | Player umur 11 disimpan ke kategori U-17 (16–17) → `assertSessionHasNoErrors()` + player tercipta |
-| 9 | `max_age < min_age` ditolak | POST kategori dengan min 15 / max 12 → `assertSessionHasErrors('max_age')` |
-
-Kerangka untuk skenario 6, 7, 8 (sisanya tiru `PlayerTypeTest`):
+```bash
+php artisan tinker
+```
 
 ```php
-    /**
-     * Saran kategori dari umur -- ini fitur khas module ini.
-     */
-    public function test_suggest_for_mengembalikan_kategori_sesuai_umur(): void
+(new \App\Http\Requests\Academy\StoreAcademyAccountRequest)->rules();
+(new \App\Http\Requests\Academy\UpdateAcademyAccountRequest)->rules();
+// keduanya tidak boleh error saat dipanggil
+```
+
+---
+
+## Tahap 8 — Route
+
+**Tujuan**: nested route `academies/{academy}/account/*`, digerbang `academy.update` (lihat [2d](#2d-kenapa-permission-academyupdate-bukan-user-atau-permission-baru)).
+
+Tambahkan di `routes/web.php`, **tepat setelah** blok `Route::resource('academies', ...)` yang sudah ada (lihat `issue.md` Tahap 6):
+
+```php
+use App\Http\Controllers\AcademyAccountController;
+
+// ...
+
+/*
+|--------------------------------------------------------------------------
+| Academy Owner Account Management
+|--------------------------------------------------------------------------
+| Sub-resource dari academies.* -- SENGAJA pakai permission academy.update
+| (bukan user.* seperti Player Account), karena Academy Management memang
+| tidak pernah didelegasikan ke role manapun selain Super Admin. Lihat
+| issue2.md Bagian 2d.
+*/
+Route::prefix('academies/{academy}/account')
+    ->name('academies.account.')
+    ->middleware('permission:academy.update')
+    ->group(function () {
+
+        Route::get('/create', [AcademyAccountController::class, 'create'])->name('create');
+        Route::post('/', [AcademyAccountController::class, 'store'])->name('store');
+
+        Route::get('/edit', [AcademyAccountController::class, 'edit'])->name('edit');
+        Route::put('/', [AcademyAccountController::class, 'update'])->name('update');
+        Route::patch('/status', [AcademyAccountController::class, 'status'])->name('status');
+        Route::patch('/password', [AcademyAccountController::class, 'password'])->name('password');
+
+    });
+```
+
+> Beda dengan Player Account yang membagi dua middleware group (`user.create` untuk create/store, `user.update` untuk sisanya), di sini **cukup satu** middleware `academy.update` untuk seluruh sub-resource — karena permission-nya memang cuma satu (`academy.update`), tidak ada pemisahan create-vs-update seperti Player.
+
+**✅ Cek dulu**
+
+```bash
+php artisan route:list --name=academies.account
+```
+
+- Harus muncul 6 route: `create`, `store`, `edit`, `update`, `status`, `password`.
+- Login sebagai role academy biasa (**bukan** Super Admin), coba akses `academies/{id}/account/create` langsung lewat URL → **403**.
+
+---
+
+## Tahap 9 — View: `show.blade.php` + `academies/account/create.blade.php` + `academies/account/edit.blade.php`
+
+### 9a. `academies/show.blade.php`
+
+Tambahkan `<x-account.dropdown>` di `card-actions` (lihat baris `card-actions` yang sudah ada di file ini, berisi tombol Kembali/Edit), setelah tombol Edit:
+
+```blade
+<x-account.dropdown :model="$academy" :user="$academy->owner" route-create="academies.account.create"
+    route-edit="academies.account.edit" route-password="academies.account.password"
+    route-status="academies.account.status" />
+```
+
+> Komponen ini **generik** — sudah dipakai persis sama di `players/show.blade.php`. Kalau `$academy->owner` null, komponen otomatis merender link "Buat Account" ke `academies.account.create`; kalau sudah ada, merender dropdown Edit/Reset Password/Aktifkan-Nonaktifkan.
+
+### 9b. `app/Http/Controllers/AcademyController.php` — eager load `owner`
+
+Ubah method `show()` supaya tidak N+1 (lihat `docs/query-performance.md`):
+
+```php
+public function show(Academy $academy)
+{
+    $academy->load('owner');
+
+    return view('academies.show', [
+        // ...tidak ada perubahan lain, isi array tetap sama
+    ]);
+}
+```
+
+### 9c. `resources/views/academies/account/create.blade.php` — file baru
+
+Salin persis struktur `resources/views/players/account/create.blade.php`, ganti teks & route:
+
+```blade
+@extends('layouts.app', ['page' => 'academies'])
+
+@section('title', $title . ' - ' . config('app.name'))
+
+@section('content')
+
+    <x-breadcrumb :title="$title" :items="$breadcrumb" />
+
+    <x-alert />
+
+    <div class="card">
+
+        <div class="card-header">
+            <div>
+                <h3 class="card-title">
+                    Buat Akun Owner
+                </h3>
+
+                <p class="card-description">
+                    Membuat akun login untuk <strong>{{ $academy->name }}</strong>.
+                </p>
+            </div>
+
+            <div class="card-actions">
+                <a href="{{ route('academies.show', $academy) }}" class="btn btn-secondary">
+                    Kembali
+                </a>
+            </div>
+        </div>
+
+        <form action="{{ route('academies.account.store', $academy) }}" method="POST">
+            @csrf
+
+            <div class="p-5">
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Email <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="email" name="email" value="{{ old('email') }}"
+                        class="form-input @error('email') form-danger @enderror">
+
+                    @error('email')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Password <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="password" name="password" class="form-input @error('password') form-danger @enderror">
+
+                    @error('password')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Konfirmasi Password <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="password" name="password_confirmation" class="form-input">
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3 border-t pt-5">
+                    <a href="{{ route('academies.show', $academy) }}" class="btn btn-secondary">
+                        Batal
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Buat Akun
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+@endsection
+```
+
+### 9d. `resources/views/academies/account/edit.blade.php` — file baru
+
+Salin persis struktur `resources/views/players/account/edit.blade.php`, ganti teks & route (`academies.account.update`, `academies.show`, `$academy->name` sebagai ganti `$player->name`).
+
+**✅ Cek dulu**
+
+- Buka Detail Academy (`academies.show`) untuk academy **tanpa** akun Owner → tombol/dropdown menampilkan "Buat Account", link ke `academies.account.create`.
+- Isi form, submit → redirect ke `academies.show` dengan pesan sukses, dropdown sekarang berubah jadi menu Edit/Reset Password/Nonaktifkan.
+- Klik "Reset Password" → password baru ditampilkan lewat flash message, cek `php artisan tinker` bisa login dengan password baru itu (`Hash::check()`).
+- Klik "Nonaktifkan" → `$academy->owner->status` jadi `false`, coba login pakai akun itu → ditolak "Akun Anda sedang dinonaktifkan."
+
+---
+
+## Tahap 10 — Test
+
+**Tujuan**: `tests/Feature/AcademyAccountTest.php` — pastikan seluruh alur (create-with-account, create-without-account, validasi, permission gate, edit/reset/status) berjalan sesuai desain.
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Academy;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
+use Tests\TestCase;
+
+class AcademyAccountTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
     {
-        $academy = Academy::factory()->create();
+        parent::setUp();
 
-        $u12 = PlayerCategory::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'name' => 'U-12', 'min_age' => 10, 'max_age' => 12,
-        ]);
-
-        PlayerCategory::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'name' => 'U-15', 'min_age' => 13, 'max_age' => 15,
-        ]);
-
-        $service = app(\App\Services\PlayerCategoryService::class);
-
-        // Umur 11 -> U-12
-        $birthDate = Carbon::now()->subYears(11)->subMonths(2);
-        $this->assertSame(
-            $u12->id_player_category,
-            $service->suggestFor($birthDate, $academy->id_academy)?->id_player_category
-        );
-
-        // Umur 30 -> tidak ada yang cocok
-        $this->assertNull(
-            $service->suggestFor(Carbon::now()->subYears(30), $academy->id_academy)
-        );
-
-        // Tanpa tanggal lahir -> tidak menebak
-        $this->assertNull($service->suggestFor(null, $academy->id_academy));
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
-    /**
-     * Mengunci orderBy('min_age') di suggestFor(). Lihat Bagian 4.3.
-     */
-    public function test_suggest_for_deterministik_saat_rentang_tumpang_tindih(): void
+    protected function makeSuperAdmin(): User
     {
-        $academy = Academy::factory()->create();
-
-        // Sengaja dibuat TERBALIK urutan insert-nya, supaya kalau orderBy
-        // hilang, test ini gampang merah.
-        PlayerCategory::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'name' => 'U-13', 'min_age' => 12, 'max_age' => 13,
-        ]);
-
-        $u12 = PlayerCategory::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'name' => 'U-12', 'min_age' => 10, 'max_age' => 12,
-        ]);
-
-        $service = app(\App\Services\PlayerCategoryService::class);
-        $birthDate = Carbon::now()->subYears(12)->subMonths(1);   // umur 12 -> cocok DUA-DUANYA
-
-        // min_age terkecil yang menang, dan hasilnya konsisten tiap dipanggil.
-        for ($i = 0; $i < 3; $i++) {
-            $this->assertSame(
-                $u12->id_player_category,
-                $service->suggestFor($birthDate, $academy->id_academy)?->id_player_category
-            );
+        foreach (['academy.view', 'academy.create', 'academy.update', 'academy.delete'] as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
+
+        $role = Role::firstOrCreate([
+            'id_academy' => null,
+            'name' => 'Super Admin',
+            'guard_name' => 'web',
+        ]);
+
+        $user = User::factory()->create([
+            'id_academy' => null,
+            'status' => true,
+        ]);
+
+        $user->assignRole($role);
+
+        return $user;
     }
 
-    /**
-     * INI MENGUNCI KEPUTUSAN PALING PENTING DI MODULE INI.
-     * Pemain berbakat boleh "main naik kelas". Lihat Bagian 4.2.
-     */
-    public function test_player_boleh_ditempatkan_di_kategori_di_luar_umurnya(): void
+    protected function baseAcademyPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'name' => 'Academy Tes',
+            'code' => 'TES' . fake()->unique()->numberBetween(100, 999),
+            'phone' => '081234567890',
+            'email' => 'academy@tes.com',
+            'address' => 'Jl. Tes',
+            'tagline' => 'Tagline Tes',
+            'status' => true,
+            'subscription_type' => 'monthly',
+            'subscription_fee' => 100000,
+            'subscription_started_at' => now()->toDateString(),
+            'subscription_ends_at' => now()->addMonth()->toDateString(),
+        ], $overrides);
+    }
+
+    public function test_super_admin_bisa_buat_academy_sekaligus_akun_owner(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload([
+            'create_account' => 1,
+            'owner_email' => 'owner@tes.com',
+            'owner_password' => 'password123',
+            'owner_password_confirmation' => 'password123',
+        ]);
+
+        $response = $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $response->assertRedirect(route('academies.index'));
+
+        $academy = Academy::where('code', $payload['code'])->first();
+
+        $this->assertNotNull($academy->id_owner_user);
+        $this->assertSame('owner@tes.com', $academy->owner->email);
+        $this->assertTrue($academy->owner->hasRole('Owner'));
+        $this->assertTrue($academy->owner->status);
+    }
+
+    public function test_academy_tanpa_toggle_create_account_tidak_membuat_user(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload(['create_account' => 0]);
+
+        $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $academy = Academy::where('code', $payload['code'])->first();
+
+        $this->assertNull($academy->id_owner_user);
+    }
+
+    public function test_toggle_aktif_tapi_owner_email_kosong_ditolak(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload([
+            'create_account' => 1,
+            'owner_password' => 'password123',
+            'owner_password_confirmation' => 'password123',
+        ]);
+
+        $response = $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $response->assertSessionHasErrors('owner_email');
+        $this->assertDatabaseMissing('academies', ['code' => $payload['code']]);
+    }
+
+    public function test_owner_email_tidak_bentrok_dengan_email_kontak_academy(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload([
+            'email' => 'kontak@academytes.com',
+            'create_account' => 1,
+            'owner_email' => 'owner@academytes.com',
+            'owner_password' => 'password123',
+            'owner_password_confirmation' => 'password123',
+        ]);
+
+        $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $academy = Academy::where('code', $payload['code'])->first();
+
+        $this->assertSame('kontak@academytes.com', $academy->email);
+        $this->assertSame('owner@academytes.com', $academy->owner->email);
+    }
+
+    public function test_role_academy_biasa_ditolak_403_akses_route_account(): void
     {
         $academy = Academy::factory()->create();
 
-        $type = PlayerType::factory()->create(['id_academy' => $academy->id_academy]);
+        Permission::firstOrCreate(['name' => 'player.view', 'guard_name' => 'web']);
+        $role = Role::create(['id_academy' => $academy->id_academy, 'name' => 'Staff', 'guard_name' => 'web']);
+        $role->syncPermissions(['player.view']);
 
-        $u17 = PlayerCategory::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'name' => 'U-17', 'min_age' => 16, 'max_age' => 17,
+        $staff = User::factory()->create(['id_academy' => $academy->id_academy, 'status' => true]);
+        $staff->assignRole($role);
+
+        $response = $this->actingAs($staff)->get(route('academies.account.create', $academy));
+
+        $response->assertForbidden();
+    }
+
+    public function test_super_admin_bisa_reset_password_owner(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload([
+            'create_account' => 1,
+            'owner_email' => 'owner@tes.com',
+            'owner_password' => 'password-lama',
+            'owner_password_confirmation' => 'password-lama',
         ]);
 
-        $owner = $this->makeUser($academy, ['player.view', 'player.create']);
+        $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
-        $this->actingAs($owner)
-            ->post(route('players.store'), [
-                'id_player_type' => $type->id_player_type,
-                'id_player_category' => $u17->id_player_category,   // umur 11 -> kategori U-17
-                'name' => 'Pemain Berbakat',
-                'birth_date' => Carbon::now()->subYears(11)->format('Y-m-d'),
-                'gender' => 'male',
-                'primary_position' => 'ST',
-            ])
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('players.index'));
+        $academy = Academy::where('code', $payload['code'])->first();
+        $oldHash = $academy->owner->password;
 
-        $this->assertSame(
-            $u17->id_player_category,
-            Player::withoutGlobalScopes()->where('name', 'Pemain Berbakat')->first()->id_player_category
-        );
+        $this->actingAs($superAdmin)->patch(route('academies.account.password', $academy));
+
+        $this->assertNotSame($oldHash, $academy->owner->fresh()->password);
     }
+
+    public function test_super_admin_bisa_nonaktifkan_akun_owner(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload([
+            'create_account' => 1,
+            'owner_email' => 'owner@tes.com',
+            'owner_password' => 'password123',
+            'owner_password_confirmation' => 'password123',
+        ]);
+
+        $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $academy = Academy::where('code', $payload['code'])->first();
+
+        $this->assertTrue($academy->owner->status);
+
+        $this->actingAs($superAdmin)->patch(route('academies.account.status', $academy));
+
+        $this->assertFalse($academy->owner->fresh()->status);
+    }
+}
 ```
 
 **✅ Cek dulu**
 
 ```bash
-php artisan test --filter=PlayerCategoryTest
-php artisan test --filter=PlayerTypeTest
-php artisan test --filter=RoleAcademyTest
+php artisan test --filter=AcademyAccountTest
 ```
 
-Ketiganya harus hijau. `PlayerTypeTest` & `RoleAcademyTest` wajib ikut dijalankan karena Tahap 5 & 10 menyentuh `AcademyManagementService`, `PlayerService`, dan form Player yang dipakai bersama.
-
-> Catatan: `php artisan test` polos akan menunjukkan **7 test Breeze lama yang memang sudah merah sejak sebelum brief ini** (`AuthenticationTest`, `RegistrationTest`, `ExampleTest`, `ProfileTest`, `EmailVerificationTest`). Itu bukan ulahmu — penyebabnya `User` memakai primary key `id_user` + SoftDeletes yang bentrok dengan asumsi test bawaan Breeze. Jangan diperbaiki di brief ini.
+Ketujuh test harus **pass**. Kalau `test_owner_email_tidak_bentrok_dengan_email_kontak_academy` gagal dengan salah satu email ketimpa yang lain, cek lagi Tahap 4–5 — kemungkinan field masih dinamai `email` polos, bukan `owner_email`.
 
 ---
 
-## Tahap 12 — Update `docs/`
+## Tahap 11 — Dokumentasi
 
-`docs/permission-reference.md`:
+**Tujuan**: `docs/permission-reference.md` mencatat sub-module baru ini, supaya keputusan "kenapa `academy.update`, bukan permission baru" tidak hilang saat module berikutnya dikerjakan.
 
-1. Tambah section **Module: Player Category** (tiru format section "Module: Player Type"), status **✅ Implemented**:
+Tambahkan sub-section baru **tepat setelah** section "Module: Academy Management" (dan sebelum "Module: Academy Profile"):
+
+```markdown
+### Sub-module: Academy Account (login Owner)
+
+Nested di `academies/{academy}/account/*`. Sama seperti *Sub-module: Player Account*, ini **membuat/mengelola record `User`** (login Owner), bukan data `Academy` itu sendiri — tapi **beda** dari Player Account soal permission: di sini **sengaja tetap** `academy.update`, bukan permission `user.*` atau permission baru.
 
 | Permission | Untuk apa | Digerbang di |
 |---|---|---|
-| `player_category.view` | Lihat daftar kategori umur | `player-categories.index` + menu sidebar |
-| `player_category.create` | Tambah kategori baru | `player-categories.create`, `player-categories.store` |
-| `player_category.update` | Ubah nama/rentang umur/status | `player-categories.edit`, `player-categories.update` |
-| `player_category.delete` | Hapus kategori (kalau tidak dipakai player) | `player-categories.destroy` |
+| `academy.update` | Buat akun Owner (kalau belum ada), edit akun, reset password, aktif/nonaktifkan akun Owner | `academies.account.create`, `academies.account.store`, `academies.account.edit`, `academies.account.update`, `academies.account.status`, `academies.account.password` (route middleware) + `<x-account.dropdown>` di `academies.show` |
 
-Sertakan catatan:
+Kenapa **tidak** dipisah seperti Player Account (`user.create`/`user.update` terpisah dari `player.*`): pemisahan itu berguna di Player karena role macam Coach/Staff **memang** didelegasikan `player.update` tapi belum tentu boleh membuat akun login player. Di Academy, tidak ada role manapun (termasuk Owner) yang pernah punya `academy.*` sama sekali (lihat *Module: Academy Management* → `4.4` di `issue.md`) — jadi menambah permission terpisah untuk sub-resource-nya tidak memberi pemisahan hak akses yang nyata, cuma menambah satu baris permission yang tidak pernah dipakai membedakan siapa boleh apa.
 
-- Isolasi antar academy memakai `AcademyScope`, **bukan** Policy → akses academy lain menghasilkan **404**.
-- `player_category.view` **tidak** dibutuhkan untuk memilih kategori saat menambah Player.
-- `min_age`/`max_age` **hanya untuk menyarankan** kategori dari `birth_date`. Sistem **tidak pernah menolak** player yang umurnya di luar rentang — "main naik kelas" adalah hal normal di sepak bola.
-
-2. Di section **Module: Player**, tambahkan bahwa `players.id_player_category` wajib diisi saat create.
-
-3. Di tabel **Role Template Default per Academy Baru**, tambahkan `player_category.*` → hanya **Owner**.
-
----
-
-## 4. Kenapa Begini? (alasan teknis)
-
-### 4.1 Kenapa kategori DISIMPAN, bukan dihitung terus dari `birth_date`
-
-Menghitung kategori on-the-fly (`umur → cocokkan rentang`) kelihatannya lebih "pintar": tidak pernah basi, tidak perlu kolom. Tapi konsekuensinya berat:
-
-- **Kategori berubah sendiri saat ulang tahun.** Anak yang latihan di U-12 tiba-tiba pindah U-15 di tengah musim, hanya karena hari ini ulang tahunnya. Roster latihan berubah tanpa ada yang mengubahnya.
-- **"Main naik kelas" jadi mustahil.** Pemain berbakat umur 11 yang ikut U-15 tidak bisa direpresentasikan sama sekali.
-- **Riwayat hilang.** "Latihan bulan lalu dia ikut kelompok apa?" tidak akan pernah bisa dijawab.
-- **Query jadi mahal.** Module Template Latihan nanti butuh "semua player U-12" — dengan kolom FK itu index lookup biasa; tanpa kolom, jadi `whereBetween` pada hasil hitungan tanggal yang tidak bisa di-index.
-
-Dengan menyimpan pilihan: umur cuma **menyarankan**, manusia yang **memutuskan**, dan keputusannya stabil sampai ada yang sengaja mengubahnya.
-
-### 4.2 Kenapa umur TIDAK divalidasi keras terhadap kategori
-
-Godaan terbesar saat mengerjakan brief ini adalah menambahkan validasi:
-
-```php
-// ❌ JANGAN PERNAH
-'id_player_category' => [..., new AgeMatchesCategory($birthDate)],
+Akun Owner yang dibuat lewat sub-module ini otomatis diberi role **Owner** (hardcode di `AcademyManagementService::create()` dan `AcademyAccountController::store()`) — role lain **tidak bisa** dipilih lewat jalur ini. Kalau Owner butuh akun tambahan dengan role lain (Coach, Staff, dst), itu tetap lewat jalur biasa (Role Management + pembuatan akun oleh Owner sendiri di academy-nya, di luar scope brief ini).
 ```
 
-Di sepak bola, **memainkan pemain di kelompok umur lebih tua adalah praktik normal dan penting** — namanya "playing up". Pemain berbakat umur 11 rutin dilatih bersama U-15 supaya berkembang. Akademi yang serius pasti melakukannya.
+Perbarui juga baris ringkasan status implementasi di bagian bawah dokumen (cari kalimat "Role, Permission, Player Management, ... Academy Management, dan Academy Profile sudah digerbang penuh") supaya menyebut Academy Account juga.
 
-Kalau sistem menolak itu, yang terjadi bukan "data jadi rapi", tapi:
-- Coach mengarang tanggal lahir supaya lolos validasi → **data lahir jadi sampah**, dan itu jauh lebih merusak daripada kategori yang "tidak cocok umur".
-- Atau coach berhenti memakai sistem untuk kasus itu, dan datanya hilang sama sekali.
-
-Karena itu: `min_age`/`max_age` hanya menyarankan, dan UI cuma **memberi tahu** ("umur di luar rentang, pastikan disengaja"). Test nomor 8 di Tahap 11 mengunci perilaku ini supaya tidak ada yang "memperbaikinya" jadi validasi keras di kemudian hari.
-
-### 4.3 Kenapa saran kategori wajib `orderBy`
-
-Academy bebas menentukan rentang, dan tidak ada yang melarang rentangnya tumpang tindih:
-
-```text
-U-12 : 10 - 12
-U-13 : 12 - 13     ← umur 12 cocok ke DUA-DUANYA
-```
-
-Tanpa `orderBy`, SQL **tidak menjamin** baris mana yang dikembalikan `first()`. Hasilnya: saran untuk anak umur 12 bisa "U-12" hari ini dan "U-13" besok, tanpa ada data yang berubah. Bug seperti ini nyaris mustahil dilacak karena tidak bisa direproduksi.
-
-`orderBy('min_age')` membuatnya deterministik: yang rentangnya mulai paling awal yang menang. Test nomor 7 menguncinya.
-
-> Rentang tumpang tindih sengaja **tidak** dilarang — ada academy yang memang butuh (mis. U-13 dan U-15 yang sengaja beririsan). Yang kita jamin cuma: sarannya konsisten.
-
-### 4.4 `cascadeOnDelete` = hapus kategori, hapus semua playernya
-
-Persis seperti di `issue.md` Bagian 4.1. Kalau FK ditulis `cascadeOnDelete`, satu klik "Hapus kategori U-12" akan **menghapus seluruh player U-12**. `nullOnDelete` memastikan yang hilang cuma label kategorinya. Guard di `PlayerCategoryService::delete()` mencegahnya sejak awal.
-
-### 4.5 `Rule::exists` tidak kena `AcademyScope`
-
-Persis seperti di `issue.md` Bagian 4.2. `AcademyScope` adalah Eloquent global scope; `Rule::exists()` memakai query builder mentah, jadi scope-nya **tidak ikut**. Tanpa `where('id_academy', ...)` eksplisit, Owner Academy A bisa memasang kategori milik Academy B lewat POST karangan, dan validasi **lolos tanpa error**. Test nomor 4 menguncinya.
-
-### 4.6 Kenapa `id_player_category` nullable di DB tapi `required` di Form Request
-
-Persis seperti `id_player_type` di `issue.md` Bagian 4.5. Kolom `NOT NULL` akan membuat migration gagal di database yang sudah punya player, atau memaksa migration menebak-nebak kategori mereka.
-
-Dengan nullable + `required` di Form Request: migration mulus, player baru wajib punya kategori, player lama tampil "-" dan otomatis dipaksa memilih saat pertama kali di-edit (dibantu `$suggestedCategory` di form edit).
-
-Yang wajib diingat: **relasi `playerCategory` bisa `null`** — setiap Blade yang mengaksesnya wajib dijaga `@if`.
-
-### 4.7 Kenapa umur dihitung di dua tempat (Service dan Alpine)?
-
-Ini duplikasi yang **disengaja**, bukan kelalaian:
-
-| Tempat | Dipakai di | Kenapa tidak bisa yang satunya |
-|--------|-----------|-------------------------------|
-| `PlayerCategoryService::suggestFor()` (PHP) | Form **edit**, dan module Template Latihan nanti | Ini versi yang **diuji** (test 6 & 7) dan jadi acuan |
-| Alpine `get age()` / `get suggestedCategory()` (JS) | Form **create** | Server belum tahu `birth_date`-nya — user baru mengetiknya di form yang sama, tanpa reload |
-
-Yang penting: **aturannya sendiri tidak diduplikasi**. Aturan "umur berapa masuk kategori mana" hidup di kolom `min_age`/`max_age` di database. PHP dan JS sama-sama cuma **mencocokkan** ke data yang sama. Kalau academy mengubah rentangnya, dua-duanya otomatis ikut — tidak ada yang perlu diubah di kode.
+**✅ Cek dulu**: baca ulang section barunya sekali lagi, pastikan tidak menyiratkan bahwa Academy Account punya permission sendiri yang berbeda dari Academy Management — intinya justru sebaliknya: sengaja dibuat **memakai** permission yang sama.
 
 ---
 
-## 5. Keputusan Arsitektur
+## 4. Alasan Teknis
 
-Keputusan berikut sudah dibahas dengan pemilik produk. Kalau mau mengubahnya, **diskusikan dulu**.
+### 4.1. Kenapa field akun dinamai `owner_email` / `owner_password`, bukan `email` / `password`
 
-| Pilihan | Keputusan | Alasan |
-|---------|-----------|--------|
-| Nama module | **Player Category** | Nama ini sengaja **disisakan** untuk kelompok umur saat module Player Type dibuat, justru karena "category" di akademi bola umumnya berarti kelompok umur. |
-| Cara penentuan kategori | **Disimpan + disarankan otomatis, boleh ditimpa** | Menghitung terus dari `birth_date` bikin kategori berubah saat ulang tahun & menghapus kemungkinan "main naik kelas" (4.1). |
-| Dasar rentang | **Umur saat ini (`min_age`/`max_age`)** | Project belum punya konsep "musim". Alternatifnya (tahun lahir, standar kompetisi resmi) mengharuskan angka digeser manual tiap musim. Bisa ditinjau ulang kalau module Season/Musim dibuat. |
-| Validasi umur vs kategori | **Tidak ada validasi keras**, cuma peringatan lunak | "Main naik kelas" itu normal. Validasi keras membuat coach mengarang tanggal lahir — merusak data yang jauh lebih penting (4.2). |
-| Rentang tumpang tindih | **Diizinkan**, tapi sarannya deterministik (`orderBy('min_age')`) | Ada academy yang memang butuh rentang beririsan. Yang dijamin cuma konsistensi saran (4.3). |
-| Urutan tampil | **`orderBy('min_age')`**, bukan `latest()` | Kelompok umur punya urutan alami (U-12 → U-17). Urut tanggal dibuat tidak berarti apa-apa bagi user. |
-| Isolasi antar academy | **`AcademyScope`**, tanpa Policy | Sama seperti PlayerType. Larangan global scope hanya berlaku untuk `Role` (cache Spatie). |
-| Pindah academy | **Tidak bisa**, baik kategori maupun player | Konsisten dengan Role & PlayerType. |
-| Halaman `show` kategori | **Tidak dibuat** | Seluruh info muat di index. Konsisten dengan PlayerType. |
-| Fitur "naik kelas massal" tiap tahun | **Di luar cakupan brief ini** | Butuh konsep musim/angkatan. Diskusikan terpisah saat dibutuhkan. |
+Lihat [2b](#2b-kenapa-field-akun-dinamai-owner_email--owner_password-bukan-email--password). Ringkas: `AcademyFormRequest` sudah punya `email` untuk kontak academy sejak `issue.md`. Reuse nama akan membuat satu `<input>` menimpa makna yang lain di form yang sama — beda dengan Player yang form Tambah Player-nya memang tidak punya field `email` bawaan apapun, jadi aman pakai nama polos di sana.
 
----
+### 4.2. Kenapa permission Academy Account pakai `academy.update`, bukan `user.*` atau permission baru
 
-## 6. Definition of Done
+Lihat [2d](#2d-kenapa-permission-academyupdate-bukan-user-atau-permission-baru). Ringkas: `user.*` sudah bermakna spesifik di Player Account (Owner boleh kelola akun player-nya sendiri) dan **sudah** default dimiliki role Owner — dipakai ulang di sini berarti Owner akan lolos middleware ke rute pembuatan/pengubahan akun Owner academy manapun. Permission baru juga tidak menambah manfaat karena Academy Management memang selalu Super-Admin-exclusive, tidak pernah ada role kedua yang perlu dibedakan aksesnya.
 
-- [ ] `php artisan migrate:fresh --seed` bersih tanpa error.
-- [ ] FK `players.id_player_category` = **`on delete set null`**, bukan cascade.
-- [ ] Tabel `player_categories` punya unique `(id_academy, name)`.
-- [ ] Dua academy bisa punya "U-12" masing-masing, dengan rentang umur yang boleh berbeda.
-- [ ] Owner hanya melihat & mengelola kategori academy sendiri; akses lintas academy → **404**.
-- [ ] Super Admin melihat seluruh kategori dan wajib memilih academy saat create.
-- [ ] Academy baru otomatis dapat U-12/U-15/U-17 lengkap dengan `min_age`/`max_age`-nya.
-- [ ] Daftar kategori tampil **urut umur**, bukan urut tanggal dibuat.
-- [ ] Isi tanggal lahir di form create Player → kategori otomatis tersaran, dan **bisa ditimpa**.
-- [ ] **Player umur 11 bisa disimpan ke kategori U-17** (cuma diberi peringatan, tidak ditolak) — terbukti lewat test.
-- [ ] `suggestFor()` deterministik saat rentang tumpang tindih — terbukti lewat test.
-- [ ] `max_age < min_age` ditolak validasi.
-- [ ] Kategori yang masih dipakai player tidak bisa dihapus.
-- [ ] Player lama (`id_player_category` = NULL) tidak bikin error 500 di index/show.
-- [ ] `php artisan test --filter=PlayerCategoryTest`, `--filter=PlayerTypeTest`, `--filter=RoleAcademyTest` hijau.
-- [ ] Controller tetap tipis, business logic di Service, validasi di Form Request.
-- [ ] Pesan user-facing Bahasa Indonesia, hardcoded, tanpa folder `lang/`.
-- [ ] Halaman index punya Card List responsif; sudah dicek di 375px / tablet / desktop.
-- [ ] `docs/permission-reference.md` sudah diperbarui.
+### 4.3. Kenapa membuat akun Owner tidak otomatis berarti bisa login
+
+`LoginRequest::authenticate()` (lihat `app/Http/Requests/Auth/LoginRequest.php` baris ~100 dan ~152) mengecek **dua** kondisi berurutan sebelum sesi login diizinkan untuk user non-Super-Admin: `$user->status` (akun) dan `$academy->status` (academy tempat user itu berada). `AccountService::create()` selalu men-set `status => true` untuk akun baru, jadi kondisi pertama otomatis lolos. Tapi `AcademyManagementService::create()` men-set `status = $data['status'] ?? false` — **default `false`** kalau Super Admin tidak eksplisit centang toggle Aktif di form. Kalau brief ini diam-diam memaksa `status` academy jadi `true` setiap kali `create_account` dicentang, itu mengambil keputusan produk (kapan academy dianggap "resmi aktif") atas nama Super Admin tanpa diminta — dua toggle ini sengaja dibiarkan independen, Super Admin yang memutuskan keduanya secara eksplisit setiap kali menambah academy baru.
+
+### 4.4. Kenapa `id_owner_user` di `academies`, bukan dicari lewat role
+
+Lihat [2a](#2a-kenapa-perlu-kolom-baru-id_owner_user-di-academies). Ringkas: role Owner bisa lebih dari satu per academy (Super Admin bebas menambah lewat Role Management), jadi "akun Owner utama yang terhubung ke academy ini" butuh penanda eksplisit, bukan disimpulkan dari role. Pola ini identik dengan `players.id_user`.
 
 ---
 
-## 7. Urutan Commit
+## 5. Development Checklist
 
-| # | Isi | Tahap |
-|---|-----|-------|
-| 1 | Migration `player_categories` + kolom `id_player_category` | 1 |
-| 2 | Model `PlayerCategory` + relasi di `Player` + `player_category_templates` | 2, 3 |
-| 3 | `PlayerCategoryService` + `AcademyManagementService` | 4, 5 |
-| 4 | Permission (seeder, `role_templates`, `PermissionPresenter`) | 6 |
-| 5 | `PlayerCategoryFormRequest` + Controller + Route + View + menu | 7, 8, 9 |
-| 6 | Integrasi ke module Player (termasuk saran kategori di form) | 10 |
-| 7 | Factory + Test | 11 |
-| 8 | Update `docs/` | 12 |
+Sebelum brief ini dinyatakan selesai, cocokkan dengan checklist `docs/module-standard.md`:
 
-Kalau perilaku terasa aneh saat manual testing:
+- [ ] Migration: `id_owner_user` nullable, FK ke `users.id_user`, `nullOnDelete()`.
+- [ ] Model: `Academy::owner()` (`belongsTo`), fillable bertambah `id_owner_user`, **tidak ada** logic baru di Model.
+- [ ] Service: `AcademyManagementService::create()` membuat akun Owner dalam **satu** `DB::transaction()` yang sama dengan `Academy::create()`, urutan `createDefaultRoles()` → akun Owner.
+- [ ] Form Request: `create_account`, `owner_email`, `owner_password` — nama field **tidak** bentrok dengan `email` kontak academy.
+- [ ] View create: toggle "Buat Akun Owner" dengan field tersembunyi/tampil via Alpine, mengikuti pola `players/create.blade.php`.
+- [ ] `AcademyAccountController`: 6 method (create/store/edit/update/status/password), semuanya cek keberadaan akun sebelum aksi (redirect + flash error kalau belum/sudah ada).
+- [ ] Form Request baru: `StoreAcademyAccountRequest`, `UpdateAcademyAccountRequest` — validasi identik pola Player Account.
+- [ ] Route: nested `academies/{academy}/account/*`, **satu** middleware `permission:academy.update` untuk seluruh 6 route.
+- [ ] View `show.blade.php`: `<x-account.dropdown>` terpasang, `AcademyController::show()` eager-load `owner`.
+- [ ] View baru: `academies/account/create.blade.php`, `academies/account/edit.blade.php`.
+- [ ] Test: 7 skenario `AcademyAccountTest` pass.
+- [ ] `docs/permission-reference.md`: sub-section "Sub-module: Academy Account" ditambahkan, menjelaskan kenapa **tidak** pakai permission terpisah (beda dari Player Account).
+- [ ] Manual: login sebagai role academy biasa, akses `academies/{id}/account/create` langsung lewat URL → 403.
+- [ ] Manual: buat academy dengan toggle akun **aktif** tapi toggle status academy **nonaktif** → coba login pakai akun Owner baru → ditolak "Academy sedang tidak aktif." (bukti dua toggle memang independen).
 
-```bash
-php artisan permission:cache-reset
-php artisan config:clear
-php artisan view:clear
-```
+## Summary
 
----
-
-## 8. Hasil Akhir
-
-Setelah module ini, setiap academy punya kelompok umurnya sendiri dengan rentang yang mereka tentukan sendiri. Setiap player punya kategori yang **disarankan sistem dari tanggal lahirnya**, tapi **diputuskan coach** — termasuk menaikkan pemain berbakat ke kelompok yang lebih tua.
-
-Ini fondasi langsung untuk module **Template Latihan**: coach tinggal membuat template per kategori, dan "siapa saja pesertanya" cukup satu lookup FK (`players.id_player_category`), bukan hitung-hitungan umur yang berubah tiap hari.
-
-Bersama Player Type (`issue.md`), Player sekarang punya dua dimensi pengelompokan yang saling tegak lurus dan keduanya per-academy:
-
-```text
-                 U-12          U-15          U-17
-  Reguler      ditagih       ditagih       ditagih
-  Beasiswa       —             —             —
-  Trial          —             —             —
-```
-
-Module Payment memakai sumbu **Type** (`is_billable`), module Template Latihan memakai sumbu **Category**. Keduanya tidak saling mengganggu.
+Brief ini menambahkan kemampuan bagi Super Admin untuk langsung membuatkan akun login Owner saat menambah academy baru — meniru persis pola `create_account` yang sudah ada di form Tambah Player, plus sub-resource `academies/{academy}/account/*` untuk membuat/mengelola akun itu belakangan (mirip `players/{player}/account/*`). Relasi academy-ke-akun-Owner disimpan lewat kolom baru `id_owner_user` (FK eksplisit, bukan dicari lewat role, karena satu academy bisa punya lebih dari satu user berrole Owner). Dua gotcha utama yang membedakan brief ini dari sekadar "copy-paste Player Account": nama field form (`owner_email`/`owner_password`, bukan `email`/`password` polos, karena `Academy` sudah punya field kontak `email` sendiri), dan pilihan permission (`academy.update`, bukan `user.*`, karena Academy Management tidak pernah didelegasikan ke role manapun sehingga pemisahan permission ala Player Account tidak memberi manfaat nyata di sini). Membuat akun Owner **tidak** otomatis membuatnya bisa login — `LoginRequest` tetap mensyaratkan academy itu sendiri berstatus aktif, dan brief ini sengaja tidak memaksa status itu ikut berubah hanya karena akun dibuat.
