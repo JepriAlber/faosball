@@ -22,16 +22,16 @@ class AcademyAccountController extends Controller
         if ($academy->id_owner_user) {
             return redirect()
                 ->route('academies.show', $academy)
-                ->with('error', 'Academy sudah memiliki akun Owner.');
+                ->with('error', __('Academy sudah memiliki akun Owner.'));
         }
 
         return view('academies.account.create', [
-            'title' => 'Buat Akun Owner',
+            'title' => __('Buat Akun Owner'),
             'academy' => $academy,
             'breadcrumb' => [
-                ['label' => 'Manajemen Academy', 'url' => route('academies.index')],
+                ['label' => __('Manajemen Academy'), 'url' => route('academies.index')],
                 ['label' => $academy->name, 'url' => route('academies.show', $academy)],
-                ['label' => 'Buat Akun Owner'],
+                ['label' => __('Buat Akun Owner')],
             ],
         ]);
     }
@@ -43,7 +43,7 @@ class AcademyAccountController extends Controller
             if ($academy->id_owner_user) {
                 return redirect()
                     ->route('academies.show', $academy)
-                    ->with('error', 'Academy sudah memiliki akun Owner.');
+                    ->with('error', __('Academy sudah memiliki akun Owner.'));
             }
 
             DB::transaction(function () use ($request, $academy) {
@@ -62,11 +62,11 @@ class AcademyAccountController extends Controller
 
             return redirect()
                 ->route('academies.show', $academy)
-                ->with('success', 'Akun Owner berhasil dibuat.');
+                ->with('success', __('Akun Owner berhasil dibuat.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal membuat akun Owner');
+            return $this->handleException($e, __('Gagal membuat akun Owner'));
         }
     }
 
@@ -75,17 +75,17 @@ class AcademyAccountController extends Controller
         if (!$academy->owner) {
             return redirect()
                 ->route('academies.show', $academy)
-                ->with('error', 'Academy belum memiliki akun Owner.');
+                ->with('error', __('Academy belum memiliki akun Owner.'));
         }
 
         return view('academies.account.edit', [
-            'title' => 'Edit Akun Owner',
+            'title' => __('Edit Akun Owner'),
             'academy' => $academy,
             'user' => $academy->owner,
             'breadcrumb' => [
-                ['label' => 'Manajemen Academy', 'url' => route('academies.index')],
+                ['label' => __('Manajemen Academy'), 'url' => route('academies.index')],
                 ['label' => $academy->name, 'url' => route('academies.show', $academy)],
-                ['label' => 'Edit Akun Owner'],
+                ['label' => __('Edit Akun Owner')],
             ],
         ]);
     }
@@ -97,7 +97,7 @@ class AcademyAccountController extends Controller
             if (!$academy->owner) {
                 return redirect()
                     ->route('academies.show', $academy)
-                    ->with('error', 'Academy belum memiliki akun Owner.');
+                    ->with('error', __('Academy belum memiliki akun Owner.'));
             }
 
             $this->accountService->update(
@@ -107,11 +107,11 @@ class AcademyAccountController extends Controller
 
             return redirect()
                 ->route('academies.show', $academy)
-                ->with('success', 'Akun Owner berhasil diperbarui.');
+                ->with('success', __('Akun Owner berhasil diperbarui.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal update akun Owner');
+            return $this->handleException($e, __('Gagal update akun Owner'));
         }
     }
 
@@ -122,7 +122,7 @@ class AcademyAccountController extends Controller
             if (!$academy->owner) {
                 return redirect()
                     ->route('academies.show', $academy)
-                    ->with('error', 'Academy belum memiliki akun Owner.');
+                    ->with('error', __('Academy belum memiliki akun Owner.'));
             }
 
             $newPassword = $this->accountService->generatePassword();
@@ -134,11 +134,11 @@ class AcademyAccountController extends Controller
 
             return redirect()
                 ->route('academies.show', $academy)
-                ->with('success', 'Password berhasil direset. Password baru: ' . $newPassword);
+                ->with('success', __('Password berhasil direset. Password baru: ') . $newPassword);
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal reset password', 'academies.show', [$academy]);
+            return $this->handleException($e, __('Gagal reset password'), 'academies.show', [$academy]);
         }
     }
 
@@ -149,7 +149,7 @@ class AcademyAccountController extends Controller
             if (!$academy->owner) {
                 return redirect()
                     ->route('academies.show', $academy)
-                    ->with('error', 'Academy belum memiliki akun Owner.');
+                    ->with('error', __('Academy belum memiliki akun Owner.'));
             }
 
             $status = !$academy->owner->status;
@@ -164,13 +164,13 @@ class AcademyAccountController extends Controller
                 ->with(
                     'success',
                     $status
-                        ? 'Akun Owner berhasil diaktifkan.'
-                        : 'Akun Owner berhasil dinonaktifkan.'
+                        ? __('Akun Owner berhasil diaktifkan.')
+                        : __('Akun Owner berhasil dinonaktifkan.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal mengubah status akun Owner', 'academies.show', [$academy]);
+            return $this->handleException($e, __('Gagal mengubah status akun Owner'), 'academies.show', [$academy]);
         }
     }
 }

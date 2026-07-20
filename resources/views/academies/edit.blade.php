@@ -11,13 +11,13 @@
         <div class="card-header">
 
             <div>
-                <h3 class="card-title">Ubah Profil Academy</h3>
-                <p class="card-description">Perbarui rincian informasi untuk akademi {{ $academy->name }}.</p>
+                <h3 class="card-title">{{ __('Ubah Profil Academy') }}</h3>
+                <p class="card-description">{{ __('Perbarui rincian informasi untuk akademi :name.', ['name' => $academy->name]) }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('academies.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
 
                 <x-account.dropdown :model="$academy" :user="$academy->owner" route-create="academies.account.create"
@@ -41,11 +41,11 @@
                     <div class="form-group">
 
                         <label for="name" class="form-label">
-                            Nama Academy <span class="text-error-500">*</span>
+                            {{ __('Nama Academy') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="name" name="name" value="{{ old('name', $academy->name) }}"
-                            placeholder="Masukkan nama akademi" class="form-input @error('name') form-danger @enderror"
+                            placeholder="{{ __('Masukkan nama akademi') }}" class="form-input @error('name') form-danger @enderror"
                             required>
 
                         @error('name')
@@ -58,11 +58,11 @@
                     <div class="form-group">
 
                         <label for="code" class="form-label">
-                            Kode Academy <span class="text-error-500">*</span>
+                            {{ __('Kode Academy') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="code" name="code" value="{{ old('code', $academy->code) }}"
-                            placeholder="Contoh: FAOS" class="form-input @error('code') form-danger @enderror" required>
+                            placeholder="{{ __('Contoh: FAOS') }}" class="form-input @error('code') form-danger @enderror" required>
 
                         @error('code')
                             <span class="form-error">{{ $message }}</span>
@@ -74,11 +74,11 @@
                     <div class="form-group">
 
                         <label for="tagline" class="form-label">
-                            Tagline / Slogan <span class="text-error-500">*</span>
+                            {{ __('Tagline / Slogan') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="tagline" name="tagline" value="{{ old('tagline', $academy->tagline) }}"
-                            placeholder="Contoh: Maju Bersama Sepakbola"
+                            placeholder="{{ __('Contoh: Maju Bersama Sepakbola') }}"
                             class="form-input @error('tagline') form-danger @enderror" required>
 
                         @error('tagline')
@@ -91,11 +91,11 @@
                     <div class="form-group">
 
                         <label for="phone" class="form-label">
-                            Nomor Telepon <span class="text-error-500">*</span>
+                            {{ __('Nomor Telepon') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="phone" name="phone" value="{{ old('phone', $academy->phone) }}"
-                            placeholder="Contoh: 08123456789" class="form-input @error('phone') form-danger @enderror"
+                            placeholder="{{ __('Contoh: 08123456789') }}" class="form-input @error('phone') form-danger @enderror"
                             required>
 
                         @error('phone')
@@ -108,11 +108,11 @@
                     <div class="form-group">
 
                         <label for="email" class="form-label">
-                            Email <span class="text-error-500">*</span>
+                            {{ __('Email') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="email" id="email" name="email" value="{{ old('email', $academy->email) }}"
-                            placeholder="Contoh: info@akademi.com" class="form-input @error('email') form-danger @enderror"
+                            placeholder="{{ __('Contoh: info@akademi.com') }}" class="form-input @error('email') form-danger @enderror"
                             required>
 
                         @error('email')
@@ -125,7 +125,7 @@
                     <div class="form-group">
 
                         <label class="form-label">
-                            Status Aktif
+                            {{ __('Status Aktif') }}
                         </label>
 
                         <div x-data="{ switcherOn: {{ old('status', $academy->status) ? 'true' : 'false' }} }">
@@ -140,7 +140,7 @@
                                 </div>
 
                                 <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"
-                                    x-text="switcherOn ? 'Aktif' : 'Nonaktif'"></span>
+                                    x-text="switcherOn ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'"></span>
 
                             </label>
 
@@ -151,17 +151,17 @@
                     {{-- Subscription --}}
                     <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
 
-                        <h4 class="section-title mb-4">Informasi Langganan</h4>
+                        <h4 class="section-title mb-4">{{ __('Informasi Langganan') }}</h4>
 
                         {{-- Tipe Langganan --}}
                         <div class="form-group">
                             <label for="subscription_type" class="form-label">
-                                Tipe Langganan <span class="text-error-500">*</span>
+                                {{ __('Tipe Langganan') }} <span class="text-error-500">*</span>
                             </label>
 
                             <select id="subscription_type" name="subscription_type"
                                 class="form-select @error('subscription_type') form-danger @enderror" required>
-                                <option value="">Pilih Tipe Langganan</option>
+                                <option value="">{{ __('Pilih Tipe Langganan') }}</option>
                                 @foreach ($subscriptionTypes as $value => $label)
                                     <option value="{{ $value }}"
                                         @selected(old('subscription_type', $academy->subscription_type) === $value)>
@@ -178,7 +178,7 @@
                         {{-- Biaya Langganan --}}
                         <div class="form-group">
                             <label for="subscription_fee" class="form-label">
-                                Biaya Langganan (Rp) <span class="text-error-500">*</span>
+                                {{ __('Biaya Langganan (Rp)') }} <span class="text-error-500">*</span>
                             </label>
 
                             <input type="number" id="subscription_fee" name="subscription_fee"
@@ -195,7 +195,7 @@
 
                             <div class="form-group">
                                 <label for="subscription_started_at" class="form-label">
-                                    Mulai Langganan <span class="text-error-500">*</span>
+                                    {{ __('Mulai Langganan') }} <span class="text-error-500">*</span>
                                 </label>
 
                                 <input type="date" id="subscription_started_at" name="subscription_started_at"
@@ -209,7 +209,7 @@
 
                             <div class="form-group">
                                 <label for="subscription_ends_at" class="form-label">
-                                    Berakhir Langganan <span class="text-error-500">*</span>
+                                    {{ __('Berakhir Langganan') }} <span class="text-error-500">*</span>
                                 </label>
 
                                 <input type="date" id="subscription_ends_at" name="subscription_ends_at"
@@ -237,7 +237,7 @@
                     <div class="form-group">
 
                         <label for="primary_color" class="form-label">
-                            Warna Utama Sistem <span class="text-error-500">*</span>
+                            {{ __('Warna Utama Sistem') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="color" id="primary_color" name="primary_color"
@@ -246,7 +246,7 @@
                             required>
 
                         <p class="mt-1 text-xs text-gray-400">
-                            Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.
+                            {{ __('Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.') }}
                         </p>
 
                         @error('primary_color')
@@ -259,10 +259,10 @@
                     <div class="form-group">
 
                         <label for="address" class="form-label">
-                            Alamat <span class="text-error-500">*</span>
+                            {{ __('Alamat') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap akademi"
+                        <textarea id="address" name="address" rows="3" placeholder="{{ __('Masukkan alamat lengkap akademi') }}"
                             class="form-textarea @error('address') form-danger @enderror" required>{{ old('address', $academy->address) }}</textarea>
 
                         @error('address')
@@ -275,11 +275,11 @@
                     <div class="form-group">
 
                         <label for="description" class="form-label">
-                            Deskripsi
+                            {{ __('Deskripsi') }}
                         </label>
 
                         <textarea id="description" name="description" rows="3"
-                            placeholder="Jelaskan secara singkat mengenai profil akademi Anda"
+                            placeholder="{{ __('Jelaskan secara singkat mengenai profil akademi Anda') }}"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description', $academy->description) }}</textarea>
 
                         @error('description')
@@ -295,11 +295,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Perbarui Academy
+                    {{ __('Perbarui Academy') }}
                 </button>
 
             </div>

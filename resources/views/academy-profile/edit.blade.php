@@ -12,9 +12,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Profil Academy</h3>
-                <p class="card-description">Kelola informasi profil academy Anda. Kode academy, status, dan
-                    informasi langganan hanya dapat diubah oleh Super Admin.</p>
+                <h3 class="card-title">{{ __('Profil Academy') }}</h3>
+                <p class="card-description">{{ __('Kelola informasi profil academy Anda. Kode academy, status, dan informasi langganan hanya dapat diubah oleh Super Admin.') }}</p>
             </div>
         </div>
 
@@ -30,7 +29,7 @@
 
                     <div class="form-group">
                         <label for="name" class="form-label">
-                            Nama Academy <span class="text-error-500">*</span>
+                            {{ __('Nama Academy') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="name" name="name" value="{{ old('name', $academy->name) }}"
@@ -43,7 +42,7 @@
 
                     <div class="form-group">
                         <label for="tagline" class="form-label">
-                            Tagline / Slogan <span class="text-error-500">*</span>
+                            {{ __('Tagline / Slogan') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="tagline" name="tagline" value="{{ old('tagline', $academy->tagline) }}"
@@ -56,7 +55,7 @@
 
                     <div class="form-group">
                         <label for="phone" class="form-label">
-                            Nomor Telepon <span class="text-error-500">*</span>
+                            {{ __('Nomor Telepon') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="phone" name="phone" value="{{ old('phone', $academy->phone) }}"
@@ -69,7 +68,7 @@
 
                     <div class="form-group">
                         <label for="email" class="form-label">
-                            Email <span class="text-error-500">*</span>
+                            {{ __('Email') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="email" id="email" name="email" value="{{ old('email', $academy->email) }}"
@@ -90,7 +89,7 @@
                     <div class="form-group">
 
                         <label for="primary_color" class="form-label">
-                            Warna Utama Sistem <span class="text-error-500">*</span>
+                            {{ __('Warna Utama Sistem') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="color" id="primary_color" name="primary_color"
@@ -99,7 +98,7 @@
                             required>
 
                         <p class="mt-1 text-xs text-gray-400">
-                            Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.
+                            {{ __('Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.') }}
                         </p>
 
                         @error('primary_color')
@@ -110,7 +109,7 @@
 
                     <div class="form-group">
                         <label for="address" class="form-label">
-                            Alamat <span class="text-error-500">*</span>
+                            {{ __('Alamat') }} <span class="text-error-500">*</span>
                         </label>
 
                         <textarea id="address" name="address" rows="3"
@@ -122,7 +121,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="description" class="form-label">Deskripsi</label>
+                        <label for="description" class="form-label">{{ __('Deskripsi') }}</label>
 
                         <textarea id="description" name="description" rows="3"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description', $academy->description) }}</textarea>
@@ -137,7 +136,7 @@
             </div>
 
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <button type="submit" class="btn btn-primary">{{ __('Simpan Perubahan') }}</button>
             </div>
 
         </form>

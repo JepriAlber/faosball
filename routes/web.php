@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AcademyProfileController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
 use App\Http\Controllers\PlayerCategoryController;
@@ -22,6 +23,8 @@ Route::get('/', function () {
         : redirect()->route('login');
 
 });
+
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
  
 

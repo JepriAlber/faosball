@@ -27,7 +27,7 @@
             <div class="mb-6">
                 <h3 class="menu-group-heading">
                     <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
-                        MENU
+                        {{ __('MENU') }}
                     </span>
                     {{-- Dots icon saat sidebar collapsed di desktop --}}
                     <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'" class="menu-group-icon" width="24"
@@ -57,7 +57,7 @@
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Dashboard
+                                {{ __('Dashboard') }}
                             </span>
 
                             <svg class="menu-item-arrow transition-transform duration-200"
@@ -78,7 +78,7 @@
                                     <a href="{{ route('dashboard') }}" class="menu-dropdown-item group"
                                         :class="{{ Route::is('dashboard') ? 'true' : 'false' }} ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
-                                        Ringkasan
+                                        {{ __('Ringkasan') }}
                                     </a>
                                 </li>
                             </ul>
@@ -89,7 +89,7 @@
 
                     <h3 class="menu-group-heading">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
-                            football academy
+                            {{ __('football academy') }}
                         </span>
                         {{-- Dots icon saat sidebar collapsed di desktop --}}
                         <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'" class="menu-group-icon"
@@ -131,7 +131,7 @@
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Football Academy
+                                {{ __('Football Academy') }}
                             </span>
 
                             <svg class="menu-item-arrow transition-transform duration-200"
@@ -159,7 +159,7 @@
                                                 ?
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
-                                            Players
+                                            {{ __('Players') }}
                                         </a>
                                     </li>
                                 @endcan
@@ -172,7 +172,7 @@
                                                 ?
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
-                                            Player Types
+                                            {{ __('Player Types') }}
                                         </a>
                                     </li>
                                 @endcan
@@ -185,7 +185,7 @@
                                                 ?
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
-                                            Player Categories
+                                            {{ __('Player Categories') }}
                                         </a>
                                     </li>
                                 @endcan
@@ -226,7 +226,7 @@
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Profile
+                                {{ __('Profile') }}
                             </span>
                         </a>
                     </li>
@@ -258,7 +258,7 @@
                                 </svg>
 
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                    Profil Academy
+                                    {{ __('Profil Academy') }}
                                 </span>
                             </a>
                         </li>
@@ -280,7 +280,7 @@
                     @if (app(\App\Services\AcademyService::class)->isSuperAdmin() || auth()->user()->can('role.view'))
                         <h3 class="menu-group-heading">
                             <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Administrasi
+                                {{ __('Administrasi') }}
                             </span>
                             {{-- Dots icon saat sidebar collapsed di desktop --}}
                             <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'" class="menu-group-icon"
@@ -305,7 +305,7 @@
                                     </svg>
 
                                     <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                        Academy
+                                        {{ __('Academy') }}
                                     </span>
                                 </a>
                             </li>
@@ -327,7 +327,7 @@
 
                                 </svg>
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                    Roles &amp; Permissions
+                                    {{ __('Roles & Permissions') }}
                                 </span>
                                 <svg class="menu-item-arrow transition-transform duration-200"
                                     :class="[
@@ -353,7 +353,7 @@
                                                     ?
                                                     'menu-dropdown-item-active' :
                                                     'menu-dropdown-item-inactive'">
-                                                Roles
+                                                {{ __('Roles') }}
 
                                             </a>
                                         </li>
@@ -367,7 +367,7 @@
                                                     ?
                                                     'menu-dropdown-item-active' :
                                                     'menu-dropdown-item-inactive'">
-                                                Permissions
+                                                {{ __('Permissions') }}
                                             </a>
                                         </li>
                                     @endcan
@@ -414,7 +414,7 @@
                                 </svg>
 
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                    Master
+                                    {{ __('Master') }}
                                 </span>
 
                                 <svg class="menu-item-arrow transition-transform duration-200"
@@ -444,7 +444,7 @@
                                                     ?
                                                     'menu-dropdown-item-active' :
                                                     'menu-dropdown-item-inactive'">
-                                                Posisi Pemain
+                                                {{ __('Posisi Pemain') }}
                                             </a>
                                         </li>
                                     @endcan
@@ -470,10 +470,10 @@
         <!-- Sign Out -->
         <div :class="sidebarToggle ? 'lg:hidden' : ''" class="sidebar-footer">
             <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Keluar dari akun?
+                {{ __('Keluar dari akun?') }}
             </p>
             <button type="button" @click="$dispatch('logout-confirm')" class="sidebar-signout-btn">
-                Sign Out
+                {{ __('Sign Out') }}
             </button>
         </div>
 
