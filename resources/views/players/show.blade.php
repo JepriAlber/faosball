@@ -29,7 +29,7 @@
                     </h3>
 
                     <p class="card-description">
-                        {{ $player->primaryPosition->name ?? 'Player' }}
+                        {{ $player->primaryPosition->name ?? __('Player') }}
                     </p>
                 </div>
             </div>
@@ -38,12 +38,12 @@
             <div class="card-actions flex items-center gap-2">
 
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
 
                 @can('player.update')
                     <a href="{{ route('players.edit', $player->id_player) }}" class="btn btn-primary">
-                        Edit Player
+                        {{ __('Edit Player') }}
                     </a>
                 @endcan
 
@@ -79,7 +79,7 @@
                         <button type="button" class="focus:outline-none" @click="tab='profile'"
                             :class="tab === 'profile' ? 'tab tab-active' : 'tab'">
 
-                            Profil Pemain
+                            {{ __('Profil Pemain') }}
 
                         </button>
 
@@ -87,7 +87,7 @@
                         <button type="button" class="focus:outline-none" @click="tab='physical'"
                             :class="tab === 'physical' ? 'tab tab-active' : 'tab'">
 
-                            Fisik & Posisi
+                            {{ __('Fisik & Posisi') }}
 
                         </button>
 
@@ -95,7 +95,7 @@
                         <button type="button" class="focus:outline-none" @click="tab='parent'"
                             :class="tab === 'parent' ? 'tab tab-active' : 'tab'">
 
-                            Parent Information
+                            {{ __('Parent Information') }}
 
                         </button>
 
@@ -103,7 +103,7 @@
                         <button type="button" class="focus:outline-none" @click="tab='dokumen'"
                             :class="tab === 'dokumen' ? 'tab tab-active' : 'tab'">
 
-                            Dokumen / File
+                            {{ __('Dokumen / File') }}
 
                         </button>
 
@@ -116,7 +116,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Player Code
+                                    {{ __('Player Code') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->player_code }}
@@ -125,7 +125,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Nama Lengkap
+                                    {{ __('Nama Lengkap') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->name }}
@@ -134,7 +134,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Nickname
+                                    {{ __('Nickname') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->nick_name ?? '-' }}
@@ -143,7 +143,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Gender
+                                    {{ __('Gender') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->gender ?? '-' }}
@@ -152,7 +152,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Nationality
+                                    {{ __('Nationality') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->nationality ?? '-' }}
@@ -161,7 +161,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Tanggal Lahir
+                                    {{ __('Tanggal Lahir') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->birth_date?->format('d M Y') ?? '-' }}
@@ -177,7 +177,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Tinggi Badan
+                                    {{ __('Tinggi Badan') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->height ? $player->height . ' cm' : '-' }}
@@ -186,7 +186,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Berat Badan
+                                    {{ __('Berat Badan') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->weight ? $player->weight . ' kg' : '-' }}
@@ -195,7 +195,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Kaki Dominan
+                                    {{ __('Kaki Dominan') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->preferred_foot ?? '-' }}
@@ -203,7 +203,7 @@
                             </div>
 
                             <div>
-                                <span class="block mb-1 text-xs text-gray-400">Posisi Utama</span>
+                                <span class="block mb-1 text-xs text-gray-400">{{ __('Posisi Utama') }}</span>
                                 <span class="table-text">
                                     @if ($player->primaryPosition)
                                         {{ $player->primaryPosition->code }} — {{ $player->primaryPosition->name }}
@@ -214,7 +214,7 @@
                             </div>
 
                             <div>
-                                <span class="block mb-1 text-xs text-gray-400">Posisi Kedua</span>
+                                <span class="block mb-1 text-xs text-gray-400">{{ __('Posisi Kedua') }}</span>
                                 <span class="table-text">
                                     @if ($player->secondaryPosition)
                                         {{ $player->secondaryPosition->code }} — {{ $player->secondaryPosition->name }}
@@ -226,7 +226,7 @@
 
                             <div>
                                 <span class="block mb-1 text-xs text-gray-400">
-                                    Tanggal Bergabung
+                                    {{ __('Tanggal Bergabung') }}
                                 </span>
                                 <span class="table-text">
                                     {{ $player->join_date?->format('d M Y') ?? '-' }}
@@ -243,7 +243,7 @@
                         <div class="rounded-lg border border-dashed border-gray-200 p-5 dark:border-gray-800">
 
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Informasi orang tua akan tersedia pada pengembangan berikutnya.
+                                {{ __('Informasi orang tua akan tersedia pada pengembangan berikutnya.') }}
                             </p>
 
                         </div>
@@ -256,7 +256,7 @@
                         <div class="rounded-lg border border-dashed border-gray-200 p-5 dark:border-gray-800">
 
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Dokumen pemain belum tersedia.
+                                {{ __('Dokumen pemain belum tersedia.') }}
                             </p>
 
                         </div>
@@ -270,11 +270,11 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title">
-                        Catatan Pemain
+                        {{ __('Catatan Pemain') }}
                     </h4>
 
                     <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                        {{ $player->notes ?: 'Tidak ada catatan pemain.' }}
+                        {{ $player->notes ?: __('Tidak ada catatan pemain.') }}
                     </p>
 
                 </div>
@@ -289,14 +289,14 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title border-b border-gray-100 pb-3 dark:border-gray-800">
-                        Informasi Academy
+                        {{ __('Informasi Academy') }}
                     </h4>
 
                     <div class="mt-4 space-y-4">
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Academy
+                                {{ __('Academy') }}
                             </span>
 
                             <span class="table-text">
@@ -307,7 +307,7 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Type Player
+                                {{ __('Type Player') }}
                             </span>
 
                             @if ($player->playerType)
@@ -322,7 +322,7 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Kategori Umur
+                                {{ __('Kategori Umur') }}
                             </span>
 
                             @if ($player->playerCategory)
@@ -337,15 +337,15 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Status Player
+                                {{ __('Status Player') }}
                             </span>
 
                             @php
                                 $playerStatusBadge = match ($player->status) {
-                                    'active' => ['label' => 'Aktif', 'class' => 'badge-success'],
-                                    'inactive' => ['label' => 'Nonaktif', 'class' => 'badge-danger'],
-                                    'graduated' => ['label' => 'Lulus', 'class' => 'badge-primary'],
-                                    'left' => ['label' => 'Keluar', 'class' => 'badge-secondary'],
+                                    'active' => ['label' => __('Aktif'), 'class' => 'badge-success'],
+                                    'inactive' => ['label' => __('Nonaktif'), 'class' => 'badge-danger'],
+                                    'graduated' => ['label' => __('Lulus'), 'class' => 'badge-primary'],
+                                    'left' => ['label' => __('Keluar'), 'class' => 'badge-secondary'],
                                     default => ['label' => '-', 'class' => 'badge-secondary'],
                                 };
                             @endphp
@@ -365,7 +365,7 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title border-b border-gray-100 pb-3 dark:border-gray-800">
-                        Informasi Account
+                        {{ __('Informasi Account') }}
                     </h4>
 
 
@@ -375,7 +375,7 @@
 
                             <div>
                                 <span class="mb-1 block text-xs text-gray-400">
-                                    Nama Account
+                                    {{ __('Nama Account') }}
                                 </span>
 
                                 <span class="table-text">
@@ -386,7 +386,7 @@
 
                             <div>
                                 <span class="mb-1 block text-xs text-gray-400">
-                                    Email
+                                    {{ __('Email') }}
                                 </span>
 
                                 <a href="mailto:{{ $player->user->email }}"
@@ -400,7 +400,7 @@
 
                             <div>
                                 <span class="mb-1 block text-xs text-gray-400">
-                                    Role
+                                    {{ __('Role') }}
                                 </span>
 
                                 <span class="badge badge-secondary">
@@ -411,30 +411,30 @@
 
                             <div>
                                 <span class="mb-1 block text-xs text-gray-400">
-                                    Status Account
+                                    {{ __('Status Account') }}
                                 </span>
 
                                 @if ($player->user->status)
                                     <span class="badge badge-success">
-                                        Aktif
+                                        {{ __('Aktif') }}
                                     </span>
                                 @else
                                     <span class="badge badge-danger">
-                                        Nonaktif
+                                        {{ __('Nonaktif') }}
                                     </span>
                                 @endif
 
                             </div>
                         @else
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Player belum memiliki akun.
+                                {{ __('Player belum memiliki akun.') }}
                             </p>
 
                             @can('user.create')
                                 <a href="{{ route('players.account.create', $player) }}"
                                     class="btn btn-primary w-full">
 
-                                    Buat Account
+                                    {{ __('Buat Account') }}
 
                                 </a>
                             @endcan
@@ -450,7 +450,7 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title">
-                        Informasi Sistem
+                        {{ __('Informasi Sistem') }}
                     </h4>
 
 
@@ -459,7 +459,7 @@
                         <div class="flex items-center justify-between">
 
                             <span>
-                                Dibuat pada
+                                {{ __('Dibuat pada') }}
                             </span>
 
                             <span class="font-medium text-gray-600 dark:text-gray-300">
@@ -472,7 +472,7 @@
                         <div class="flex items-center justify-between">
 
                             <span>
-                                Pembaruan terakhir
+                                {{ __('Pembaruan terakhir') }}
                             </span>
 
                             <span class="font-medium text-gray-600 dark:text-gray-300">

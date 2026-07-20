@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Profil Player</h3>
-                <p class="card-description">Perbarui detail informasi player.</p>
+                <h3 class="card-title">{{ __('Informasi Profil Player') }}</h3>
+                <p class="card-description">{{ __('Perbarui detail informasi player.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
 
                 @if ($player->user)
@@ -45,14 +45,14 @@
                 <div>
 
                     <div class="form-group">
-                        <label class="form-label">Player Code</label>
+                        <label class="form-label">{{ __('Player Code') }}</label>
 
                         <input type="text" value="{{ $player->player_code }}" class="form-input form-disabled" readonly>
                     </div>
 
                     @if ($isSuperAdmin)
                         <div class="form-group">
-                            <label class="form-label">Academy</label>
+                            <label class="form-label">{{ __('Academy') }}</label>
                             <p class="form-input bg-gray-50 dark:bg-gray-800">
                                 {{ $player->academy->name ?? '-' }}
                             </p>
@@ -62,7 +62,7 @@
                     {{-- Nama --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Player <span class="text-error-500">*</span>
+                            {{ __('Nama Player') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" name="name" value="{{ old('name', $player->name) }}"
@@ -75,7 +75,7 @@
 
                     {{-- Nickname --}}
                     <div class="form-group">
-                        <label class="form-label">Nickname</label>
+                        <label class="form-label">{{ __('Nickname') }}</label>
 
                         <input type="text" name="nick_name" value="{{ old('nick_name', $player->nick_name) }}"
                             class="form-input @error('nick_name') form-danger @enderror">
@@ -88,15 +88,15 @@
                     {{-- Type Player --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Type Player <span class="text-error-500">*</span>
+                            {{ __('Type Player') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_player_type"
                             class="form-select @error('id_player_type') form-danger @enderror" required>
-                            <option value="">Pilih Type Player</option>
+                            <option value="">{{ __('Pilih Type Player') }}</option>
                             @foreach ($playerTypes as $type)
                                 <option value="{{ $type->id_player_type }}" @selected(old('id_player_type', $player->id_player_type) === $type->id_player_type)>
-                                    {{ $type->name }}@unless ($type->status) (nonaktif)@endunless
+                                    {{ $type->name }}@unless ($type->status) ({{ __('nonaktif') }})@endunless
                                 </option>
                             @endforeach
                         </select>
@@ -109,23 +109,23 @@
                     {{-- Kategori Umur --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Kategori Umur <span class="text-error-500">*</span>
+                            {{ __('Kategori Umur') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_player_category"
                             class="form-select @error('id_player_category') form-danger @enderror" required>
-                            <option value="">Pilih Kategori Umur</option>
+                            <option value="">{{ __('Pilih Kategori Umur') }}</option>
                             @foreach ($playerCategories as $category)
                                 <option value="{{ $category->id_player_category }}" @selected(old('id_player_category', $player->id_player_category) === $category->id_player_category)>
                                     {{ $category->name }} ({{ $category->min_age }}-{{ $category->max_age }}
-                                    th)@unless ($category->status) — nonaktif @endunless
+                                    th)@unless ($category->status) — {{ __('nonaktif') }} @endunless
                                 </option>
                             @endforeach
                         </select>
 
                         @if ($suggestedCategory && $suggestedCategory->id_player_category !== $player->id_player_category)
                             <p class="form-helper">
-                                Saran berdasarkan umur pemain: <strong>{{ $suggestedCategory->name }}</strong>
+                                {{ __('Saran berdasarkan umur pemain:') }} <strong>{{ $suggestedCategory->name }}</strong>
                             </p>
                         @endif
 
@@ -137,12 +137,12 @@
                     {{-- Posisi Utama --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Posisi Utama <span class="text-error-500">*</span>
+                            {{ __('Posisi Utama') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_primary_position"
                             class="form-select @error('id_primary_position') form-danger @enderror" required>
-                            <option value="">Pilih Posisi Utama</option>
+                            <option value="">{{ __('Pilih Posisi Utama') }}</option>
                             @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
                                 <optgroup label="{{ $group }}">
                                     @foreach ($positions as $position)
@@ -161,11 +161,11 @@
 
                     {{-- Posisi Kedua --}}
                     <div class="form-group">
-                        <label class="form-label">Posisi Kedua</label>
+                        <label class="form-label">{{ __('Posisi Kedua') }}</label>
 
                         <select name="id_secondary_position"
                             class="form-select @error('id_secondary_position') form-danger @enderror">
-                            <option value="">Tidak ada</option>
+                            <option value="">{{ __('Tidak ada') }}</option>
                             @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
                                 <optgroup label="{{ $group }}">
                                     @foreach ($positions as $position)
@@ -177,7 +177,7 @@
                             @endforeach
                         </select>
 
-                        <p class="form-helper">Opsional. Tidak boleh sama dengan posisi utama.</p>
+                        <p class="form-helper">{{ __('Opsional. Tidak boleh sama dengan posisi utama.') }}</p>
 
                         @error('id_secondary_position')
                             <span class="form-error">{{ $message }}</span>
@@ -191,7 +191,7 @@
 
                     {{-- Tanggal Lahir --}}
                     <div class="form-group">
-                        <label class="form-label">Tanggal Lahir</label>
+                        <label class="form-label">{{ __('Tanggal Lahir') }}</label>
 
                         <input type="date" name="birth_date"
                             value="{{ old('birth_date', $player->birth_date?->format('Y-m-d')) }}"
@@ -204,10 +204,10 @@
 
                     {{-- Gender --}}
                     <div class="form-group">
-                        <label class="form-label">Gender</label>
+                        <label class="form-label">{{ __('Gender') }}</label>
 
                         <select name="gender" class="form-select">
-                            <option value="">Pilih Gender</option>
+                            <option value="">{{ __('Pilih Gender') }}</option>
                             <option value="male" @selected(old('gender', $player->gender) == 'male')>Male</option>
                             <option value="female" @selected(old('gender', $player->gender) == 'female')>Female</option>
                         </select>
@@ -215,7 +215,7 @@
 
                     {{-- Nationality --}}
                     <div class="form-group">
-                        <label class="form-label">Nationality</label>
+                        <label class="form-label">{{ __('Nationality') }}</label>
 
                         <input type="text" name="nationality" value="{{ old('nationality', $player->nationality) }}"
                             class="form-input">
@@ -225,14 +225,14 @@
                     <div class="form-row grid-cols-2">
 
                         <div class="form-group">
-                            <label class="form-label">Tinggi (cm)</label>
+                            <label class="form-label">{{ __('Tinggi (cm)') }}</label>
 
                             <input type="number" name="height" value="{{ old('height', $player->height) }}"
                                 class="form-input">
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Berat (kg)</label>
+                            <label class="form-label">{{ __('Berat (kg)') }}</label>
 
                             <input type="number" name="weight" value="{{ old('weight', $player->weight) }}"
                                 class="form-input">
@@ -242,10 +242,10 @@
 
                     {{-- Kaki Dominan --}}
                     <div class="form-group">
-                        <label class="form-label">Kaki Dominan</label>
+                        <label class="form-label">{{ __('Kaki Dominan') }}</label>
 
                         <select name="preferred_foot" class="form-select">
-                            <option value="">Pilih</option>
+                            <option value="">{{ __('Pilih') }}</option>
                             <option value="right" @selected(old('preferred_foot', $player->preferred_foot) == 'right')>Right</option>
                             <option value="left" @selected(old('preferred_foot', $player->preferred_foot) == 'left')>Left</option>
                             <option value="both" @selected(old('preferred_foot', $player->preferred_foot) == 'both')>Both</option>
@@ -258,10 +258,10 @@
                     {{-- Catatan --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Catatan
+                            {{ __('Catatan') }}
                         </label>
 
-                        <textarea name="notes" rows="4" placeholder="Tambahkan catatan player" class="form-textarea">{{ old('notes', $player->notes) }}</textarea>
+                        <textarea name="notes" rows="4" placeholder="{{ __('Tambahkan catatan player') }}" class="form-textarea">{{ old('notes', $player->notes) }}</textarea>
 
                         @error('notes')
                             <span class="form-error">
@@ -272,7 +272,7 @@
 
                     {{-- Status --}}
                     <div class="form-group">
-                        <label class="form-label">Status Player</label>
+                        <label class="form-label">{{ __('Status Player') }}</label>
 
                         <select name="status" class="form-select">
                             <option value="active" @selected(old('status', $player->status) == 'active')>Active</option>
@@ -289,11 +289,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
 
                 <button type="submit" class="btn btn-primary">
-                    Update Player
+                    {{ __('Update Player') }}
                 </button>
 
             </div>
