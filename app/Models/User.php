@@ -79,4 +79,10 @@ class User extends Authenticatable
     }
 
 
+    public function ownedAcademy()
+    {
+        return $this->hasOne(Academy::class, 'id_owner_user');
+    }
+
+
 }

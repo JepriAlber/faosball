@@ -180,7 +180,7 @@ Tabs status masuk akal untuk module yang punya kolom status/state dengan sedikit
 
 Kalau sebuah partial/view perlu menampilkan data yang dihitung sendiri (query database, statistik, dsb), gunakan **class-based Blade Component** (`App\View\Components\Xxx`), bukan View Composer.
 
-Contoh yang sudah ada: `App\View\Components\Alert`, `App\View\Components\Breadcrumb`, `App\View\Components\AuthSidebar`. Pola bakunya:
+Contoh yang sudah ada: `App\View\Components\Alert`, `App\View\Components\Breadcrumb`, `App\View\Components\AuthSidebar`, `App\View\Components\AcademyLogo`. Pola bakunya:
 
 ```php
 class AuthSidebar extends Component

@@ -143,6 +143,83 @@
 
                     </div>
 
+                    {{-- Subscription --}}
+                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+
+                        <h4 class="section-title mb-4">Informasi Langganan</h4>
+
+                        {{-- Tipe Langganan --}}
+                        <div class="form-group">
+                            <label for="subscription_type" class="form-label">
+                                Tipe Langganan <span class="text-error-500">*</span>
+                            </label>
+
+                            <select id="subscription_type" name="subscription_type"
+                                class="form-select @error('subscription_type') form-danger @enderror" required>
+                                <option value="">Pilih Tipe Langganan</option>
+                                @foreach ($subscriptionTypes as $value => $label)
+                                    <option value="{{ $value }}"
+                                        @selected(old('subscription_type', $academy->subscription_type) === $value)>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            @error('subscription_type')
+                                <span class="form-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Biaya Langganan --}}
+                        <div class="form-group">
+                            <label for="subscription_fee" class="form-label">
+                                Biaya Langganan (Rp) <span class="text-error-500">*</span>
+                            </label>
+
+                            <input type="number" id="subscription_fee" name="subscription_fee"
+                                value="{{ old('subscription_fee', $academy->subscription_fee) }}" min="0" step="0.01"
+                                class="form-input @error('subscription_fee') form-danger @enderror" required>
+
+                            @error('subscription_fee')
+                                <span class="form-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- Mulai & Berakhir --}}
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                            <div class="form-group">
+                                <label for="subscription_started_at" class="form-label">
+                                    Mulai Langganan <span class="text-error-500">*</span>
+                                </label>
+
+                                <input type="date" id="subscription_started_at" name="subscription_started_at"
+                                    value="{{ old('subscription_started_at', $academy->subscription_started_at?->format('Y-m-d')) }}"
+                                    class="form-input @error('subscription_started_at') form-danger @enderror" required>
+
+                                @error('subscription_started_at')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subscription_ends_at" class="form-label">
+                                    Berakhir Langganan <span class="text-error-500">*</span>
+                                </label>
+
+                                <input type="date" id="subscription_ends_at" name="subscription_ends_at"
+                                    value="{{ old('subscription_ends_at', $academy->subscription_ends_at?->format('Y-m-d')) }}"
+                                    class="form-input @error('subscription_ends_at') form-danger @enderror" required>
+
+                                @error('subscription_ends_at')
+                                    <span class="form-error">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
                 {{-- Right Column --}}

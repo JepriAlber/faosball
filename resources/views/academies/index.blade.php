@@ -20,18 +20,27 @@
                     sepak bola.</p>
             </div>
             <div class="card-actions">
-                <a href="{{ route('academies.create') }}" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                    Tambah Academy
-                </a>
+                @can('academy.create')
+                    <a href="{{ route('academies.create') }}" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        Tambah Academy
+                    </a>
+                @endcan
             </div>
         </div>
 
         @php
             $hasActiveFilters = !empty($filters);
+
+            $subscriptionBadges = [
+                'aktif' => ['label' => 'Aktif', 'class' => 'badge-success'],
+                'akan_berakhir' => ['label' => 'Akan Berakhir', 'class' => 'badge-warning'],
+                'kadaluarsa' => ['label' => 'Kadaluarsa', 'class' => 'badge-danger'],
+                'belum_diatur' => ['label' => 'Belum Diatur', 'class' => 'badge-secondary'],
+            ];
         @endphp
 
         <div class="border-b border-gray-100 p-4 dark:border-gray-800">
@@ -64,6 +73,7 @@
                         <th class="table-header-cell">Info Academy </th>
                         <th class="table-header-cell">Kontak</th>
                         <th class="table-header-cell">Tagline</th>
+                        <th class="table-header-cell">Langganan</th>
                         <th class="table-header-cell">Status</th>
                         <th class="table-header-cell text-center"> Aksi</th>
                     </tr>
@@ -101,6 +111,18 @@
                                 <span class="table-description">"{{ $academy->tagline }}"</span>
                             </td>
                             <td class="table-cell">
+                                @if ($academy->subscription_type)
+                                    <span class="table-text">{{ $subscriptionTypes[$academy->subscription_type] }}</span>
+                                    <span class="table-subtitle">
+                                        Rp {{ number_format($academy->subscription_fee, 0, ',', '.') }}
+                                    </span>
+                                    @php $badge = $subscriptionBadges[$academy->subscription_status] @endphp
+                                    <span class="badge {{ $badge['class'] }} badge-sm mt-1">{{ $badge['label'] }}</span>
+                                @else
+                                    <span class="badge badge-secondary badge-sm">Belum Diatur</span>
+                                @endif
+                            </td>
+                            <td class="table-cell">
                                 @if ($academy->status)
                                     <span class="badge badge-success">
                                         Aktif
@@ -113,36 +135,60 @@
                             </td>
                             <td class="table-cell text-right">
                                 <div class="table-action">
-                                    <a href="{{ route('academies.show', $academy->id_academy) }}"
-                                        class="btn-icon btn-icon-primary" title="Detail">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                            <path
-                                                d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                    </a>
-                                    <a href="{{ route('academies.edit', $academy->id_academy) }}"
-                                        class="btn-icon btn-icon-warning" title="Edit">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                    </a>
-                                    <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
+                                    @can('academy.view')
+                                        <a href="{{ route('academies.show', $academy->id_academy) }}"
+                                            class="btn-icon btn-icon-primary" title="Detail">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path
+                                                    d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
+                                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </a>
+                                    @endcan
+                                    @can('academy.update')
+                                        <a href="{{ route('academies.edit', $academy->id_academy) }}"
+                                            class="btn-icon btn-icon-warning" title="Edit">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
+                                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </a>
+                                    @endcan
+
+                                    {{-- Create Account --}}
+                                    @can('academy.update')
+                                        @if (!$academy->id_owner_user)
+                                            <a href="{{ route('academies.account.create', $academy->id_academy) }}"
+                                                class="btn-icon btn-icon-success" title="Buat Akun Owner">
+                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <path
+                                                        d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                                        stroke="currentColor" stroke-width="1.5" />
+                                                    <path
+                                                        d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                                        stroke="currentColor" stroke-width="1.5" />
+                                                </svg>
+                                            </a>
+                                        @endif
+                                    @endcan
+
+                                    @can('academy.delete')
+                                        <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="table-empty">
+                            <td colspan="6" class="table-empty">
                                 <div class="empty-state">
                                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" class="text-gray-300 dark:text-gray-700 mb-3">
@@ -214,32 +260,70 @@
                             <span class="table-card-label">Tagline</span>
                             <span class="table-description">"{{ $academy->tagline }}"</span>
                         </div>
+
+                        <div class="table-card-field">
+                            <span class="table-card-label">Langganan</span>
+                            @if ($academy->subscription_type)
+                                <span class="table-text">{{ $subscriptionTypes[$academy->subscription_type] }}</span>
+                                <span class="table-subtitle">
+                                    Rp {{ number_format($academy->subscription_fee, 0, ',', '.') }}
+                                </span>
+                                @php $badge = $subscriptionBadges[$academy->subscription_status] @endphp
+                                <span class="badge {{ $badge['class'] }} badge-sm mt-1">{{ $badge['label'] }}</span>
+                            @else
+                                <span class="badge badge-secondary badge-sm">Belum Diatur</span>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="table-card-actions">
-                        <a href="{{ route('academies.show', $academy->id_academy) }}"
-                            class="btn-icon btn-icon-primary" title="Detail">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
-                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path
-                                    d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
-                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </a>
-                        <a href="{{ route('academies.edit', $academy->id_academy) }}"
-                            class="btn-icon btn-icon-warning" title="Edit">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
-                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </a>
-                        <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
+                        @can('academy.view')
+                            <a href="{{ route('academies.show', $academy->id_academy) }}"
+                                class="btn-icon btn-icon-primary" title="Detail">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                    <path
+                                        d="M2.5 10C4.375 5.625 7.5 3.75 10 3.75C12.5 3.75 15.625 5.625 17.5 10C15.625 14.375 12.5 16.25 10 16.25C7.5 16.25 4.375 14.375 2.5 10Z"
+                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </a>
+                        @endcan
+                        @can('academy.update')
+                            <a href="{{ route('academies.edit', $academy->id_academy) }}"
+                                class="btn-icon btn-icon-warning" title="Edit">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </a>
+                        @endcan
+
+                        {{-- Create Account --}}
+                        @can('academy.update')
+                            @if (!$academy->id_owner_user)
+                                <a href="{{ route('academies.account.create', $academy->id_academy) }}"
+                                    class="btn-icon btn-icon-success" title="Buat Akun Owner">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path
+                                            d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
+                                            stroke="currentColor" stroke-width="1.5" />
+                                        <path
+                                            d="M3.75 17.5C3.75 14.7386 6.54822 12.5 10 12.5C13.4518 12.5 16.25 14.7386 16.25 17.5"
+                                            stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                </a>
+                            @endif
+                        @endcan
+
+                        @can('academy.delete')
+                            <x-button.delete :action="route('academies.destroy', $academy->id_academy)" :name="$academy->name" />
+                        @endcan
                     </div>
                 </div>
             @empty

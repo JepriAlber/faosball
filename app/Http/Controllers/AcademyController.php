@@ -35,6 +35,7 @@ class AcademyController extends Controller
             'academies' => $this->academyManagementService->paginate($filters),
             'statusCounts' => $this->academyManagementService->statusCounts($filters),
             'filters' => $filters,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 
@@ -54,7 +55,8 @@ class AcademyController extends Controller
                 [
                     'label'=>'Tambah Academy'
                 ]
-            ]
+            ],
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 
@@ -88,6 +90,8 @@ class AcademyController extends Controller
      */
     public function show(Academy $academy)
     {
+        $academy->load('owner');
+
         return view('academies.show',[
             'title'=>'Detail Academy',
             'breadcrumb'=>[
@@ -99,7 +103,9 @@ class AcademyController extends Controller
                     'label'=>'Detail Academy'
                 ]
             ],
-            'academy'=>$academy
+            'academy'=>$academy,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
+            'subscriptionStatus' => $this->academyManagementService->subscriptionStatus($academy),
         ]);
     }
 
@@ -120,7 +126,8 @@ class AcademyController extends Controller
                     'label'=>'Edit Academy'
                 ]
             ],
-            'academy'=>$academy
+            'academy'=>$academy,
+            'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
         ]);
     }
 

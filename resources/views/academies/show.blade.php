@@ -40,6 +40,10 @@
                     </svg>
                     Ubah Profile
                 </a>
+
+                <x-account.dropdown :model="$academy" :user="$academy->owner" route-create="academies.account.create"
+                    route-edit="academies.account.edit" route-password="academies.account.password"
+                    route-status="academies.account.status" />
             </div>
         </div>
 
@@ -122,6 +126,62 @@
                     </div>
 
                 </div>
+
+                <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
+
+                    <h4 class="section-title border-b border-gray-100 pb-3 dark:border-gray-800">
+                        Informasi Langganan
+                    </h4>
+
+                    <div class="mt-4 space-y-4">
+
+                        <div>
+                            <span class="block text-xs text-gray-400 mb-1">Status</span>
+
+                            @php
+                                $subscriptionBadges = [
+                                    'aktif' => ['label' => 'Aktif', 'class' => 'badge-success'],
+                                    'akan_berakhir' => ['label' => 'Akan Berakhir', 'class' => 'badge-warning'],
+                                    'kadaluarsa' => ['label' => 'Kadaluarsa', 'class' => 'badge-danger'],
+                                    'belum_diatur' => ['label' => 'Belum Diatur', 'class' => 'badge-secondary'],
+                                ];
+                                $badge = $subscriptionBadges[$subscriptionStatus];
+                            @endphp
+
+                            <span class="badge {{ $badge['class'] }}">{{ $badge['label'] }}</span>
+                        </div>
+
+                        <div>
+                            <span class="block text-xs text-gray-400 mb-1">Tipe Langganan</span>
+                            <span class="table-text">
+                                {{ $academy->subscription_type ? $subscriptionTypes[$academy->subscription_type] : '-' }}
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="block text-xs text-gray-400 mb-1">Biaya Langganan</span>
+                            <span class="table-text">
+                                {{ $academy->subscription_fee ? 'Rp ' . number_format($academy->subscription_fee, 0, ',', '.') : '-' }}
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="block text-xs text-gray-400 mb-1">Periode</span>
+                            <span class="table-text">
+                                @if ($academy->subscription_started_at && $academy->subscription_ends_at)
+                                    {{ $academy->subscription_started_at->format('d M Y') }}
+                                    &mdash;
+                                    {{ $academy->subscription_ends_at->format('d M Y') }}
+                                @else
+                                    -
+                                @endif
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title">

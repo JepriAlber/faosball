@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
+use App\Http\Controllers\AcademyProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
 use App\Http\Controllers\PlayerCategoryController;
@@ -43,11 +45,53 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | Academy Management
     |--------------------------------------------------------------------------
+    | academy.* SENGAJA tidak ada di config('faos.role_templates') manapun,
+    | termasuk Owner -- modul ini Super-Admin-only. Lihat issue.md Bagian 4.4.
     */
-    Route::resource(
-        'academies',
-        AcademyController::class
-    );
+    Route::resource('academies', AcademyController::class)
+        ->middlewareFor(['index', 'show'], 'permission:academy.view')
+        ->middlewareFor(['create', 'store'], 'permission:academy.create')
+        ->middlewareFor(['edit', 'update'], 'permission:academy.update')
+        ->middlewareFor('destroy', 'permission:academy.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Academy Owner Account Management
+    |--------------------------------------------------------------------------
+    | Sub-resource dari academies.* -- SENGAJA pakai permission academy.update
+    | (bukan user.* seperti Player Account), karena Academy Management memang
+    | tidak pernah didelegasikan ke role manapun selain Super Admin. Lihat
+    | issue2.md Bagian 2d.
+    */
+    Route::prefix('academies/{academy}/account')
+        ->name('academies.account.')
+        ->middleware('permission:academy.update')
+        ->group(function () {
+
+            Route::get('/create', [AcademyAccountController::class, 'create'])->name('create');
+            Route::post('/', [AcademyAccountController::class, 'store'])->name('store');
+
+            Route::get('/edit', [AcademyAccountController::class, 'edit'])->name('edit');
+            Route::put('/', [AcademyAccountController::class, 'update'])->name('update');
+            Route::patch('/status', [AcademyAccountController::class, 'status'])->name('status');
+            Route::patch('/password', [AcademyAccountController::class, 'password'])->name('password');
+
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Academy Profile (Self-Service, Owner)
+    |--------------------------------------------------------------------------
+    | Singleton -- TANPA {id}, selalu beroperasi pada academy milik user yang
+    | login. BEDA TOTAL dari academies.* (CRUD lintas academy, Super Admin).
+    */
+    Route::prefix('academy-profile')
+        ->name('academy.profile.')
+        ->middleware('permission:academy_profile.update')
+        ->group(function () {
+            Route::get('/', [AcademyProfileController::class, 'edit'])->name('edit');
+            Route::patch('/', [AcademyProfileController::class, 'update'])->name('update');
+        });
 
     /*
     |--------------------------------------------------------------------------

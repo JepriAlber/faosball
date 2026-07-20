@@ -38,8 +38,8 @@
                 karena logo sidebar sudah tidak tampil di mobile.
             --}}
             <a href="{{ route('dashboard') }}" class="lg:hidden">
-                <img class="dark:hidden" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
-                <img class="hidden dark:block" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
+                <x-academy-logo variant="sidebar" class="dark:hidden" />
+                <x-academy-logo variant="sidebar" class="hidden dark:block" />
             </a>
 
             <!-- Tombol ... (mobile) -->
@@ -151,7 +151,7 @@
             <div class="relative" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false">
                 <a class="header-user-trigger" href="#" @click.prevent="dropdownOpen = !dropdownOpen">
                     <span class="header-avatar">
-                        <img src="{{ asset('assets/images/logo/kantinit-favicon.png') }}" alt="User" />
+                        <x-academy-logo variant="favicon" alt="User" />
                     </span>
                     <span class="text-theme-sm mr-1 block font-medium">
                         {{ auth()->user()->name ?? 'Admin' }}

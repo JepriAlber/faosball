@@ -39,7 +39,10 @@ class RolePermissionSeeder extends Seeder
             'academy.create',
             'academy.update',
             'academy.delete',
- 
+
+            // Academy Profile (self-service Owner -- BEDA dari academy.* di atas)
+            'academy_profile.update',
+
             // Role
             'role.view',
             'role.create',

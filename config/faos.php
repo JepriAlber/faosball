@@ -37,6 +37,7 @@ return [
     'role_templates' => [
 
         'Owner' => [
+            'academy_profile.update',
             'player.view', 'player.create', 'player.update', 'player.delete',
             'player_type.view', 'player_type.create', 'player_type.update', 'player_type.delete',
             'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',

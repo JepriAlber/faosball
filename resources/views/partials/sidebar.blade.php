@@ -8,13 +8,12 @@
         karena header sudah memiliki logo sendiri.
       --}}
             <span class="logo hidden lg:block" :class="sidebarToggle ? 'lg:hidden' : ''">
-                <img class="dark:hidden" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
-                <img class="hidden dark:block" src="{{ asset('assets/images/logo/KantinITSvg.svg') }}" alt="Logo" />
+                <x-academy-logo variant="sidebar" class="dark:hidden" />
+                <x-academy-logo variant="sidebar" class="hidden dark:block" />
             </span>
 
             {{-- Logo ikon kecil: hanya tampil di desktop saat sidebar collapsed --}}
-            <img class="logo-icon" :class="sidebarToggle ? 'lg:block' : 'hidden'"
-                src="{{ asset('assets/images/logo/kantinit-favicon.png') }}" alt="Logo" />
+            <x-academy-logo variant="favicon" class="logo-icon" ::class="sidebarToggle ? 'lg:block' : 'hidden'" />
         </a>
     </div>
     <!-- SIDEBAR HEADER -->
@@ -233,6 +232,39 @@
                     </li>
                     <!-- ===== END: Profile ===== -->
 
+
+                    {{-- ===== Menu Item: Profil Academy (tanpa dropdown) ===== --}}
+                    {{--
+                        Digabung dengan !isSuperAdmin() karena Gate::before() (lihat
+                        AppServiceProvider) meloloskan Super Admin dari SELURUH
+                        permission check, termasuk @can di sini -- padahal modul ini
+                        tidak relevan untuk Super Admin (sudah ada modul Academy
+                        Management untuk kelola academy lintas tenant).
+                    --}}
+                    @can('academy_profile.update')
+                        @if (! app(\App\Services\AcademyService::class)->isSuperAdmin())
+                        @php
+                            $isAcademyProfileActive = Route::is('academy.profile.*');
+                        @endphp
+
+                        <li>
+                            <a href="{{ route('academy.profile.edit') }}"
+                                class="menu-item group {{ $isAcademyProfileActive ? 'menu-item-active' : 'menu-item-inactive' }}">
+                                <svg class="{{ $isAcademyProfileActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
+                                    width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 21V8L12 3L20 8V21H14V14H10V21H4Z" stroke="currentColor"
+                                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                    Profil Academy
+                                </span>
+                            </a>
+                        </li>
+                        @endif
+                    @endcan
+                    <!-- ===== END: Profil Academy ===== -->
 
 
                     {{-- ===== Administration ===== --}}
