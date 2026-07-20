@@ -29,7 +29,7 @@
 }
 
 @utility sidebar-header {
-    @apply flex items-center gap-2 pt-8 pb-7;
+    @apply flex items-center gap-2 pt-5 pb-4;
 }
 
 @utility sidebar-footer {

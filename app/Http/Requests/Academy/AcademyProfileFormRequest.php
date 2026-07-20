@@ -21,6 +21,7 @@ class AcademyProfileFormRequest extends FormRequest
             'address' => ['required', 'string'],
             'description' => ['nullable', 'string'],
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:2048'],
+            'primary_color' => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
         ];
     }
 
@@ -41,6 +42,9 @@ class AcademyProfileFormRequest extends FormRequest
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Format gambar logo harus berupa: jpeg, png, jpg, webp, atau svg.',
             'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
+
+            'primary_color.required' => 'Warna utama wajib dipilih.',
+            'primary_color.regex' => 'Format warna tidak valid.',
         ];
     }
 }

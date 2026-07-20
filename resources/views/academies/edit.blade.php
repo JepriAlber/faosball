@@ -19,6 +19,10 @@
                 <a href="{{ route('academies.index') }}" class="btn btn-secondary">
                     Kembali
                 </a>
+
+                <x-account.dropdown :model="$academy" :user="$academy->owner" route-create="academies.account.create"
+                    route-edit="academies.account.edit" route-password="academies.account.password"
+                    route-status="academies.account.status" />
             </div>
 
         </div>
@@ -50,6 +54,22 @@
 
                     </div>
 
+                    {{-- Code --}}
+                    <div class="form-group">
+
+                        <label for="code" class="form-label">
+                            Kode Academy <span class="text-error-500">*</span>
+                        </label>
+
+                        <input type="text" id="code" name="code" value="{{ old('code', $academy->code) }}"
+                            placeholder="Contoh: FAOS" class="form-input @error('code') form-danger @enderror" required>
+
+                        @error('code')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
+
+                    </div>
+
                     {{-- Tagline --}}
                     <div class="form-group">
 
@@ -65,21 +85,6 @@
                             <span class="form-error">{{ $message }}</span>
                         @enderror
 
-                    </div>
-
-                    {{-- code --}}
-
-                    <div>
-                        <label class="form-label">
-                            Kode Academy <span class="text-error-500">*</span>
-                        </label>
-
-                        <input type="text" name="code" value="{{ old('code', $academy->code) }}"
-                            class="form-input  @error('code') form-danger @enderror" required placeholder="Contoh: FAOS">
-
-                        @error('code')
-                            <span class="form-error"> {{ $message }} </span>
-                        @enderror
                     </div>
 
                     {{-- Phone --}}
@@ -226,65 +231,25 @@
                 <div>
 
                     {{-- Logo --}}
-                    <div class="form-group" x-data="{ imagePreview: '{{ $academy->logo ? asset('storage/' . $academy->logo) : '' }}' }">
+                    <x-logo-upload-field :current-logo-url="$academy->logo ? asset('storage/' . $academy->logo) : null" />
 
-                        <label class="form-label">
-                            Logo Academy
+                    {{-- Warna Utama --}}
+                    <div class="form-group">
+
+                        <label for="primary_color" class="form-label">
+                            Warna Utama Sistem <span class="text-error-500">*</span>
                         </label>
 
-                        <div class="form-file-upload">
+                        <input type="color" id="primary_color" name="primary_color"
+                            value="{{ old('primary_color', $academy->primary_color ?? '#465fff') }}"
+                            class="form-input h-11 w-20 cursor-pointer p-1 @error('primary_color') form-danger @enderror"
+                            required>
 
-                            <input type="file" id="logo" name="logo"
-                                class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" accept="image/*"
-                                @change="
-                                const file=$event.target.files[0];
-                                if(file){
-                                    const reader=new FileReader();
-                                    reader.onload=(e)=>imagePreview=e.target.result;
-                                    reader.readAsDataURL(file);
-                                }
-                            ">
+                        <p class="mt-1 text-xs text-gray-400">
+                            Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.
+                        </p>
 
-                            {{-- Empty State --}}
-                            <div x-show="!imagePreview" class="empty-state">
-
-                                <span class="avatar avatar-lg mb-3">
-
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path
-                                            d="M12 16V8M8 12L12 8L16 12M3 15V18C3 18.5 3.2 19 3.6 19.4C4 19.8 4.5 20 5 20H19C19.5 20 20 19.8 20.4 19.4C20.8 19 21 18.5 21 18V15"
-                                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-
-                                </span>
-
-                                <p class="empty-title">
-                                    Klik untuk unggah logo
-                                </p>
-
-                                <p class="empty-description">
-                                    SVG, PNG, JPG, WEBP maksimal 2MB
-                                </p>
-
-                            </div>
-
-                            {{-- Preview --}}
-                            <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
-
-                                <div class="avatar avatar-xl avatar-square mb-3">
-                                    <img :src="imagePreview" class="h-full w-full object-cover">
-                                </div>
-
-                                <span class="link-primary text-xs font-semibold">
-                                    Ganti gambar
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        @error('logo')
+                        @error('primary_color')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
 
@@ -342,5 +307,8 @@
         </form>
 
     </div>
+
+    <x-modal.reset-password />
+    <x-modal.status />
 
 @endsection

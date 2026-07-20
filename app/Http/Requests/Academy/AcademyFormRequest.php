@@ -98,6 +98,12 @@ class AcademyFormRequest extends FormRequest
                 'max:2048'
             ],
 
+            'primary_color' => [
+                'required',
+                'string',
+                'regex:/^#[0-9a-fA-F]{6}$/',
+            ],
+
             'description' => [
                 'nullable',
                 'string'
@@ -163,6 +169,10 @@ class AcademyFormRequest extends FormRequest
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Format gambar logo harus berupa: jpeg, png, jpg, webp, atau svg.',
             'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
+
+            'primary_color.required' => 'Warna utama wajib dipilih.',
+            'primary_color.regex' => 'Format warna tidak valid.',
+
             'code.required'=>'Kode academy wajib diisi.',
             'code.max'=>'Kode academy maksimal 10 karakter.',
             'code.alpha_dash'=>'Kode academy hanya boleh berisi huruf, angka, dan tanda strip.',

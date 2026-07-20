@@ -64,6 +64,10 @@
                     </label>
 
                     <input type="password" name="password_confirmation" class="form-input">
+
+                    @error('password_confirmation')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3 border-t pt-5">

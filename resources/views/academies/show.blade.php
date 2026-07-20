@@ -49,7 +49,7 @@
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-            <div class="space-y-6 lg:col-span-2">
+            <div class="order-2 space-y-6 lg:order-0 lg:col-span-2">
 
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
                     <h4 class="section-title">Deskripsi Academy</h4>
@@ -67,7 +67,7 @@
 
             </div>
 
-            <div class="space-y-6">
+            <div class="order-1 space-y-6 lg:order-0">
 
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
@@ -213,5 +213,8 @@
         </div>
 
     </div>
+
+    <x-modal.reset-password />
+    <x-modal.status />
 
 @endsection

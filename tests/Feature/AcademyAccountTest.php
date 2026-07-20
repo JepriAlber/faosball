@@ -57,6 +57,7 @@ class AcademyAccountTest extends TestCase
             'subscription_fee' => 100000,
             'subscription_started_at' => now()->toDateString(),
             'subscription_ends_at' => now()->addMonth()->toDateString(),
+            'primary_color' => '#465fff',
         ], $overrides);
     }
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Academy;
+use App\Support\ColorRamp;
 
 
 class AcademyService
@@ -71,6 +72,35 @@ class AcademyService
         }
 
         return asset('assets/images/logo/kantinit-favicon.png');
+    }
+
+
+    /**
+     * Ramp 12 shade warna brand untuk academy AKTIF, siap dipakai sebagai
+     * override CSS custom property. Return null kalau tidak perlu override
+     * apa pun -- browser tetap pakai default biru dari variables.css:
+     * - Super Admin (tidak ada academy aktif)
+     * - Academy belum pernah set primary_color (kolom NULL)
+     * - primary_color di database ternyata bukan format hex valid (data
+     *   korup/lama) -- divalidasi ULANG di sini, bukan percaya kolom DB
+     *   begitu saja walau sudah divalidasi Form Request saat disimpan.
+     *   Lihat issue6.md Bagian 4.1.
+     *
+     * @return array<string,string>|null
+     */
+    public function brandColorVariables(): ?array
+    {
+        $academy = $this->current();
+
+        if (!$academy || !$academy->primary_color) {
+            return null;
+        }
+
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $academy->primary_color)) {
+            return null;
+        }
+
+        return ColorRamp::generate($academy->primary_color);
     }
 
 }

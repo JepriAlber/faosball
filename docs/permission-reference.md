@@ -186,7 +186,7 @@ Status: **✅ Implemented**.
 
 | Permission | Untuk apa | Digerbang di |
 |---|---|---|
-| `academy_profile.update` | Owner melihat & mengubah profil UMUM academy miliknya sendiri (nama, tagline, kontak, alamat, deskripsi, logo) | `academy.profile.edit`, `academy.profile.update` (route middleware) + menu sidebar |
+| `academy_profile.update` | Owner melihat & mengubah profil UMUM academy miliknya sendiri (nama, tagline, kontak, alamat, deskripsi, logo, warna utama) | `academy.profile.edit`, `academy.profile.update` (route middleware) + menu sidebar |
 
 Catatan:
 

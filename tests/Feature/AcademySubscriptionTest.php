@@ -126,4 +126,27 @@ class AcademySubscriptionTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_halaman_create_academy_render_tanpa_error(): void
+    {
+        Permission::firstOrCreate(['name' => 'academy.create', 'guard_name' => 'web']);
+        $superAdmin = $this->makeSuperAdmin();
+
+        $response = $this->actingAs($superAdmin)->get(route('academies.create'));
+
+        $response->assertOk();
+        $response->assertSee('Logo Academy');
+    }
+
+    public function test_halaman_edit_academy_render_tanpa_error(): void
+    {
+        Permission::firstOrCreate(['name' => 'academy.update', 'guard_name' => 'web']);
+        $superAdmin = $this->makeSuperAdmin();
+        $academy = Academy::factory()->create();
+
+        $response = $this->actingAs($superAdmin)->get(route('academies.edit', $academy));
+
+        $response->assertOk();
+        $response->assertSee('Logo Academy');
+    }
 }

@@ -1,6 +1,6 @@
 <aside :class="sidebarToggle ? 'sidebar-collapsed' : 'sidebar-expanded'" class="sidebar">
     <!-- SIDEBAR HEADER -->
-    <div :class="sidebarToggle ? 'lg:justify-center' : 'justify-start'" class="sidebar-header">
+    <div class="sidebar-header justify-center">
         <a href="{{ route('dashboard') }}">
             {{--
         Logo teks: HANYA tampil di desktop (lg ke atas).

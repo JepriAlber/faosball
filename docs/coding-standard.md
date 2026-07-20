@@ -17,6 +17,7 @@ Seluruh module wajib mengikuti standar ini agar struktur kode tetap konsisten, m
 - [Route Naming](#route-naming)
 - [View Structure](#view-structure)
 - [Service Structure](#service-structure)
+- [Support Structure](#support-structure)
 - [Request Structure](#request-structure)
 - [Controller Standard](#controller-standard)
 - [Service Standard](#service-standard)
@@ -160,6 +161,25 @@ app/Services
 ```
 
 Satu Service hanya menangani satu domain.
+
+---
+
+## Support Structure
+
+Class murni yang **tidak** bergantung Laravel (tidak ada Model/Eloquent/Facade/DB, tidak butuh boot framework untuk di-test) ditempatkan di:
+
+```text
+app/Support
+```
+
+Contoh:
+
+```text
+app/Support
+└── ColorRamp.php
+```
+
+Bedanya dengan `app/Services`: Service selalu mengandung *business logic* domain FAOSBall (butuh Model/DB/Auth, hanya masuk akal dites lewat `RefreshDatabase`/HTTP). Class di `app/Support` adalah fungsi/algoritma generik (mis. transformasi warna, format angka) yang tidak tahu apa-apa soal Academy/Player/dst — bisa di-unit-test dengan `PHPUnit\Framework\TestCase` biasa (`tests/Unit`), tanpa `RefreshDatabase`.
 
 ---
 

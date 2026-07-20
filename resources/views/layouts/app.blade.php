@@ -22,6 +22,9 @@
     {{-- Vite: CSS & JS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Override warna brand per academy aktif (kalau primary_color sudah diset) --}}
+    <x-academy-theme />
+
     {{-- Stack untuk CSS tambahan per-halaman --}}
     @stack('styles')
 </head>

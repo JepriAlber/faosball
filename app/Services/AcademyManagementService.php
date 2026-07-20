@@ -24,6 +24,7 @@ class AcademyManagementService
     public const SUBSCRIPTION_TYPES = [
         'monthly' => 'Bulanan',
         'yearly' => 'Tahunan',
+        'one_season' => 'Satu Musim',
     ];
 
     /**
@@ -332,6 +333,7 @@ class AcademyManagementService
                 'email' => $data['email'],
                 'address' => $data['address'],
                 'description' => $data['description'] ?? null,
+                'primary_color' => $data['primary_color'],
             ];
 
             if (isset($data['logo'])) {

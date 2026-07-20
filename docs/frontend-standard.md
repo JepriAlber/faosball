@@ -15,7 +15,9 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Konsistensi Warna & Token](#konsistensi-warna--token)
 - [Tabel Responsif: Table Desktop + Card List Mobile/Tablet](#tabel-responsif-table-desktop--card-list-mobiletablet)
 - [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)
+- [Urutan & Pengelompokan Field Form (Create/Edit)](#urutan--pengelompokan-field-form-createedit)
 - [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
+- [Theming Per-Academy (CSS Custom Property Override)](#theming-per-academy-css-custom-property-override)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -176,11 +178,70 @@ Tabs status masuk akal untuk module yang punya kolom status/state dengan sedikit
 
 ---
 
+## Urutan & Pengelompokan Field Form (Create/Edit)
+
+### Masalah
+
+Form create/edit di FAOSBall ditulis tanpa urutan atau pengelompokan field yang konsisten — tiap module punya urutannya sendiri, kadang bahkan tidak konsisten antara create dan edit di module yang sama. Beberapa contoh nyata yang sudah terjadi:
+
+- **`academies/create.blade.php` & `academies/edit.blade.php`**: field `Kode Academy` diselipkan di antara `Tagline` dan `Nomor Telepon`, padahal `Kode` secara logis adalah identitas record (sejenis dengan `Nama`), bukan atribut deskriptif. Tidak ada pemisah visual apa pun antar kelompok field.
+- **`players/create.blade.php` vs `players/edit.blade.php`**: field `Posisi Utama`/`Posisi Kedua` ada di **kolom kiri** pada form create, tapi pindah ke **kolom kanan** pada form edit — dua tampilan dari entity yang sama, urutan berbeda. Ini bikin user yang sudah familiar dengan create harus mencari ulang letak field yang sama di edit.
+- **Duplikasi markup upload**: komponen `<x-logo-upload-field>` sudah ada dan dipakai dengan benar oleh `academies/create`, `academies/edit`, `academy-profile/edit` — tapi `players/create` dan `players/edit` masing-masing hand-roll ulang markup upload foto yang hampir identik (termasuk SVG icon dan logic Alpine-nya), bukan reuse komponen yang sudah ada.
+- **Asterisk & pesan error tidak konsisten**: field yang jadi wajib secara kondisional (misal `Email`/`Password` saat toggle "Buat Akun" aktif) tidak diberi tanda `*`, dan field konfirmasi password (`players/account/create`, `academies/account/create`) tidak punya slot `@error` sama sekali walau field password utamanya punya.
+- **Tombol submit tidak seragam**: sebagian besar form create pakai `Reset` + submit, sebagian besar edit pakai `Batal` (link) + submit — tapi `academy-profile/edit` dan form Breeze (`profile/edit`) cuma punya satu tombol submit tanpa `Reset`/`Batal` sama sekali.
+
+Akibatnya form terasa berantakan — field yang berhubungan (nama & kode, posisi & tipe/kategori) terpisah jauh, dan pengalaman create vs edit tidak konsisten.
+
+### Solusi: Taksonomi Urutan Field
+
+Field pada form create/edit **wajib** dikelompokkan dan diurutkan berdasarkan kategori berikut, top-to-bottom (atau kiri-ke-kanan kalau dipecah dua kolom — lihat [Pembagian Kolom](#pembagian-kolom) di bawah). Field dalam satu kategori harus berdekatan, tidak boleh disisipi field dari kategori lain:
+
+1. **Konteks/Scope** — field yang menentukan cakupan record, misal select Academy untuk Super Admin. Selalu paling atas, karena field lain di bawahnya secara implisit bergantung pada scope ini.
+2. **Identitas Utama** — `Nama`, `Kode`/`Slug`, dan field lain yang jadi "penanda" record. Kalau ada field kode/slug yang berasal dari nama, **taruh langsung bersebelahan dengan Nama**, jangan dipisah field lain (lihat contoh kasus `Kode Academy` di atas).
+3. **Klasifikasi/Relasi Wajib** — select/dropdown yang menentukan "jenis" record (`Type`, `Kategori`, `Posisi`, dst). Field-field ini saling terkait secara semantik (biasanya membentuk funnel: pilih tipe → pilih kategori → pilih posisi) dan harus berkelompok, tidak boleh dipisah field bio/kontak.
+4. **Informasi Kontak** — `Telepon`, `Email`, `Alamat`.
+5. **Atribut Deskriptif/Opsional** — `Tagline`, `Deskripsi`, `Catatan`, dan atribut sekunder lain (`Nationality`, `Kaki Dominan`, dst) yang tidak menentukan identitas maupun klasifikasi record.
+6. **Media/Upload** — logo/foto. Kalau perlu upload dengan preview/crop, **pakai `<x-logo-upload-field>` yang sudah ada**, jangan hand-roll markup baru (lihat [Reusable View](#reusable-view-dengan-data-dinamis) untuk alasan yang sama soal duplikasi).
+7. **Status/Toggle aktif-nonaktif** — selalu diletakkan di posisi yang sama tiap module (langsung sebelum kategori 8 atau tombol submit), jangan diselipkan di tengah-tengah field lain.
+8. **Section Terpisah** — kelompok field yang merepresentasikan sub-entitas/concern yang benar-benar berbeda dari record utama (info langganan, matrix permission, kredensial akun baru). Selalu paling bawah, sebelum tombol submit — lihat aturan pembungkusan di bawah.
+
+**Wajib konsisten antara create dan edit di module yang sama** — urutan kategori, isi tiap kolom, dan penempatan tiap field harus identik (kecuali field yang secara fungsional memang hanya ada di salah satu, misal toggle "Buat Akun" cuma relevan di create).
+
+### Pembagian Kolom
+
+Kalau form dipecah dua kolom (`form-row`), pembagiannya ikut taksonomi di atas: **kolom kiri = kategori 1–4** (yang mendefinisikan "record ini record apa": scope, identitas, klasifikasi, kontak), **kolom kanan = kategori 5–8** (deskriptif, media, status, section terpisah). Field numerik pendek yang benar-benar sepasang (`Umur Minimal`+`Umur Maksimal`, `Tinggi`+`Berat`) boleh digabung jadi grid 2 kolom kecil (`form-row grid-cols-2`) **di dalam** kolom yang sesuai — tapi jangan gabungkan dua field cuma karena sama-sama pendek kalau tidak ada hubungan logis (mis. `Kode` + `Urutan` di `player-positions/create` dipasangkan hanya karena sama-sama field pendek, padahal `Kode` itu identitas dan `Urutan` itu atribut layout — ini bukan pola yang direkomendasikan, meski sudah ada).
+
+### Kapan Membungkus Field jadi Section (`rounded-xl border` + `section-title`)
+
+Bungkus sekelompok field jadi section berjudul (`<div class="rounded-xl border ..."><h4 class="section-title">...</h4>...</div>`) **hanya** kalau field-field itu representasi sub-entitas/concern yang secara konsep berbeda dari record utama — bukan sekadar 2-3 field yang related. Contoh yang sudah benar dan jadi acuan:
+
+- `academies/edit.blade.php` — "Informasi Langganan" (subscription adalah concern terpisah dari profil academy itu sendiri).
+- `roles/create.blade.php` / `roles/edit.blade.php` — "Hak Akses" (permission matrix adalah concern terpisah dari data role itu sendiri).
+
+Untuk grouping ringan (identitas, kontak, dst) **tidak perlu** dibungkus section — cukup urutan yang benar sudah menyampaikan pengelompokan. Membungkus semua kelompok jadi section akan membuat form penuh kotak bersarang dan justru menambah noise visual.
+
+### Tombol Submit: Reset vs Batal
+
+- **Form Create** pada module dengan halaman index/list → `<button type="reset">Reset</button>` + tombol submit primary. Reset masuk akal karena form masih kosong/baru diisi.
+- **Form Edit** pada module dengan halaman index/list → `<a href="...">Batal</a>` (link kembali ke index/show) + tombol submit primary. **Jangan** pakai `type="reset"` di form edit — reset akan mengembalikan ke value kosong bukan ke data lama, yang membingungkan.
+- **Form self-service tanpa halaman index** (`profile/edit`, `academy-profile/edit` — user mengedit data miliknya sendiri, tidak ada "list" untuk kembali) → submit-only dapat diterima, tidak perlu dipaksakan punya Reset/Batal.
+
+### Kelengkapan Asterisk & Slot Error
+
+- Field yang wajib **secara kondisional** (misal `Email`/`Password` yang muncul saat toggle "Buat Akun" dinyalakan) tetap wajib diberi tanda `<span class="text-error-500">*</span>`, sama seperti field yang selalu wajib — jangan dianggap opsional secara visual hanya karena validasinya bersyarat.
+- Setiap input yang divalidasi lewat Form Request wajib punya slot `@error` pendampingnya — termasuk field konfirmasi password, yang di beberapa form saat ini (`players/account/create`, `academies/account/create`) belum punya.
+
+### Kapan Pola Ini Wajib Dipakai
+
+Wajib untuk **semua form create/edit baru**, tanpa kecuali. Untuk form existing yang menyimpang dari taksonomi ini (lihat daftar di [Masalah](#masalah) di atas), jangan langsung di-refactor massal — diskusikan dulu dengan user, karena mengubah urutan field pada form yang sudah dipakai sehari-hari bisa mengejutkan tanpa pemberitahuan (lihat Aturan Utama di `CLAUDE.md`).
+
+---
+
 ## Reusable View dengan Data Dinamis
 
 Kalau sebuah partial/view perlu menampilkan data yang dihitung sendiri (query database, statistik, dsb), gunakan **class-based Blade Component** (`App\View\Components\Xxx`), bukan View Composer.
 
-Contoh yang sudah ada: `App\View\Components\Alert`, `App\View\Components\Breadcrumb`, `App\View\Components\AuthSidebar`, `App\View\Components\AcademyLogo`. Pola bakunya:
+Contoh yang sudah ada: `App\View\Components\Alert`, `App\View\Components\Breadcrumb`, `App\View\Components\AuthSidebar`, `App\View\Components\AcademyLogo`, `App\View\Components\LogoUploadField`. Pola bakunya:
 
 ```php
 class AuthSidebar extends Component
@@ -205,6 +266,18 @@ Dipakai di Blade sebagai `<x-auth-sidebar />`. View-nya taruh di `resources/view
 
 ---
 
+## Theming Per-Academy (CSS Custom Property Override)
+
+FAOSBall mendukung 1 warna utama (`primary_color`) per academy yang menggantikan token `--color-brand-*` default. Mekanismenya:
+
+1. Tailwind v4 compile utility (`bg-brand-500`, dst) selalu mengacu ke `var(--color-brand-500)`, tidak pernah membakar nilai hex langsung — jadi override cukup lewat CSS custom property, tidak perlu rebuild asset per tenant.
+2. Override dicetak lewat Blade Component (`<x-academy-theme />`, lihat `App\View\Components\AcademyTheme`) sebagai `<style>:root{...}</style>` **tanpa** `@layer` apa pun — style unlayered otomatis menang lawan Tailwind punya `@theme` (yang di-compile ke dalam `@layer theme`), terlepas dari urutan penempatan di `<head>`.
+3. Generate ramp 12 shade dari 1 warna dasar ada di `App\Support\ColorRamp` — class murni, tidak bergantung Laravel, gampang di-unit-test.
+
+**Kapan pola ini dipakai lagi**: kalau ada kebutuhan theming per-tenant lain (secondary color, dst), reuse `ColorRamp` dan pola Component yang sama — jangan bikin mekanisme baru dari nol.
+
+---
+
 ## Development Rules
 
 Gunakan:
@@ -215,6 +288,7 @@ Gunakan:
 - Class-based Blade Component untuk view yang butuh data dinamis/hitung sendiri, bukan View Composer.
 - Dual-render Table (desktop) + Card List (mobile/tablet) untuk semua halaman index/list module (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).
 - `<x-table.tabs>`/`<x-table.toolbar>` untuk search/filter/sort di halaman index/list yang datanya berpotensi banyak baris, dengan state lewat query string (GET) dan business logic filter di Service (lihat [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)).
+- Taksonomi urutan field (Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah) untuk semua form create/edit baru, konsisten antara create dan edit di module yang sama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
 
 Hindari:
 
@@ -223,9 +297,12 @@ Hindari:
 - Membuat `@utility` baru untuk toggle dinamis yang sepele (single property, dipakai sekali).
 - `View::composer()` untuk mengikat data ke partial — pakai Blade Component (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)).
 - Halaman index/list baru yang hanya mengandalkan tabel dengan scroll horizontal tanpa Card List di mobile/tablet.
+- Field form yang saling berhubungan (identitas & kode, klasifikasi & relasi) dipisah oleh field dari kategori lain, atau urutan/kolom field yang berbeda antara create dan edit di module yang sama.
+- Hand-roll ulang markup upload/komponen form yang sudah ada (`<x-logo-upload-field>`, dst) — reuse komponen yang sudah ada.
+- Membungkus setiap kelompok kecil field (2-3 field) jadi section berjudul — section hanya untuk sub-entitas/concern yang benar-benar terpisah (subscription, permission matrix, dst).
 
 ---
 
 ## Summary
 
-FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar. Untuk halaman index/list module, tabel wajib didampingi Card List responsif (`table-card-list`) supaya data tidak kepotong saat diakses lewat tablet/smartphone di lapangan (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).
+FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar. Untuk halaman index/list module, tabel wajib didampingi Card List responsif (`table-card-list`) supaya data tidak kepotong saat diakses lewat tablet/smartphone di lapangan (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)). Untuk form create/edit, field wajib diurutkan dan dikelompokkan berdasarkan taksonomi Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah, konsisten antara create dan edit di module yang sama, dengan section berjudul hanya dipakai untuk sub-entitas yang benar-benar terpisah dari record utama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).

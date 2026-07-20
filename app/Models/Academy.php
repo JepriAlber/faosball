@@ -33,6 +33,7 @@ class Academy extends Model
         'logo',
         'logo_sidebar',
         'logo_favicon',
+        'primary_color',
         'description',
     ];
 

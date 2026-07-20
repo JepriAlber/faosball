@@ -74,10 +74,12 @@ class AcademyProfileTest extends TestCase
             'phone' => '081234567890',
             'email' => 'baru@academy.com',
             'address' => 'Alamat Baru',
+            'primary_color' => '#465fff',
         ]);
 
         $response->assertRedirect(route('academy.profile.edit'));
         $this->assertSame('Nama Baru', $academy->fresh()->name);
+        $this->assertSame('#465fff', $academy->fresh()->primary_color);
     }
 
     public function test_owner_tidak_bisa_selipkan_perubahan_code_status_atau_subscription(): void
@@ -95,6 +97,7 @@ class AcademyProfileTest extends TestCase
             'phone' => $academy->phone,
             'email' => $academy->email,
             'address' => $academy->address,
+            'primary_color' => '#465fff',
             // Field terlarang, dikirim seolah request yang dikarang lewat DevTools:
             'code' => 'BARU',
             'status' => false,
