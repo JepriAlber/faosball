@@ -7,6 +7,7 @@ use App\Models\Academy;
 use App\Models\Role;
 use App\Services\AcademyService;
 use App\Services\RoleService;
+use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
@@ -22,16 +23,24 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filters = array_filter($request->only(['search', 'id_academy', 'sort']));
+
         return view('roles.index',[
             'title'=>'Role Management',
             'breadcrumb'=>[
                 ['label'=>'Administration'],
                 ['label'=>'Role Management']
             ],
-            'roles'=>$this->roleService->paginate(),
+            'roles'=>$this->roleService->paginate($filters),
+            'filters'=>$filters,
             'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
+            // Opsi dropdown filter Academy -- cuma dibutuhkan Super Admin,
+            // yang melihat role lintas seluruh academy.
+            'academies'=>$this->academyService->isSuperAdmin()
+                ? Academy::orderBy('name')->get()
+                : collect(),
         ]);
     }
 

@@ -5,12 +5,20 @@ namespace App\Services;
 use App\Models\Academy;
 use App\Models\Role;
 use App\Support\PermissionPresenter;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 
 class RoleService
 {
+    /**
+     * Value sentinel untuk filter dropdown "Role System" (id_academy NULL) --
+     * dipilih supaya tidak pernah bentrok dengan UUID id_academy asli.
+     */
+    public const SYSTEM_ROLE_FILTER = '__system__';
+
     protected AcademyService $academyService;
 
     public function __construct(AcademyService $academyService)
@@ -18,13 +26,44 @@ class RoleService
         $this->academyService = $academyService;
     }
 
-    public function paginate(?int $perPage = null)
+    /**
+     * Terapkan filter search/academy ke query.
+     *
+     * Filter id_academy cuma berguna buat Super Admin -- user academy biasa
+     * sudah dibatasi ke 1 academy lewat scopeForCurrentAcademy(), jadi
+     * filter ini tidak pernah mengubah hasil untuk mereka (aman diabaikan).
+     */
+    protected function applyFilters(Builder $query, array $filters): void
     {
-        return Role::forCurrentAcademy()
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', "%{$filters['search']}%");
+        }
+
+        if (!empty($filters['id_academy'])) {
+            if ($filters['id_academy'] === self::SYSTEM_ROLE_FILTER) {
+                $query->whereNull('roles.id_academy');
+            } else {
+                $query->where('roles.id_academy', $filters['id_academy']);
+            }
+        }
+    }
+
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = Role::forCurrentAcademy()
             ->with('academy')
-            ->withCount(['permissions', 'users'])
-            ->latest()
-            ->paginate($perPage ?? config('faos.pagination.default'));
+            ->withCount(['permissions', 'users']);
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'oldest' => $query->oldest(),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
     }
 
     public function permissionGroups(): Collection
