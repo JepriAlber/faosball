@@ -379,6 +379,15 @@
                         {{-- ===== END: Roles & Permissions ===== --}}
 
                         {{-- ===== Menu Item: Master (dengan dropdown) ===== --}}
+                        {{--
+                            Digerbang di level dropdown (bukan cuma item di dalamnya) --
+                            kalau tidak, Owner (yang lolos gate "Administrasi" lewat
+                            role.view tapi tidak punya player_position.view) akan tetap
+                            melihat dropdown "Master" yang bisa diklik tapi kosong
+                            isinya. Kalau nanti Master menampung item lain selain
+                            Posisi Pemain, ganti jadi @canany([...daftar permission...]).
+                        --}}
+                        @can('player_position.view')
                         @php
                             $masterRoutes = ['player-positions.*'];
 
@@ -445,6 +454,7 @@
                             </div>
 
                         </li>
+                        @endcan
                         {{-- ===== END: Master ===== --}}
                     @endif
                     {{-- ===== END: Administrasi ===== --}}
