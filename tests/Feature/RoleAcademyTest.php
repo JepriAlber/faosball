@@ -239,4 +239,88 @@ class RoleAcademyTest extends TestCase
         $this->assertTrue($roles->pluck('id')->contains($roleA->id));
         $this->assertTrue($roles->pluck('id')->contains($roleB->id));
     }
+
+    /**
+     * Skenario 9: Super Admin bisa filter role berdasarkan academy tertentu.
+     */
+    public function test_super_admin_bisa_filter_role_berdasarkan_academy(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        $roleA = $this->makeRole($academyA, 'Owner', []);
+        $roleB = $this->makeRole($academyB, 'Owner', []);
+
+        $superAdmin = User::factory()->create(['id_academy' => null, 'status' => true]);
+        $this->actingAs($superAdmin);
+
+        $roles = app(RoleService::class)->paginate(['id_academy' => $academyA->id_academy]);
+
+        $this->assertTrue($roles->pluck('id')->contains($roleA->id));
+        $this->assertFalse($roles->pluck('id')->contains($roleB->id));
+    }
+
+    /**
+     * Skenario 10: filter "Role System" cuma menampilkan role dengan
+     * id_academy NULL, tidak ikut role academy manapun.
+     */
+    public function test_filter_role_system_hanya_tampilkan_role_tanpa_academy(): void
+    {
+        $academy = Academy::factory()->create();
+        $roleAcademy = $this->makeRole($academy, 'Owner', []);
+
+        $roleSystem = Role::create([
+            'id_academy' => null,
+            'name' => 'Super Admin',
+            'guard_name' => 'web',
+        ]);
+
+        $superAdmin = User::factory()->create(['id_academy' => null, 'status' => true]);
+        $this->actingAs($superAdmin);
+
+        $roles = app(RoleService::class)->paginate(['id_academy' => RoleService::SYSTEM_ROLE_FILTER]);
+
+        $this->assertTrue($roles->pluck('id')->contains($roleSystem->id));
+        $this->assertFalse($roles->pluck('id')->contains($roleAcademy->id));
+    }
+
+    /**
+     * Skenario 11: search berdasarkan nama role.
+     */
+    public function test_search_role_berdasarkan_nama(): void
+    {
+        $academy = Academy::factory()->create();
+        $roleOwner = $this->makeRole($academy, 'Owner', []);
+        $roleCoach = $this->makeRole($academy, 'Coach', []);
+
+        $superAdmin = User::factory()->create(['id_academy' => null, 'status' => true]);
+        $this->actingAs($superAdmin);
+
+        $roles = app(RoleService::class)->paginate(['search' => 'Own']);
+
+        $this->assertTrue($roles->pluck('id')->contains($roleOwner->id));
+        $this->assertFalse($roles->pluck('id')->contains($roleCoach->id));
+    }
+
+    /**
+     * Skenario 12: filter id_academy diabaikan (tidak berdampak) untuk
+     * user academy biasa -- scopeForCurrentAcademy() sudah membatasinya ke
+     * academy sendiri, jadi mencoba filter academy lain tidak membocorkan
+     * role academy tersebut.
+     */
+    public function test_filter_id_academy_tidak_bisa_dipakai_user_biasa_untuk_intip_academy_lain(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        $roleA = $this->makeRole($academyA, 'Owner', []);
+        $roleB = $this->makeRole($academyB, 'Owner', []);
+
+        $userA = $this->makeUser($academyA, $roleA);
+        $this->actingAs($userA);
+
+        $roles = app(RoleService::class)->paginate(['id_academy' => $academyB->id_academy]);
+
+        $this->assertFalse($roles->pluck('id')->contains($roleB->id));
+    }
 }

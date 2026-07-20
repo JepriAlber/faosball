@@ -28,6 +28,38 @@
             @endcan
         </div>
 
+        <x-table.toolbar route="roles.index" :filters="$filters" placeholder="Cari nama role...">
+
+            <div class="form-group">
+                <label class="form-label">Urutkan</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                </select>
+            </div>
+
+            @if ($isSuperAdmin)
+                <div class="form-group">
+                    <label class="form-label">Academy</label>
+                    <select name="id_academy" class="form-select">
+                        <option value="">Semua Academy</option>
+                        <option value="{{ \App\Services\RoleService::SYSTEM_ROLE_FILTER }}"
+                            @selected(($filters['id_academy'] ?? '') === \App\Services\RoleService::SYSTEM_ROLE_FILTER)>
+                            Role System
+                        </option>
+                        @foreach ($academies as $academy)
+                            <option value="{{ $academy->id_academy }}" @selected(($filters['id_academy'] ?? '') === $academy->id_academy)>
+                                {{ $academy->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
+        </x-table.toolbar>
+
         <div class="table-wrapper">
             <table class="table">
 
@@ -232,7 +264,7 @@
 
         @if ($roles->hasPages())
             <div class="table-footer">
-                {{ $roles->links() }}
+                {{ $roles->withQueryString()->links() }}
             </div>
         @endif
 
