@@ -267,11 +267,20 @@
                     <!-- ===== END: Profil Academy ===== -->
 
 
-                    {{-- ===== Administration ===== --}}
-                    @if (app(\App\Services\AcademyService::class)->isSuperAdmin())
+                    {{-- ===== Administrasi ===== --}}
+                    {{--
+                        Beda dengan section lain: heading ini SENGAJA tidak digerbang
+                        isSuperAdmin() murni, karena Owner juga berhak melihat Roles
+                        (role.* ada di role_templates Owner, dibatasi ke academy-nya
+                        sendiri lewat Role::scopeForCurrentAcademy()) -- Academy,
+                        Permissions, dan Master TETAP Super-Admin-only karena
+                        academy.*/permission.*/player_position.* sengaja tidak pernah
+                        ada di role_templates manapun (lihat docs/permission-reference.md).
+                    --}}
+                    @if (app(\App\Services\AcademyService::class)->isSuperAdmin() || auth()->user()->can('role.view'))
                         <h3 class="menu-group-heading">
                             <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                Administration
+                                Administrasi
                             </span>
                             {{-- Dots icon saat sidebar collapsed di desktop --}}
                             <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'" class="menu-group-icon"
@@ -282,20 +291,33 @@
                                     fill="" />
                             </svg>
                         </h3>
+
+                        {{-- ===== Menu Item: Academy (tanpa dropdown, Super Admin only) ===== --}}
+                        @can('academy.view')
+                            <li>
+                                <a href="{{ route('academies.index') }}"
+                                    class="menu-item group {{ Route::is('academies.*') ? 'menu-item-active' : 'menu-item-inactive' }}">
+                                    <svg class="{{ Route::is('academies.*') ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
+                                        width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 21V8L12 3L20 8V21H14V14H10V21H4Z" stroke="currentColor"
+                                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                        Academy
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+                        {{-- ===== END: Academy ===== --}}
+
+                        {{-- ===== Menu Item: Roles & Permissions (dengan dropdown) ===== --}}
                         @php
-                            $administrationRoutes = ['roles.*', 'permissions.*', 'academies.*'];
-
-                            $isAdministrationActive = false;
-
-                            foreach ($administrationRoutes as $route) {
-                                if (Route::is($route)) {
-                                    $isAdministrationActive = true;
-                                    break;
-                                }
-                            }
+                            $isRolesPermissionsActive = Route::is('roles.*') || Route::is('permissions.*');
                         @endphp
 
-                        <li x-data="{ open: {{ $isAdministrationActive ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ $isRolesPermissionsActive ? 'true' : 'false' }} }">
 
                             <a href="#" @click.prevent="open=!open" class="menu-item group"
                                 :class="open ? 'menu-item-active' : 'menu-item-inactive'">
@@ -305,7 +327,7 @@
 
                                 </svg>
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                    Administration
+                                    Roles &amp; Permissions
                                 </span>
                                 <svg class="menu-item-arrow transition-transform duration-200"
                                     :class="[
@@ -323,45 +345,38 @@
                             <div x-show="open" x-collapse class="overflow-hidden">
 
                                 <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
-                                    {{-- Roles --}}
-                                    <li>
-                                        <a href="{{ route('roles.index') }}" class="menu-dropdown-item group"
-                                            :class="{{ Route::is('roles.*') ? 'true' : 'false' }}
-                                                ?
-                                                'menu-dropdown-item-active' :
-                                                'menu-dropdown-item-inactive'">
-                                            Roles
+                                    {{-- Roles: Super Admin (semua academy) + Owner (academy sendiri) --}}
+                                    @can('role.view')
+                                        <li>
+                                            <a href="{{ route('roles.index') }}" class="menu-dropdown-item group"
+                                                :class="{{ Route::is('roles.*') ? 'true' : 'false' }}
+                                                    ?
+                                                    'menu-dropdown-item-active' :
+                                                    'menu-dropdown-item-inactive'">
+                                                Roles
 
-                                        </a>
-                                    </li>
+                                            </a>
+                                        </li>
+                                    @endcan
 
-                                    {{-- Permissions --}}
-                                    <li>
-                                        <a href="{{ route('permissions.index') }}" class="menu-dropdown-item group"
-                                            :class="{{ Route::is('permissions.*') ? 'true' : 'false' }}
-                                                ?
-                                                'menu-dropdown-item-active' :
-                                                'menu-dropdown-item-inactive'">
-                                            Permissions
-                                        </a>
-                                    </li>
-
-                                    {{-- Academy --}}
-                                    <li>
-                                        <a href="{{ route('academies.index') }}" class="menu-dropdown-item group"
-                                            :class="{{ Route::is('academies.*') ? 'true' : 'false' }}
-                                                ?
-                                                'menu-dropdown-item-active' :
-                                                'menu-dropdown-item-inactive'">
-                                            Academy
-                                        </a>
-                                    </li>
-
+                                    {{-- Permissions: Super Admin only --}}
+                                    @can('permission.view')
+                                        <li>
+                                            <a href="{{ route('permissions.index') }}" class="menu-dropdown-item group"
+                                                :class="{{ Route::is('permissions.*') ? 'true' : 'false' }}
+                                                    ?
+                                                    'menu-dropdown-item-active' :
+                                                    'menu-dropdown-item-inactive'">
+                                                Permissions
+                                            </a>
+                                        </li>
+                                    @endcan
                                 </ul>
 
                             </div>
 
                         </li>
+                        {{-- ===== END: Roles & Permissions ===== --}}
 
                         {{-- ===== Menu Item: Master (dengan dropdown) ===== --}}
                         @php
@@ -432,7 +447,7 @@
                         </li>
                         {{-- ===== END: Master ===== --}}
                     @endif
-                    {{-- ===== END: Administration ===== --}}
+                    {{-- ===== END: Administrasi ===== --}}
 
 
                 </ul>
