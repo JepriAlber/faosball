@@ -1,16 +1,3 @@
-@props([
-    'currentLogoUrl' => null,
-    'name' => 'logo',
-    'label' => __('Logo Academy'),
-    'helpText' => __('SVG, PNG, JPG, WEBP maksimal 2MB -- akan diminta crop persegi setelah dipilih'),
-    'cropTitle' => __('Sesuaikan Logo'),
-    'cropDescription' => __('Geser & perbesar untuk memilih area logo (persegi).'),
-    'aspectRatio' => 1,
-    'outputWidth' => 1024,
-    'outputHeight' => 1024,
-    'previewClass' => 'avatar avatar-lg avatar-square',
-])
-
 <div class="form-group"
     x-data="logoCropField('{{ $currentLogoUrl }}', {{ $aspectRatio }}, {{ $outputWidth }}, {{ $outputHeight }})">
 
