@@ -13,15 +13,15 @@
         <div class="card-header">
 
             <div>
-                <h3 class="card-title">Informasi Role</h3>
+                <h3 class="card-title">{{ __('Informasi Role') }}</h3>
                 <p class="card-description">
-                    Perbarui informasi role dan hak akses yang dimiliki.
+                    {{ __('Perbarui informasi role dan hak akses yang dimiliki.') }}
                 </p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('roles.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
 
@@ -34,9 +34,9 @@
 
             @if ($isSuperAdmin)
                 <div class="form-group">
-                    <label class="form-label">Academy</label>
+                    <label class="form-label">{{ __('Academy') }}</label>
                     <p class="form-input bg-gray-50 dark:bg-gray-800">
-                        {{ $role->id_academy ? $role->academy->name : 'Role System' }}
+                        {{ $role->id_academy ? $role->academy->name : __('Role System') }}
                     </p>
                 </div>
             @endif
@@ -44,12 +44,12 @@
             <div class="form-group">
 
                 <label class="form-label">
-                    Nama Role
+                    {{ __('Nama Role') }}
                     <span class="text-error-500">*</span>
                 </label>
 
                 <input type="text" name="name" value="{{ old('name', $role->name) }}"
-                    placeholder="Contoh : Finance Manager"
+                    placeholder="{{ __('Contoh : Finance Manager') }}"
                     class="form-input @error('name') form-danger @elseif(old()) form-success @enderror"
                     required>
 
@@ -64,11 +64,11 @@
                 <div class="mb-4">
 
                     <h4 class="card-title text-base">
-                        Hak Akses
+                        {{ __('Hak Akses') }}
                     </h4>
 
                     <p class="card-description">
-                        Perbarui permission yang dimiliki oleh role ini.
+                        {{ __('Perbarui permission yang dimiliki oleh role ini.') }}
                     </p>
 
                 </div>
@@ -79,11 +79,11 @@
                     <div>
 
                         <h4 class="text-base font-semibold text-gray-900 dark:text-white">
-                            Permission
+                            {{ __('Permission') }}
                         </h4>
 
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            Pilih seluruh permission atau atur setiap modul secara terpisah.
+                            {{ __('Pilih seluruh permission atau atur setiap modul secara terpisah.') }}
                         </p>
 
                     </div>
@@ -91,11 +91,11 @@
                     <div class="flex flex-wrap gap-3">
 
                         <button type="button" class="btn btn-primary" @click="selectAll()">
-                            Pilih Semua
+                            {{ __('Pilih Semua') }}
                         </button>
 
                         <button type="button" class="btn btn-secondary" @click="unselectAll()">
-                            Hapus Semua
+                            {{ __('Hapus Semua') }}
                         </button>
 
                     </div>
@@ -115,11 +115,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
                 <a href="{{ route('roles.index') }}" class="btn btn-secondary">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
 
                 <button type="submit" class="btn btn-primary">
-                    Update Role
+                    {{ __('Update Role') }}
                 </button>
 
             </div>

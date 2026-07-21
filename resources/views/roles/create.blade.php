@@ -10,15 +10,15 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Role</h3>
+                <h3 class="card-title">{{ __('Informasi Role') }}</h3>
                 <p class="card-description">
-                    Buat role baru dan tentukan permission yang dimiliki.
+                    {{ __('Buat role baru dan tentukan permission yang dimiliki.') }}
                 </p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('roles.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -30,10 +30,10 @@
             @if ($isSuperAdmin)
                 <div class="form-group">
 
-                    <label class="form-label">Academy</label>
+                    <label class="form-label">{{ __('Academy') }}</label>
 
                     <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror">
-                        <option value="">— Role System —</option>
+                        <option value="">{{ __('— Role System —') }}</option>
                         @foreach ($academies as $academy)
                             <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
                                 {{ $academy->name }}
@@ -51,11 +51,11 @@
             <div class="form-group">
 
                 <label class="form-label">
-                    Nama Role
+                    {{ __('Nama Role') }}
                     <span class="text-error-500">*</span>
                 </label>
 
-                <input type="text" name="name" value="{{ old('name') }}" placeholder="Contoh : Finance Manager"
+                <input type="text" name="name" value="{{ old('name') }}" placeholder="{{ __('Contoh : Finance Manager') }}"
                     class="form-input @error('name') form-danger @elseif(old('name')) form-success @enderror"
                     required>
 
@@ -70,11 +70,11 @@
 
                 <div class="mb-4">
                     <h4 class="card-title text-base">
-                        Hak Akses
+                        {{ __('Hak Akses') }}
                     </h4>
 
                     <p class="card-description">
-                        Pilih permission yang dimiliki oleh role ini.
+                        {{ __('Pilih permission yang dimiliki oleh role ini.') }}
                     </p>
                 </div>
 
@@ -83,22 +83,22 @@
 
                     <div>
                         <h4 class="text-base font-semibold text-gray-900 dark:text-white">
-                            Permission
+                            {{ __('Permission') }}
                         </h4>
 
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            Pilih seluruh permission atau atur setiap modul secara terpisah.
+                            {{ __('Pilih seluruh permission atau atur setiap modul secara terpisah.') }}
                         </p>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
 
                         <button type="button" class="btn btn-primary" @click="selectAll()">
-                            Pilih Semua
+                            {{ __('Pilih Semua') }}
                         </button>
 
                         <button type="button" class="btn btn-secondary" @click="unselectAll()">
-                            Hapus Semua
+                            {{ __('Hapus Semua') }}
                         </button>
 
                     </div>
@@ -118,11 +118,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Role
+                    {{ __('Simpan Role') }}
                 </button>
 
             </div>

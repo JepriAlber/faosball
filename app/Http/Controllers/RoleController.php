@@ -28,10 +28,10 @@ class RoleController extends Controller
         $filters = array_filter($request->only(['search', 'id_academy', 'sort']));
 
         return view('roles.index',[
-            'title'=>'Role Management',
+            'title'=>__('Role Management'),
             'breadcrumb'=>[
-                ['label'=>'Administration'],
-                ['label'=>'Role Management']
+                ['label'=>__('Administration')],
+                ['label'=>__('Role Management')]
             ],
             'roles'=>$this->roleService->paginate($filters),
             'filters'=>$filters,
@@ -50,14 +50,14 @@ class RoleController extends Controller
     public function create()
     {
         return view('roles.create',[
-            'title'=>'Tambah Role',
+            'title'=>__('Tambah Role'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Role Management',
+                    'label'=>__('Role Management'),
                     'url'=>route('roles.index')
                 ],
                 [
-                    'label'=>'Tambah Role'
+                    'label'=>__('Tambah Role')
                 ]
             ],
             'permissionGroups'=>$this->roleService->permissionGroups(),
@@ -81,11 +81,11 @@ class RoleController extends Controller
 
             return redirect()
                 ->route('roles.index')
-                ->with('success','Role berhasil ditambahkan.');
+                ->with('success',__('Role berhasil ditambahkan.'));
 
         }catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal menambahkan role');
+            return $this->handleException($e, __('Gagal menambahkan role'));
 
         }
     }
@@ -100,14 +100,14 @@ class RoleController extends Controller
         $data = $this->roleService->detail($role);
 
         return view('roles.show', [
-            'title' => 'Detail Role',
+            'title' => __('Detail Role'),
             'breadcrumb' => [
                 [
-                    'label' => 'Role Management',
+                    'label' => __('Role Management'),
                     'url' => route('roles.index'),
                 ],
                 [
-                    'label' => 'Detail Role',
+                    'label' => __('Detail Role'),
                 ],
             ],
             'role' => $data['role'],
@@ -123,14 +123,14 @@ class RoleController extends Controller
         $this->authorize('update', $role);
 
         return view('roles.edit', [
-            'title' => 'Edit Role',
+            'title' => __('Edit Role'),
             'breadcrumb' => [
                 [
-                    'label' => 'Role Management',
+                    'label' => __('Role Management'),
                     'url' => route('roles.index'),
                 ],
                 [
-                    'label' => 'Edit Role',
+                    'label' => __('Edit Role'),
                 ],
             ],
             'role' => $role,
@@ -159,11 +159,11 @@ class RoleController extends Controller
 
             return redirect()
                 ->route('roles.index')
-                ->with('success','Role berhasil diperbarui.');
+                ->with('success',__('Role berhasil diperbarui.'));
 
         }catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal memperbarui role');
+            return $this->handleException($e, __('Gagal memperbarui role'));
 
         }
     }
@@ -181,11 +181,11 @@ class RoleController extends Controller
 
             return redirect()
                 ->route('roles.index')
-                ->with('success','Role berhasil dihapus.');
+                ->with('success',__('Role berhasil dihapus.'));
 
         }catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal menghapus role', 'roles.index');
+            return $this->handleException($e, __('Gagal menghapus role'), 'roles.index');
 
         }
     }

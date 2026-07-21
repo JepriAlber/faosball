@@ -21,7 +21,7 @@
                 <div>
                     <h3 class="card-title text-xl">{{ $role->name }}</h3>
                     <p class="card-description">
-                        {{ $role->permissions->count() }} Permission &middot; {{ $role->users->count() }} User
+                        {{ $role->permissions->count() }} {{ __('Permission') }} &middot; {{ $role->users->count() }} {{ __('User') }}
                     </p>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="card-actions">
 
                 <a href="{{ route('roles.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
 
                 @if ($role->name !== config('faos.super_admin_role'))
@@ -40,7 +40,7 @@
                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
                                     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            Edit Role
+                            {{ __('Edit Role') }}
                         </a>
                     @endcan
                 @endif
@@ -55,9 +55,9 @@
 
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
-                    <h4 class="section-title">Hak Akses</h4>
+                    <h4 class="section-title">{{ __('Hak Akses') }}</h4>
                     <p class="section-description">
-                        Daftar permission yang dimiliki role ini, dikelompokkan per module.
+                        {{ __('Daftar permission yang dimiliki role ini, dikelompokkan per module.') }}
                     </p>
 
                     <div class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -111,7 +111,7 @@
                             <div
                                 class="rounded-lg border border-dashed border-gray-200 p-5 dark:border-gray-800 sm:col-span-2">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Role ini belum memiliki permission.
+                                    {{ __('Role ini belum memiliki permission.') }}
                                 </p>
                             </div>
                         @endforelse
@@ -127,14 +127,14 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title border-b border-gray-100 pb-3 dark:border-gray-800">
-                        Informasi Ringkas
+                        {{ __('Informasi Ringkas') }}
                     </h4>
 
                     <div class="mt-4 space-y-4">
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Guard
+                                {{ __('Guard') }}
                             </span>
                             <span class="badge badge-secondary">
                                 {{ $role->guard_name }}
@@ -143,7 +143,7 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Total Permission
+                                {{ __('Total Permission') }}
                             </span>
                             <span class="table-text">
                                 {{ $role->permissions->count() }}
@@ -152,7 +152,7 @@
 
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">
-                                Total User
+                                {{ __('Total User') }}
                             </span>
                             <span class="table-text">
                                 {{ $role->users->count() }}
@@ -166,20 +166,20 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title">
-                        Informasi Sistem
+                        {{ __('Informasi Sistem') }}
                     </h4>
 
                     <div class="mt-4 space-y-3 text-xs text-gray-400">
 
                         <div class="flex items-center justify-between">
-                            <span>Dibuat pada</span>
+                            <span>{{ __('Dibuat pada') }}</span>
                             <span class="font-medium text-gray-600 dark:text-gray-300">
                                 {{ $role->created_at->format('d M Y, H:i') }}
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <span>Pembaruan terakhir</span>
+                            <span>{{ __('Pembaruan terakhir') }}</span>
                             <span class="font-medium text-gray-600 dark:text-gray-300">
                                 {{ $role->updated_at->format('d M Y, H:i') }}
                             </span>
