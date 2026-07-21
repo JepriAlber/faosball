@@ -8,13 +8,24 @@ use Illuminate\View\Component;
 
 class AcademyLogo extends Component
 {
-    public string $url;
+    public ?string $url;
+    public ?string $fallbackText;
+    public bool $isFavicon;
 
     public function __construct(AcademyService $academyService, string $variant = 'sidebar')
     {
-        $this->url = $variant === 'favicon'
-            ? $academyService->faviconUrl()
-            : $academyService->sidebarLogoUrl();
+        $this->isFavicon = $variant === 'favicon';
+
+        $hasOwnLogo = $academyService->isSuperAdmin()
+            || ($this->isFavicon ? $academyService->hasOwnFaviconLogo() : $academyService->hasOwnSidebarLogo());
+
+        $this->url = $hasOwnLogo
+            ? ($this->isFavicon ? $academyService->faviconUrl() : $academyService->sidebarLogoUrl())
+            : null;
+
+        $this->fallbackText = $hasOwnLogo
+            ? null
+            : ($this->isFavicon ? $academyService->faviconFallbackInitials() : $academyService->sidebarFallbackName());
     }
 
     public function render(): View

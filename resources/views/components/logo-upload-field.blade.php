@@ -1,12 +1,13 @@
-<div class="form-group" x-data="logoCropField('{{ $currentLogoUrl }}')">
+<div class="form-group"
+    x-data="logoCropField('{{ $currentLogoUrl }}', {{ $aspectRatio }}, {{ $outputWidth }}, {{ $outputHeight }})">
 
     <label class="form-label">
-        Logo Academy
+        {{ $label }}
     </label>
 
     <div class="form-file-upload">
 
-        <input type="file" id="logo" name="logo" x-ref="fileInput"
+        <input type="file" id="{{ $name }}" name="{{ $name }}" x-ref="fileInput"
             class="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" accept="image/*"
             @change="onFileSelected($event)">
 
@@ -21,30 +22,30 @@
             </span>
 
             <p class="empty-title">
-                Klik untuk unggah logo
+                {{ __('Klik untuk unggah logo') }}
             </p>
 
             <p class="empty-description">
-                SVG, PNG, JPG, WEBP maksimal 2MB -- akan diminta crop persegi setelah dipilih
+                {{ $helpText }}
             </p>
 
         </div>
 
         <div x-show="imagePreview" x-cloak class="flex flex-col items-center">
 
-            <div class="avatar avatar-lg avatar-square mb-3">
+            <div class="{{ $previewClass }} mb-3">
                 <img :src="imagePreview" class="h-full w-full object-cover">
             </div>
 
             <span class="link-primary text-xs font-semibold">
-                Ganti gambar
+                {{ __('Ganti gambar') }}
             </span>
 
         </div>
 
     </div>
 
-    @error('logo')
+    @error($name)
         <span class="form-error">{{ $message }}</span>
     @enderror
 
@@ -56,8 +57,8 @@
 
             <div class="modal-header">
                 <div>
-                    <h3 class="modal-title">Sesuaikan Logo</h3>
-                    <p class="modal-description">Geser & perbesar untuk memilih area logo (persegi).</p>
+                    <h3 class="modal-title">{{ $cropTitle }}</h3>
+                    <p class="modal-description">{{ $cropDescription }}</p>
                 </div>
             </div>
 
@@ -71,11 +72,11 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="cancelCrop()">
-                    Batal
+                    {{ __('Batal') }}
                 </button>
 
                 <button type="button" class="btn btn-primary" @click="confirmCrop()">
-                    Pakai Crop Ini
+                    {{ __('Pakai Crop Ini') }}
                 </button>
             </div>
 

@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Academy;
 use App\Support\ColorRamp;
+use App\Support\Initials;
 
 
 class AcademyService
@@ -72,6 +73,50 @@ class AcademyService
         }
 
         return asset('assets/images/logo/kantinit-favicon.png');
+    }
+
+
+    /**
+     * Apakah academy AKTIF sudah punya logo_sidebar sendiri (bukan berarti
+     * Super Admin -- itu ranah isSuperAdmin()). Dipakai AcademyLogo Component
+     * untuk memutuskan render <img> atau fallback teks nama academy.
+     */
+    public function hasOwnSidebarLogo(): bool
+    {
+        return (bool) $this->current()?->logo_sidebar;
+    }
+
+
+    /**
+     * Sama seperti hasOwnSidebarLogo(), untuk slot favicon/ikon persegi.
+     */
+    public function hasOwnFaviconLogo(): bool
+    {
+        return (bool) $this->current()?->logo_favicon;
+    }
+
+
+    /**
+     * Nama academy aktif, dipakai fallback slot "lebar" (sidebar/header)
+     * saat belum ada logo_sidebar. Null kalau tidak ada academy aktif
+     * (Super Admin -- tapi Super Admin tidak pernah masuk cabang ini,
+     * lihat AcademyLogo Component).
+     */
+    public function sidebarFallbackName(): ?string
+    {
+        return $this->current()?->name;
+    }
+
+
+    /**
+     * Inisial 1-2 huruf dari nama academy aktif, dipakai fallback slot
+     * "ikon persegi" (favicon) saat belum ada logo_favicon.
+     */
+    public function faviconFallbackInitials(): ?string
+    {
+        $academy = $this->current();
+
+        return $academy ? Initials::from($academy->name) : null;
     }
 
 

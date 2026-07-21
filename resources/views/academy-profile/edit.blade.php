@@ -86,6 +86,16 @@
 
                     <x-logo-upload-field :current-logo-url="$academy->logo ? asset('storage/' . $academy->logo) : null" />
 
+                    {{-- Logo Sidebar (Wordmark) --}}
+                    <x-logo-upload-field name="logo_sidebar"
+                        :current-logo-url="$academy->logo_sidebar ? asset('storage/' . $academy->logo_sidebar) : null"
+                        :label="__('Logo Sidebar (Wordmark)')"
+                        :help-text="__('PNG, JPG, JPEG, WEBP maksimal 2MB -- akan diminta crop rasio lebar. Dipakai di sidebar & header saat sidebar diperluas; kalau belum diupload, sidebar menampilkan nama academy sebagai gantinya.')"
+                        :crop-title="__('Sesuaikan Logo Sidebar')"
+                        :crop-description="__('Geser & perbesar untuk memilih area logo (rasio lebar).')"
+                        :aspect-ratio="3.77" :output-width="980" :output-height="260"
+                        preview-class="flex h-16 w-40 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-white/5" />
+
                     <div class="form-group">
 
                         <label for="primary_color" class="form-label">
