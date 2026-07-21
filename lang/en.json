@@ -564,5 +564,14 @@
     "Simpan Posisi": "Save Position",
 
     "Perbarui detail posisi pemain.": "Update the player position details.",
-    "Update Posisi": "Update Position"
+    "Update Posisi": "Update Position",
+
+    "Role Super Admin tidak dapat diubah.": "The Super Admin role cannot be modified.",
+    "Role Super Admin tidak dapat dihapus.": "The Super Admin role cannot be deleted.",
+    "Type masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan type ini kalau sudah tidak dipakai.": "Type is still used by a player, cannot be deleted. Deactivate this type if it's no longer used.",
+    "Posisi masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan posisi ini kalau sudah tidak dipakai.": "Position is still used by a player, cannot be deleted. Deactivate this position if it's no longer used.",
+    "Kategori masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan kategori ini kalau sudah tidak dipakai.": "Category is still used by a player, cannot be deleted. Deactivate this category if it's no longer used.",
+    "Role tidak berasal dari academy yang sama dengan user.": "Role does not belong to the same academy as the user.",
+    "Role \":role\" tidak ditemukan pada academy user.": "Role \":role\" not found in the user's academy.",
+    "Academy harus dipilih.": "Academy must be selected."
 }

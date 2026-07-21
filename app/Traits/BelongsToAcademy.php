@@ -36,7 +36,7 @@ trait BelongsToAcademy
         if(!$academyId){
 
             throw new \Exception(
-                'Academy harus dipilih.'
+                __('Academy harus dipilih.')
             );
 
         }

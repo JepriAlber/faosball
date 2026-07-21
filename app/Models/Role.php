@@ -64,7 +64,7 @@ class Role extends SpatieRole
             ->exists();
 
         if ($duplicate) {
-            throw new \Exception('Nama role sudah digunakan pada academy ini.');
+            throw new \Exception(__('Nama role sudah digunakan pada academy ini.'));
         }
 
         return static::query()->create($attributes);

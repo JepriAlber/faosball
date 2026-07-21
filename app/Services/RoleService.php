@@ -128,7 +128,7 @@ class RoleService
         return DB::transaction(function () use ($role, $data) {
 
             if ($role->name === config('faos.super_admin_role')) {
-                throw new \Exception('Role Super Admin tidak dapat diubah.');
+                throw new \Exception(__('Role Super Admin tidak dapat diubah.'));
             }
 
             // id_academy sengaja TIDAK ikut diubah.
@@ -148,11 +148,11 @@ class RoleService
         return DB::transaction(function () use ($role) {
 
             if ($role->name === config('faos.super_admin_role')) {
-                throw new \Exception('Role Super Admin tidak dapat dihapus.');
+                throw new \Exception(__('Role Super Admin tidak dapat dihapus.'));
             }
 
             if ($role->users()->exists()) {
-                throw new \Exception('Role masih digunakan oleh user, tidak dapat dihapus.');
+                throw new \Exception(__('Role masih digunakan oleh user, tidak dapat dihapus.'));
             }
 
             return $role->delete();

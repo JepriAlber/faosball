@@ -115,7 +115,7 @@ class PlayerTypeService
             // Type yang sudah tidak dipakai lagi: nonaktifkan (status = false),
             // jangan dihapus.
             if ($playerType->players()->exists()) {
-                throw new \Exception('Type masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan type ini kalau sudah tidak dipakai.');
+                throw new \Exception(__('Type masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan type ini kalau sudah tidak dipakai.'));
             }
 
             return $playerType->delete();

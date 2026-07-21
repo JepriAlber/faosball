@@ -99,7 +99,7 @@ class AccountService
         if ($role instanceof Role) {
 
             if ($role->id_academy !== $user->id_academy) {
-                throw new \Exception('Role tidak berasal dari academy yang sama dengan user.');
+                throw new \Exception(__('Role tidak berasal dari academy yang sama dengan user.'));
             }
 
             return $role;
@@ -117,7 +117,7 @@ class AccountService
         $resolved = $query->first();
 
         if (! $resolved) {
-            throw new \Exception('Role "' . $role . '" tidak ditemukan pada academy user.');
+            throw new \Exception(__('Role ":role" tidak ditemukan pada academy user.', ['role' => $role]));
         }
 
         return $resolved;

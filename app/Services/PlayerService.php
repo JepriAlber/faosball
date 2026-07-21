@@ -55,7 +55,7 @@ class PlayerService
             $academy = Academy::find($data['id_academy'] ?? null);
 
             if (!$academy) {
-                throw new \Exception('Academy tidak ditemukan.');
+                throw new \Exception(__('Academy tidak ditemukan.'));
             }
 
             return $academy;
@@ -64,7 +64,7 @@ class PlayerService
         $academy = $this->academyService->current();
 
         if (!$academy) {
-            throw new \Exception('Academy tidak ditemukan.');
+            throw new \Exception(__('Academy tidak ditemukan.'));
         }
 
         return $academy;
