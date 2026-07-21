@@ -17,6 +17,7 @@ Seluruh module baru wajib mengikuti alur pengembangan yang sama agar struktur pr
 - [Step 4 - Service](#step-4---service)
 - [Step 5 - Controller](#step-5---controller)
 - [Step 6 - View](#step-6---view)
+- [Step 6a - Multi-Language](#step-6a---multi-language)
 - [Step 7 - Route](#step-7---route)
 - [Step 8 - Permission](#step-8---permission)
 - [Step 9 - Menu](#step-9---menu)
@@ -195,11 +196,11 @@ public function store(StorePlayerRequest $request)
 
         return redirect()
             ->route('players.index')
-            ->with('success', 'Player berhasil dibuat.');
+            ->with('success', __('Player berhasil dibuat.'));
 
     } catch (\Exception $e) {
 
-        return $this->handleException($e, 'Gagal membuat player');
+        return $this->handleException($e, __('Gagal membuat player'));
 
     }
 }
@@ -212,15 +213,17 @@ public function destroy(Player $player)
 
         return redirect()
             ->route('players.index')
-            ->with('success', 'Player berhasil dihapus.');
+            ->with('success', __('Player berhasil dihapus.'));
 
     } catch (\Exception $e) {
 
-        return $this->handleException($e, 'Gagal menghapus player', 'players.index');
+        return $this->handleException($e, __('Gagal menghapus player'), 'players.index');
 
     }
 }
 ```
+
+String Indonesia di flash message dan `$message` `handleException()` **wajib** dibungkus `__()` sejak awal ditulis, bukan ditambahkan belakangan — lihat [Step 6a - Multi-Language](#step-6a---multi-language).
 
 ### `handleException()`
 
@@ -296,6 +299,21 @@ Ketentuan:
 - Tombol aksi utama (Simpan, Edit, Hapus) harus tetap mudah dijangkau ibu jari di layar HP — hindari tombol kecil atau menumpuk terlalu rapat.
 - Tabel dengan banyak kolom wajib dibungkus `table-wrapper` (scroll horizontal), jangan biarkan tabel memaksa halaman melebar (overflow ke luar layar).
 - Gunakan grid responsif Tailwind (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`, dst) agar layout otomatis menumpuk jadi satu kolom di layar kecil.
+
+---
+
+## Step 6a - Multi-Language
+
+FAOSBall mendukung 2 bahasa (Bahasa Indonesia default + English) lewat mekanisme `__()` + `lang/en.json`. Aturan lengkapnya ada di `docs/coding-standard.md#bahasa-pesan-user-facing-messages--multi-language` — **wajib dibaca sebelum menulis View/Form Request/Controller module baru**, bukan opsional dan bukan pekerjaan susulan setelah module "selesai".
+
+Ringkasan yang wajib dipatuhi sejak baris kode pertama ditulis:
+
+- **Setiap string Indonesia yang tampil ke user** — teks di View (`<h3>`, `<label>`, `<p>`, `title="..."`, `placeholder="..."`, termasuk string di dalam ekspresi Alpine.js seperti `x-text="isActive ? '...' : '...'"`), pesan `messages()` di Form Request, flash message (`->with('success', ...)`) dan `$message` di `handleException()` pada Controller, **dan** pesan `throw new \Exception(...)` di Service yang bisa sampai ke flash message — dibungkus `__('...')` saat pertama kali ditulis, bukan ditambahkan belakangan.
+- **Setiap string baru yang dibungkus `__()` wajib langsung diberi entry di `lang/en.json`** pada PR/commit yang sama. Sebelum menambah entry baru, **cek dulu apakah string yang sama (istilah umum seperti "Academy", "Status", "Aktif", "Deskripsi", dst) sudah punya entry dari module lain** — jangan menduplikasi key.
+- Kalau ada tag HTML di tengah kalimat (mis. `<strong>`) atau bagian kalimat yang dinamis (nama, angka, dsb), pakai parameter `__('teks :placeholder', ['placeholder' => $value])`, atau pecah jadi beberapa fragmen `__()` terpisah — **jangan** biarkan sebagian kalimat tidak terbungkus.
+- Verifikasi sebelum commit: `php -l` untuk file yang diubah, `php artisan test` (bandingkan hasil dengan baseline — jangan ada regresi baru), dan `npm run build` kalau ada file Blade/JS yang berubah.
+
+Module yang menambahkan permission checking baru **dan** module yang menambahkan string user-facing baru sama-sama tidak dianggap selesai sebelum poin ini terpenuhi — sejajar dengan kewajiban update `docs/permission-reference.md` di [Step 8 - Permission](#step-8---permission).
 
 ---
 
@@ -421,6 +439,12 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - Tampilan sudah dicek di breakpoint mobile dan tablet, bukan cuma desktop.
 - Tab (jika ada) tetap dapat diakses/di-scroll dengan nyaman di layar sempit.
 - Tabel lebar dibungkus `table-wrapper` agar tidak overflow di HP.
+
+### Multi-Language
+
+- Seluruh string user-facing (View, Form Request `messages()`, Controller flash/breadcrumb, pesan `throw new \Exception(...)` di Service) dibungkus `__()`.
+- Setiap string baru punya entry di `lang/en.json` (sudah dicek dulu tidak duplikat dengan key module lain).
+- Lihat `docs/coding-standard.md#bahasa-pesan-user-facing-messages--multi-language` untuk detail aturan.
 
 ### Multi-Tenant
 

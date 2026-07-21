@@ -17,6 +17,7 @@ Seluruh module harus memiliki struktur, alur, dan implementasi yang konsisten ag
 - [Service Standard](#service-standard)
 - [Controller Standard](#controller-standard)
 - [View Standard](#view-standard)
+- [Multi-Language Standard](#multi-language-standard)
 - [Route Standard](#route-standard)
 - [Authorization Standard](#authorization-standard)
 - [Multi-Tenant Standard](#multi-tenant-standard)
@@ -197,6 +198,23 @@ Halaman index/list yang datanya berpotensi banyak baris wajib punya search/filte
 
 ---
 
+## Multi-Language Standard
+
+Module baru **wajib** bilingual (Bahasa Indonesia default + English) sejak awal ditulis — bukan pekerjaan yang ditunda sampai "modulnya jadi dulu". Aturan lengkap dan contoh kode ada di `docs/coding-standard.md#bahasa-pesan-user-facing-messages--multi-language`.
+
+Yang wajib dibungkus `__()`:
+
+- Seluruh teks di View — heading, label, placeholder, `title="..."`, empty state, termasuk string di dalam ekspresi Alpine.js (`x-text="cond ? '...' : '...'"`).
+- Pesan `messages()` di Form Request.
+- Flash message (`->with('success', ...)`) dan `$message` di `handleException()` pada Controller.
+- Pesan `throw new \Exception(...)` di Service yang bisa sampai ke user lewat flash message.
+
+Setiap string baru yang dibungkus `__()` wajib langsung punya entry di `lang/en.json` pada commit yang sama — cek dulu apakah istilah yang sama sudah dipakai module lain (mis. "Academy", "Status", "Aktif", "Deskripsi") supaya tidak menduplikasi key.
+
+Module tidak dianggap selesai kalau ada string user-facing yang lolos tidak terbungkus — sejajar dengan kewajiban authorization di bawah.
+
+---
+
 ## Route Standard
 
 Gunakan Resource Route Naming.
@@ -315,6 +333,11 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - [ ] Menggunakan Blade Permission Directive.
 - [ ] Halaman index/list punya Card List responsif (`table-card-list`) selain tabel, jika datanya ditampilkan dalam tabel.
 - [ ] Halaman index/list punya search/filter (`<x-table.toolbar>`, `<x-table.tabs>` jika relevan) kalau datanya berpotensi banyak baris — lihat `docs/frontend-standard.md#tabs-status--toolbar-filtersearch`.
+
+### Multi-Language
+
+- [ ] Seluruh string user-facing (View, Form Request `messages()`, Controller flash/breadcrumb, pesan `throw new \Exception(...)` di Service) dibungkus `__()`.
+- [ ] Setiap string baru punya entry di `lang/en.json`, sudah dicek tidak duplikat dengan key module lain.
 
 ### Route
 
