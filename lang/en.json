@@ -573,5 +573,23 @@
     "Kategori masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan kategori ini kalau sudah tidak dipakai.": "Category is still used by a player, cannot be deleted. Deactivate this category if it's no longer used.",
     "Role tidak berasal dari academy yang sama dengan user.": "Role does not belong to the same academy as the user.",
     "Role \":role\" tidak ditemukan pada academy user.": "Role \":role\" not found in the user's academy.",
-    "Academy harus dipilih.": "Academy must be selected."
+    "Academy harus dipilih.": "Academy must be selected.",
+
+    "Informasi Profil": "Profile Information",
+    "Perbarui informasi profil akun dan alamat email Anda.": "Update your account's profile information and email address.",
+    "Alamat email Anda belum diverifikasi.": "Your email address is unverified.",
+    "Klik di sini untuk mengirim ulang email verifikasi.": "Click here to re-send the verification email.",
+    "Tautan verifikasi baru telah dikirim ke alamat email Anda.": "A new verification link has been sent to your email address.",
+    "Simpan": "Save",
+    "Tersimpan.": "Saved.",
+
+    "Perbarui Password": "Update Password",
+    "Pastikan akun Anda menggunakan password yang panjang dan acak agar tetap aman.": "Ensure your account is using a long, random password to stay secure.",
+    "Password Saat Ini": "Current Password",
+    "Password Baru": "New Password",
+
+    "Hapus Akun": "Delete Account",
+    "Setelah akun dihapus, seluruh sumber daya dan data akan dihapus permanen. Sebelum menghapus akun, silakan unduh data atau informasi apa pun yang ingin Anda simpan.": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
+    "Apakah Anda yakin ingin menghapus akun ini?": "Are you sure you want to delete your account?",
+    "Setelah akun dihapus, seluruh sumber daya dan data akan dihapus permanen. Masukkan password Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun ini secara permanen.": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account."
 }
