@@ -386,5 +386,43 @@
     "Total User": "Total Users",
 
     "Hapus": "Delete",
-    "Tidak dapat dihapus": "Cannot be deleted"
+    "Tidak dapat dihapus": "Cannot be deleted",
+
+    "Permission Management": "Permission Management",
+    "Tambah Permission": "Add Permission",
+    "Permission berhasil ditambahkan.": "Permission successfully added.",
+    "Gagal menambahkan permission": "Failed to add permission",
+    "Detail Permission": "Permission Details",
+    "Permission berhasil dihapus.": "Permission successfully deleted.",
+    "Gagal menghapus permission": "Failed to delete permission",
+
+    "Module wajib diisi.": "Module is required.",
+    "Module hanya boleh huruf kecil, angka, dan underscore.": "Module may only contain lowercase letters, numbers, and underscores.",
+    "Action wajib diisi.": "Action is required.",
+    "Action hanya boleh huruf kecil, angka, dan underscore.": "Action may only contain lowercase letters, numbers, and underscores.",
+    "Module dan Action wajib diisi.": "Module and Action are required.",
+    "Permission dengan module dan action tersebut sudah ada.": "A permission with that module and action already exists.",
+
+    "Permission List": "Permission List",
+    "Daftar hak akses (permission) yang tersedia pada sistem.": "List of access rights (permissions) available in the system.",
+    "Module": "Module",
+    "Action": "Action",
+    "Permission masih digunakan oleh role, tidak dapat dihapus.": "Permission is still used by a role, cannot be deleted.",
+    "Belum ada Permission": "No Permissions yet",
+    "Tambahkan permission pertama.": "Add the first permission.",
+
+    "Informasi Permission": "Permission Information",
+    "Buat permission baru dengan format :format.": "Create a new permission using the :format format.",
+    "Boleh module yang sudah ada, atau ketik module baru.": "You can use an existing module, or type a new one.",
+    "Contoh: coach": "Example: coach",
+    "Contoh: view": "Example: view",
+    "Pilih action yang sudah dikenal, atau ketik action baru.": "Choose a known action, or type a new one.",
+    "Permission yang akan disimpan": "Permission to be saved",
+    "Simpan Permission": "Save Permission",
+
+    ":count Role menggunakan permission ini": ":count Role using this permission",
+    "Role Pengguna": "Roles Using This",
+    "Daftar role yang saat ini memiliki permission ini.": "List of roles that currently have this permission.",
+    "Permission ini belum digunakan oleh role manapun.": "This permission is not used by any role yet.",
+    "Total Role": "Total Roles"
 }

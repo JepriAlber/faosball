@@ -65,14 +65,14 @@ class PermissionFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'module.required' => 'Module wajib diisi.',
-            'module.regex' => 'Module hanya boleh huruf kecil, angka, dan underscore.',
+            'module.required' => __('Module wajib diisi.'),
+            'module.regex' => __('Module hanya boleh huruf kecil, angka, dan underscore.'),
 
-            'action.required' => 'Action wajib diisi.',
-            'action.regex' => 'Action hanya boleh huruf kecil, angka, dan underscore.',
+            'action.required' => __('Action wajib diisi.'),
+            'action.regex' => __('Action hanya boleh huruf kecil, angka, dan underscore.'),
 
-            'name.required' => 'Module dan Action wajib diisi.',
-            'name.unique' => 'Permission dengan module dan action tersebut sudah ada.',
+            'name.required' => __('Module dan Action wajib diisi.'),
+            'name.unique' => __('Permission dengan module dan action tersebut sudah ada.'),
         ];
     }
 }
