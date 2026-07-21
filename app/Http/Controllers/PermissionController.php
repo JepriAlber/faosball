@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Permission\PermissionFormRequest;
 use App\Services\PermissionService;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
@@ -18,15 +19,19 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $filters = array_filter($request->only(['search', 'module', 'sort']));
+
         return view('permissions.index', [
             'title' => __('Permission Management'),
             'breadcrumb' => [
                 ['label' => __('Administration')],
                 ['label' => __('Permission Management')],
             ],
-            'permissions' => $this->permissionService->paginate(),
+            'permissions' => $this->permissionService->paginate($filters),
+            'filters' => $filters,
+            'modules' => $this->permissionService->existingModules(),
         ]);
     }
 

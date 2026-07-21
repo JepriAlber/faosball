@@ -3,14 +3,44 @@
 namespace App\Services;
 
 use App\Support\PermissionPresenter;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 
 class PermissionService
 {
-    public function paginate(int $perPage = 10)
+    /**
+     * Terapkan filter search/module ke query.
+     */
+    protected function applyFilters(Builder $query, array $filters): void
     {
-        return Permission::withCount('roles')->latest()->paginate($perPage);
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', "%{$filters['search']}%");
+        }
+
+        if (!empty($filters['module'])) {
+            $query->where('name', 'like', $filters['module'] . '.%');
+        }
+    }
+
+    /**
+     * Daftar permission untuk halaman index, dengan search/filter/sort.
+     */
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = Permission::withCount('roles');
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'oldest' => $query->oldest(),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
     }
 
     /**

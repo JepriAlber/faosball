@@ -591,5 +591,11 @@
     "Hapus Akun": "Delete Account",
     "Setelah akun dihapus, seluruh sumber daya dan data akan dihapus permanen. Sebelum menghapus akun, silakan unduh data atau informasi apa pun yang ingin Anda simpan.": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
     "Apakah Anda yakin ingin menghapus akun ini?": "Are you sure you want to delete your account?",
-    "Setelah akun dihapus, seluruh sumber daya dan data akan dihapus permanen. Masukkan password Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun ini secara permanen.": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account."
+    "Setelah akun dihapus, seluruh sumber daya dan data akan dihapus permanen. Masukkan password Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun ini secara permanen.": "Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.",
+
+    "Cari nama permission...": "Search permission name...",
+    "Semua Module": "All Modules",
+    "Filter & Sort": "Filter & Sort",
+    "Terapkan": "Apply",
+    "Cari...": "Search..."
 }
