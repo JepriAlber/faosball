@@ -424,5 +424,46 @@
     "Role Pengguna": "Roles Using This",
     "Daftar role yang saat ini memiliki permission ini.": "List of roles that currently have this permission.",
     "Permission ini belum digunakan oleh role manapun.": "This permission is not used by any role yet.",
-    "Total Role": "Total Roles"
+    "Total Role": "Total Roles",
+
+    "Tambah Player Type": "Add Player Type",
+    "Player type berhasil ditambahkan.": "Player type successfully added.",
+    "Gagal menambahkan player type": "Failed to add player type",
+    "Edit Player Type": "Edit Player Type",
+    "Player type berhasil diperbarui.": "Player type successfully updated.",
+    "Gagal memperbarui player type": "Failed to update player type",
+    "Player type berhasil dihapus.": "Player type successfully deleted.",
+    "Gagal menghapus player type": "Failed to delete player type",
+
+    "Nama type wajib diisi.": "Type name is required.",
+    "Nama type harus berupa teks.": "Type name must be text.",
+    "Nama type maksimal :max karakter.": "Type name may be at most :max characters.",
+    "Nama type sudah digunakan pada academy ini.": "Type name is already used in this academy.",
+    "Status tagihan wajib ditentukan.": "Billing status is required.",
+    "Status tagihan tidak valid.": "Invalid billing status.",
+    "Status wajib ditentukan.": "Status is required.",
+    "Status tidak valid.": "Invalid status.",
+
+    "Player Type List": "Player Type List",
+    "Manajemen jenis pemain (Reguler, Beasiswa, Trial, dsb) per academy.": "Manage player types (Regular, Scholarship, Trial, etc.) per academy.",
+    "Tagihan": "Billing",
+    "Ditagih": "Billed",
+    "Tidak Ditagih": "Not Billed",
+    "Type masih digunakan oleh player, tidak dapat dihapus.": "Type is still used by a player, cannot be deleted.",
+    "Belum ada Player Type": "No Player Types yet",
+    "Tambahkan player type pertama.": "Add the first player type.",
+
+    "Informasi Player Type": "Player Type Information",
+    "Tambahkan jenis pemain baru untuk academy.": "Add a new player type for the academy.",
+    "Pilih Academy": "Select Academy",
+    "Nama Type": "Type Name",
+    "Contoh: Reguler, Beasiswa, Trial": "Example: Regular, Scholarship, Trial",
+    "Keterangan singkat tentang type ini": "A brief description of this type",
+    "Tagihan Iuran / SPP": "Membership Fee Billing",
+    "Player dengan type ini ditagih iuran/SPP": "Players with this type are billed for membership fees",
+    "Player dengan type ini tidak ditagih": "Players with this type are not billed",
+    "Simpan Player Type": "Save Player Type",
+
+    "Perbarui detail jenis pemain.": "Update the player type details.",
+    "Update Player Type": "Update Player Type"
 }

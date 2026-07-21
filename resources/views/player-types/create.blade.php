@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Player Type</h3>
-                <p class="card-description">Tambahkan jenis pemain baru untuk academy.</p>
+                <h3 class="card-title">{{ __('Informasi Player Type') }}</h3>
+                <p class="card-description">{{ __('Tambahkan jenis pemain baru untuk academy.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('player-types.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -31,12 +31,12 @@
                     @if ($isSuperAdmin)
                         <div class="form-group">
                             <label class="form-label">
-                                Academy <span class="text-error-500">*</span>
+                                {{ __('Academy') }} <span class="text-error-500">*</span>
                             </label>
 
                             <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror"
                                 required>
-                                <option value="">Pilih Academy</option>
+                                <option value="">{{ __('Pilih Academy') }}</option>
                                 @foreach ($academies as $academy)
                                     <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
                                         {{ $academy->name }}
@@ -52,11 +52,11 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Type <span class="text-error-500">*</span>
+                            {{ __('Nama Type') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" name="name" value="{{ old('name') }}"
-                            placeholder="Contoh: Reguler, Beasiswa, Trial"
+                            placeholder="{{ __('Contoh: Reguler, Beasiswa, Trial') }}"
                             class="form-input @error('name') form-danger @enderror" required>
 
                         @error('name')
@@ -65,9 +65,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
+                        <label class="form-label">{{ __('Deskripsi') }}</label>
 
-                        <textarea name="description" rows="3" placeholder="Keterangan singkat tentang type ini"
+                        <textarea name="description" rows="3" placeholder="{{ __('Keterangan singkat tentang type ini') }}"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description') }}</textarea>
 
                         @error('description')
@@ -81,7 +81,7 @@
 
                     <div class="form-group" x-data="{ isBillable: {{ old('is_billable', 1) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Tagihan Iuran / SPP</label>
+                        <label class="form-label">{{ __('Tagihan Iuran / SPP') }}</label>
 
                         <input type="hidden" name="is_billable" :value="isBillable ? 1 : 0">
 
@@ -94,7 +94,7 @@
                             </div>
 
                             <span class="ml-3 text-sm text-gray-500"
-                                x-text="isBillable ? 'Player dengan type ini ditagih iuran/SPP' : 'Player dengan type ini tidak ditagih'">
+                                x-text="isBillable ? '{{ __('Player dengan type ini ditagih iuran/SPP') }}' : '{{ __('Player dengan type ini tidak ditagih') }}'">
                             </span>
 
                         </label>
@@ -107,7 +107,7 @@
 
                     <div class="form-group" x-data="{ isActive: {{ old('status', 1) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('Status') }}</label>
 
                         <input type="hidden" name="status" :value="isActive ? 1 : 0">
 
@@ -119,7 +119,7 @@
                                 <span class="form-toggle-dot" :class="isActive && 'form-toggle-checked'"></span>
                             </div>
 
-                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? 'Aktif' : 'Nonaktif'">
+                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'">
                             </span>
 
                         </label>
@@ -137,11 +137,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Player Type
+                    {{ __('Simpan Player Type') }}
                 </button>
 
             </div>
