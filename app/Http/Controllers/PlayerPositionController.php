@@ -18,10 +18,10 @@ class PlayerPositionController extends Controller
     public function index()
     {
         return view('player-positions.index', [
-            'title' => 'Master Posisi Pemain',
+            'title' => __('Master Posisi Pemain'),
             'breadcrumb' => [
-                ['label' => 'Master'],
-                ['label' => 'Posisi Pemain'],
+                ['label' => __('Master')],
+                ['label' => __('Posisi Pemain')],
             ],
             'playerPositions' => $this->playerPositionService->paginate(),
         ]);
@@ -30,10 +30,10 @@ class PlayerPositionController extends Controller
     public function create()
     {
         return view('player-positions.create', [
-            'title' => 'Tambah Posisi Pemain',
+            'title' => __('Tambah Posisi Pemain'),
             'breadcrumb' => [
-                ['label' => 'Posisi Pemain', 'url' => route('player-positions.index')],
-                ['label' => 'Tambah Posisi'],
+                ['label' => __('Posisi Pemain'), 'url' => route('player-positions.index')],
+                ['label' => __('Tambah Posisi')],
             ],
             'existingGroups' => $this->playerPositionService->existingGroups(),
         ]);
@@ -47,21 +47,21 @@ class PlayerPositionController extends Controller
 
             return redirect()
                 ->route('player-positions.index')
-                ->with('success', 'Posisi pemain berhasil ditambahkan.');
+                ->with('success', __('Posisi pemain berhasil ditambahkan.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menambahkan posisi pemain');
+            return $this->handleException($e, __('Gagal menambahkan posisi pemain'));
         }
     }
 
     public function edit(PlayerPosition $playerPosition)
     {
         return view('player-positions.edit', [
-            'title' => 'Edit Posisi Pemain',
+            'title' => __('Edit Posisi Pemain'),
             'breadcrumb' => [
-                ['label' => 'Posisi Pemain', 'url' => route('player-positions.index')],
-                ['label' => 'Edit Posisi'],
+                ['label' => __('Posisi Pemain'), 'url' => route('player-positions.index')],
+                ['label' => __('Edit Posisi')],
             ],
             'playerPosition' => $playerPosition,
             'existingGroups' => $this->playerPositionService->existingGroups(),
@@ -76,11 +76,11 @@ class PlayerPositionController extends Controller
 
             return redirect()
                 ->route('player-positions.index')
-                ->with('success', 'Posisi pemain berhasil diperbarui.');
+                ->with('success', __('Posisi pemain berhasil diperbarui.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui posisi pemain');
+            return $this->handleException($e, __('Gagal memperbarui posisi pemain'));
         }
     }
 
@@ -92,11 +92,11 @@ class PlayerPositionController extends Controller
 
             return redirect()
                 ->route('player-positions.index')
-                ->with('success', 'Posisi pemain berhasil dihapus.');
+                ->with('success', __('Posisi pemain berhasil dihapus.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus posisi pemain', 'player-positions.index');
+            return $this->handleException($e, __('Gagal menghapus posisi pemain'), 'player-positions.index');
         }
     }
 }
