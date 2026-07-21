@@ -81,47 +81,97 @@ class AcademyManagementService
 
 
     /**
-     * Hapus file logo asli + kedua variannya (kalau ada). Dipakai saat logo
-     * diganti (create ulang tidak butuh ini, cuma update/updateProfile/delete).
+     * Hapus logo persegi + logo_favicon (dipakai saat field `logo` diganti
+     * atau academy dihapus). TERPISAH dari deleteSidebarLogoAsset() --
+     * mengganti logo persegi TIDAK BOLEH ikut menghapus logo_sidebar yang
+     * mungkin tidak sedang diganti pada request yang sama.
      */
-    protected function deleteLogoVariants(Academy $academy): void
+    protected function deleteSquareLogoAssets(Academy $academy): void
     {
         $this->deleteLogo($academy->logo);
-        $this->deleteLogo($academy->logo_sidebar);
         $this->deleteLogo($academy->logo_favicon);
     }
 
 
     /**
-     * Batas bounding box varian logo_sidebar -- muat di dalam kotak ini, jaga
-     * aspect ratio, TANPA crop (scaleDown). Proporsi lebar (245x65) meniru
-     * bentuk logo sistem yang sekarang (wordmark lebar), supaya logo academy
-     * apapun bentuknya tidak dipaksa jadi kotak kecil yang terasa mengecil
-     * sendiri di slot sidebar/header.
+     * Hapus logo_sidebar saja (dipakai saat field itu diganti atau academy
+     * dihapus). TERPISAH dari deleteSquareLogoAssets(), lihat di atas.
+     */
+    protected function deleteSidebarLogoAsset(Academy $academy): void
+    {
+        $this->deleteLogo($academy->logo_sidebar);
+    }
+
+
+    /**
+     * Batas bounding box logo_sidebar -- muat di dalam kotak ini, jaga aspect
+     * ratio, TANPA crop tambahan (scaleDown). Proporsi lebar (245x65) meniru
+     * bentuk logo sistem yang sekarang (wordmark lebar). Sejak issue8.md,
+     * logo_sidebar punya upload+crop rasio lebar SENDIRI (bukan turunan dari
+     * logo persegi lagi) -- konstanta ini sekarang jadi bounding box output
+     * untuk hasil crop itu.
      */
     protected const LOGO_SIDEBAR_MAX_WIDTH = 245;
     protected const LOGO_SIDEBAR_MAX_HEIGHT = 65;
 
 
     /**
-     * Generate 2 varian ukuran dari file logo yang baru di-upload.
+     * Generate varian logo_favicon (cover 64x64, crop persegi) dari file
+     * logo PERSEGI yang baru di-upload. Dulu method ini juga menurunkan
+     * logo_sidebar dari sumber yang sama -- sejak issue8.md, logo_sidebar
+     * punya upload+crop sendiri (lihat processSidebarLogoUpload() di bawah)
+     * supaya logo persegi (dipakai kartu nama/kop surat nanti) tidak
+     * dipaksa proporsi lebar yang jelek saat di-scaleDown ke slot sidebar.
      *
-     * - logo_sidebar : scaleDown ke bounding box 245x65 (jaga aspect ratio,
-     *   TANPA crop) -- lihat issue3.md Bagian 4.1 untuk riwayat keputusan ini.
-     * - logo_favicon : cover ke 64x64 (crop persegi, center) -- favicon browser
-     *   WAJIB persegi.
-     *
-     * SVG di-skip (bukan error) -- driver GD tidak bisa membaca vektor. Kegagalan
-     * apapun di sini ditangkap, TIDAK BOLEH menggagalkan create/update Academy
-     * yang memanggilnya. Lihat issue3.md Bagian 4.2.
+     * SVG di-skip (return null) -- driver GD tidak bisa membaca vektor.
+     * Dalam praktiknya modal crop (logo-crop-field.js) selalu meng-flatten
+     * hasil crop ke PNG sebelum submit, jadi cabang ini nyaris tidak pernah
+     * kena lewat UI normal -- tetap dijaga untuk submit non-JS/manual.
      */
-    protected function generateLogoVariants($file, string $academyCode): array
+    protected function generateFaviconVariant($file, string $academyCode): ?string
     {
         if (strtolower($file->getClientOriginalExtension()) === 'svg') {
-            return [
-                'logo_sidebar' => null,
-                'logo_favicon' => null,
-            ];
+            return null;
+        }
+
+        try {
+
+            $manager = new ImageManager(new Driver());
+            $image = $manager->decodePath($file->getRealPath());
+
+            $faviconPath = 'academies/logo/' . strtoupper($academyCode) . '-' . Str::uuid() . '-favicon.png';
+
+            Storage::disk('public')->put(
+                $faviconPath,
+                (string) $image->cover(64, 64)->encode(new PngEncoder())
+            );
+
+            return $faviconPath;
+
+        } catch (\Throwable $e) {
+
+            Log::warning('Gagal generate varian favicon logo academy', [
+                'academy_code' => $academyCode,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+
+    /**
+     * Upload logo_sidebar -- UPLOAD+CROP SENDIRI (rasio lebar, terpisah dari
+     * logo persegi), bukan turunan otomatis lagi. scaleDown ke bounding box
+     * 245x65 (jaga aspect ratio, TANPA crop tambahan -- user sudah crop
+     * rasio yang benar di client lewat <x-logo-upload-field :aspect-ratio="...">).
+     *
+     * SVG di-skip, alasan sama seperti generateFaviconVariant().
+     */
+    protected function processSidebarLogoUpload($file, string $academyCode): array
+    {
+        if (strtolower($file->getClientOriginalExtension()) === 'svg') {
+            return ['logo_sidebar' => null];
         }
 
         try {
@@ -130,53 +180,39 @@ class AcademyManagementService
             $image = $manager->decodePath($file->getRealPath());
 
             $sidebarPath = 'academies/logo/' . strtoupper($academyCode) . '-' . Str::uuid() . '-sidebar.png';
-            $faviconPath = 'academies/logo/' . strtoupper($academyCode) . '-' . Str::uuid() . '-favicon.png';
 
-            // WAJIB clone -- Intervention Image memutasi objek in-place, resize
-            // kedua tanpa clone akan dijalankan di atas hasil resize pertama.
             Storage::disk('public')->put(
                 $sidebarPath,
-                (string) (clone $image)->scaleDown(
+                (string) $image->scaleDown(
                     self::LOGO_SIDEBAR_MAX_WIDTH,
                     self::LOGO_SIDEBAR_MAX_HEIGHT
                 )->encode(new PngEncoder())
             );
 
-            Storage::disk('public')->put(
-                $faviconPath,
-                (string) (clone $image)->cover(64, 64)->encode(new PngEncoder())
-            );
-
-            return [
-                'logo_sidebar' => $sidebarPath,
-                'logo_favicon' => $faviconPath,
-            ];
+            return ['logo_sidebar' => $sidebarPath];
 
         } catch (\Throwable $e) {
 
-            Log::warning('Gagal generate varian logo academy', [
+            Log::warning('Gagal upload logo_sidebar academy', [
                 'academy_code' => $academyCode,
                 'exception' => $e->getMessage(),
             ]);
 
-            return [
-                'logo_sidebar' => null,
-                'logo_favicon' => null,
-            ];
+            return ['logo_sidebar' => null];
         }
     }
 
 
     /**
-     * Upload logo asli + generate variannya sekaligus, dipakai bersama oleh
-     * create()/update()/updateProfile() supaya logic-nya tidak tertulis 3 kali.
+     * Upload logo PERSEGI asli + generate favicon-nya sekaligus, dipakai
+     * bersama oleh create()/update()/updateProfile() untuk field `logo`.
      */
     protected function processLogoUpload($file, string $academyCode): array
     {
-        return array_merge(
-            ['logo' => $this->uploadLogo($file, $academyCode)],
-            $this->generateLogoVariants($file, $academyCode)
-        );
+        return [
+            'logo' => $this->uploadLogo($file, $academyCode),
+            'logo_favicon' => $this->generateFaviconVariant($file, $academyCode),
+        ];
     }
 
 
@@ -337,8 +373,13 @@ class AcademyManagementService
             ];
 
             if (isset($data['logo'])) {
-                $this->deleteLogoVariants($academy);
+                $this->deleteSquareLogoAssets($academy);
                 $payload = array_merge($payload, $this->processLogoUpload($data['logo'], $academy->code));
+            }
+
+            if (isset($data['logo_sidebar'])) {
+                $this->deleteSidebarLogoAsset($academy);
+                $payload = array_merge($payload, $this->processSidebarLogoUpload($data['logo_sidebar'], $academy->code));
             }
 
             $academy->update($payload);
@@ -361,6 +402,10 @@ class AcademyManagementService
 
             if (isset($data['logo'])) {
                 $data = array_merge($data, $this->processLogoUpload($data['logo'], $data['code']));
+            }
+
+            if (isset($data['logo_sidebar'])) {
+                $data = array_merge($data, $this->processSidebarLogoUpload($data['logo_sidebar'], $data['code']));
             }
 
             $academy = Academy::create($data);
@@ -400,8 +445,13 @@ class AcademyManagementService
             $data['status'] = $data['status'] ?? false;
 
             if (isset($data['logo'])) {
-                $this->deleteLogoVariants($academy);
+                $this->deleteSquareLogoAssets($academy);
                 $data = array_merge($data, $this->processLogoUpload($data['logo'], $data['code']));
+            }
+
+            if (isset($data['logo_sidebar'])) {
+                $this->deleteSidebarLogoAsset($academy);
+                $data = array_merge($data, $this->processSidebarLogoUpload($data['logo_sidebar'], $data['code']));
             }
 
             $academy->update($data);
@@ -418,7 +468,8 @@ class AcademyManagementService
     {
         return DB::transaction(function () use ($academy) {
 
-            $this->deleteLogoVariants($academy);
+            $this->deleteSquareLogoAssets($academy);
+            $this->deleteSidebarLogoAsset($academy);
 
             return $academy->delete();
         });

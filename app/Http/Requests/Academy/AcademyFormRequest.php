@@ -98,6 +98,13 @@ class AcademyFormRequest extends FormRequest
                 'max:2048'
             ],
 
+            'logo_sidebar' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp,svg',
+                'max:2048',
+            ],
+
             'primary_color' => [
                 'required',
                 'string',
@@ -169,6 +176,10 @@ class AcademyFormRequest extends FormRequest
             'logo.image' => __('Logo harus berupa gambar.'),
             'logo.mimes' => __('Format gambar logo harus berupa: jpeg, png, jpg, webp, atau svg.'),
             'logo.max' => __('Ukuran logo tidak boleh lebih dari 2MB.'),
+
+            'logo_sidebar.image' => __('Logo sidebar harus berupa gambar.'),
+            'logo_sidebar.mimes' => __('Format gambar logo sidebar harus berupa: jpeg, png, jpg, webp, atau svg.'),
+            'logo_sidebar.max' => __('Ukuran logo sidebar tidak boleh lebih dari 2MB.'),
 
             'primary_color.required' => __('Warna utama wajib dipilih.'),
             'primary_color.regex' => __('Format warna tidak valid.'),

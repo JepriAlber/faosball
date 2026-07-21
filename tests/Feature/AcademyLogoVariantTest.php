@@ -40,7 +40,7 @@ class AcademyLogoVariantTest extends TestCase
         ], $overrides);
     }
 
-    public function test_upload_logo_raster_menghasilkan_dua_varian(): void
+    public function test_upload_logo_persegi_menghasilkan_favicon_saja(): void
     {
         $svc = app(AcademyManagementService::class);
         $academy = Academy::factory()->create();
@@ -49,10 +49,29 @@ class AcademyLogoVariantTest extends TestCase
 
         $academy = $svc->update($academy, $this->updatePayload($academy, ['logo' => $file]));
 
-        $this->assertNotNull($academy->logo_sidebar);
         $this->assertNotNull($academy->logo_favicon);
-        Storage::disk('public')->assertExists($academy->logo_sidebar);
         Storage::disk('public')->assertExists($academy->logo_favicon);
+
+        // logo_sidebar TIDAK ikut terisi lagi -- sejak issue8.md, field ini
+        // punya upload+crop sendiri, bukan turunan dari logo persegi.
+        $this->assertNull($academy->logo_sidebar);
+    }
+
+    public function test_upload_logo_sidebar_terpisah_dari_logo_persegi(): void
+    {
+        $svc = app(AcademyManagementService::class);
+        $academy = Academy::factory()->create();
+
+        $file = UploadedFile::fake()->image('logo-sidebar.png', 980, 260);
+
+        $academy = $svc->update($academy, $this->updatePayload($academy, ['logo_sidebar' => $file]));
+
+        $this->assertNotNull($academy->logo_sidebar);
+        Storage::disk('public')->assertExists($academy->logo_sidebar);
+
+        // logo (persegi) & logo_favicon TIDAK ikut terisi -- upload independen.
+        $this->assertNull($academy->logo);
+        $this->assertNull($academy->logo_favicon);
     }
 
     public function test_upload_logo_svg_di_skip_bukan_error(): void
@@ -70,35 +89,66 @@ class AcademyLogoVariantTest extends TestCase
         Storage::disk('public')->assertExists($academy->logo);
     }
 
-    public function test_ganti_logo_menghapus_varian_lama(): void
+    public function test_ganti_logo_persegi_menghapus_favicon_lama_tanpa_sentuh_sidebar(): void
     {
         $svc = app(AcademyManagementService::class);
         $academy = Academy::factory()->create();
 
         $academy = $svc->update($academy, $this->updatePayload($academy, [
             'logo' => UploadedFile::fake()->image('logo-lama.png', 300, 300),
+            'logo_sidebar' => UploadedFile::fake()->image('sidebar.png', 980, 260),
         ]));
 
-        $sidebarLama = $academy->logo_sidebar;
         $faviconLama = $academy->logo_favicon;
+        $sidebarAwal = $academy->logo_sidebar;
 
         $academy = $svc->update($academy, $this->updatePayload($academy, [
             'logo' => UploadedFile::fake()->image('logo-baru.png', 300, 300),
         ]));
 
-        Storage::disk('public')->assertMissing($sidebarLama);
         Storage::disk('public')->assertMissing($faviconLama);
-        Storage::disk('public')->assertExists($academy->logo_sidebar);
         Storage::disk('public')->assertExists($academy->logo_favicon);
+
+        // Mengganti logo persegi TIDAK BOLEH menyentuh logo_sidebar yang
+        // tidak sedang diganti pada request yang sama.
+        $this->assertSame($sidebarAwal, $academy->logo_sidebar);
+        Storage::disk('public')->assertExists($academy->logo_sidebar);
     }
 
-    public function test_hapus_academy_menghapus_logo_dan_variannya(): void
+    public function test_ganti_logo_sidebar_menghapus_sidebar_lama_tanpa_sentuh_logo_persegi(): void
     {
         $svc = app(AcademyManagementService::class);
         $academy = Academy::factory()->create();
 
         $academy = $svc->update($academy, $this->updatePayload($academy, [
             'logo' => UploadedFile::fake()->image('logo.png', 300, 300),
+            'logo_sidebar' => UploadedFile::fake()->image('sidebar-lama.png', 980, 260),
+        ]));
+
+        $sidebarLama = $academy->logo_sidebar;
+        $faviconAwal = $academy->logo_favicon;
+
+        $academy = $svc->update($academy, $this->updatePayload($academy, [
+            'logo_sidebar' => UploadedFile::fake()->image('sidebar-baru.png', 980, 260),
+        ]));
+
+        Storage::disk('public')->assertMissing($sidebarLama);
+        Storage::disk('public')->assertExists($academy->logo_sidebar);
+
+        // Mengganti logo_sidebar TIDAK BOLEH menyentuh logo persegi/favicon
+        // yang tidak sedang diganti pada request yang sama.
+        $this->assertSame($faviconAwal, $academy->logo_favicon);
+        Storage::disk('public')->assertExists($academy->logo_favicon);
+    }
+
+    public function test_hapus_academy_menghapus_logo_dan_kedua_variannya(): void
+    {
+        $svc = app(AcademyManagementService::class);
+        $academy = Academy::factory()->create();
+
+        $academy = $svc->update($academy, $this->updatePayload($academy, [
+            'logo' => UploadedFile::fake()->image('logo.png', 300, 300),
+            'logo_sidebar' => UploadedFile::fake()->image('sidebar.png', 980, 260),
         ]));
 
         $logo = $academy->logo;
@@ -138,6 +188,7 @@ class AcademyLogoVariantTest extends TestCase
 
         $academy = $academyManagementService->update($academy, $this->updatePayload($academy, [
             'logo' => UploadedFile::fake()->image('logo.png', 300, 300),
+            'logo_sidebar' => UploadedFile::fake()->image('sidebar.png', 980, 260),
         ]));
 
         $owner = User::factory()->create(['id_academy' => $academy->id_academy, 'status' => true]);

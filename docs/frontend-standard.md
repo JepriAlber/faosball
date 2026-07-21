@@ -18,6 +18,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Urutan & Pengelompokan Field Form (Create/Edit)](#urutan--pengelompokan-field-form-createedit)
 - [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
 - [Theming Per-Academy (CSS Custom Property Override)](#theming-per-academy-css-custom-property-override)
+- [Upload Logo Multi-Slot (Persegi + Wordmark)](#upload-logo-multi-slot-persegi--wordmark)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -275,6 +276,19 @@ FAOSBall mendukung 1 warna utama (`primary_color`) per academy yang menggantikan
 3. Generate ramp 12 shade dari 1 warna dasar ada di `App\Support\ColorRamp` — class murni, tidak bergantung Laravel, gampang di-unit-test.
 
 **Kapan pola ini dipakai lagi**: kalau ada kebutuhan theming per-tenant lain (secondary color, dst), reuse `ColorRamp` dan pola Component yang sama — jangan bikin mekanisme baru dari nol.
+
+---
+
+## Upload Logo Multi-Slot (Persegi + Wordmark)
+
+Academy punya 2 slot logo independen, masing-masing lewat `<x-logo-upload-field>` yang sama (reusable lewat `@props`: `name`, `aspect-ratio`, `output-width`/`output-height`, `preview-class`, dst):
+
+1. **`logo`** (persegi, aspect ratio 1) -- sumber untuk `logo_favicon` (cover crop 64x64) dan calon kebutuhan lain yang butuh logo proporsional (kartu nama, kop surat).
+2. **`logo_sidebar`** (wordmark, aspect ratio lebar ~3.77) -- dipakai apa adanya di slot sidebar/header (`scaleDown` ke bounding box 245x65, TANPA crop tambahan).
+
+**Kapan pola ini dipakai lagi**: field upload+crop baru dengan rasio berbeda dari yang sudah ada -- reuse `<x-logo-upload-field>` dengan `:aspect-ratio`/`:output-width`/`:output-height` baru, JANGAN hand-roll komponen crop baru.
+
+**Fallback saat academy belum upload**: `<x-academy-logo>` (`App\View\Components\AcademyLogo`) render teks nama academy (slot lebar) atau inisial 1-2 huruf lewat `App\Support\Initials` (slot persegi kecil) kalau academy aktif belum punya logo sendiri -- BUKAN fallback ke logo generic sistem (itu cuma untuk Super Admin). Warnanya numpang di token `brand` yang sudah di-override `<x-academy-theme>` per academy, tidak re-compute warna sendiri. Method `AcademyService::sidebarLogoUrl()`/`faviconUrl()` (selalu return URL gambar) TETAP dipakai apa adanya oleh `<link rel="icon">` -- fallback teks HANYA berlaku di jalur `<x-academy-logo>` Component.
 
 ---
 

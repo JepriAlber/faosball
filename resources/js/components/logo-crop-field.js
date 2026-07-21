@@ -1,6 +1,6 @@
 import Cropper from 'cropperjs';
 
-export default (initialPreview = '') => ({
+export default (initialPreview = '', aspectRatio = 1, outputWidth = 1024, outputHeight = 1024) => ({
     imagePreview: initialPreview,
     showCropModal: false,
     cropper: null,
@@ -27,7 +27,7 @@ export default (initialPreview = '') => ({
 
     initCropper() {
         this.cropper = new Cropper(this.$refs.cropperImage, {
-            aspectRatio: 1,
+            aspectRatio: aspectRatio,
             viewMode: 1,
             autoCropArea: 1,
             background: false,
@@ -35,7 +35,7 @@ export default (initialPreview = '') => ({
     },
 
     confirmCrop() {
-        this.cropper.getCroppedCanvas({ width: 1024, height: 1024 }).toBlob((blob) => {
+        this.cropper.getCroppedCanvas({ width: outputWidth, height: outputHeight }).toBlob((blob) => {
 
             const croppedFile = new File([blob], 'logo.png', { type: 'image/png' });
 
