@@ -22,10 +22,10 @@ class PlayerTypeController extends Controller
     public function index()
     {
         return view('player-types.index', [
-            'title' => 'Player Type',
+            'title' => __('Player Type'),
             'breadcrumb' => [
-                ['label' => 'Players', 'url' => route('players.index')],
-                ['label' => 'Player Type'],
+                ['label' => __('Players'), 'url' => route('players.index')],
+                ['label' => __('Player Type')],
             ],
             'playerTypes' => $this->playerTypeService->paginate(),
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
@@ -35,10 +35,10 @@ class PlayerTypeController extends Controller
     public function create()
     {
         return view('player-types.create', [
-            'title' => 'Tambah Player Type',
+            'title' => __('Tambah Player Type'),
             'breadcrumb' => [
-                ['label' => 'Player Type', 'url' => route('player-types.index')],
-                ['label' => 'Tambah Player Type'],
+                ['label' => __('Player Type'), 'url' => route('player-types.index')],
+                ['label' => __('Tambah Player Type')],
             ],
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
             'academies' => $this->academyService->isSuperAdmin()
@@ -55,21 +55,21 @@ class PlayerTypeController extends Controller
 
             return redirect()
                 ->route('player-types.index')
-                ->with('success', 'Player type berhasil ditambahkan.');
+                ->with('success', __('Player type berhasil ditambahkan.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menambahkan player type');
+            return $this->handleException($e, __('Gagal menambahkan player type'));
         }
     }
 
     public function edit(PlayerType $playerType)
     {
         return view('player-types.edit', [
-            'title' => 'Edit Player Type',
+            'title' => __('Edit Player Type'),
             'breadcrumb' => [
-                ['label' => 'Player Type', 'url' => route('player-types.index')],
-                ['label' => 'Edit Player Type'],
+                ['label' => __('Player Type'), 'url' => route('player-types.index')],
+                ['label' => __('Edit Player Type')],
             ],
             'playerType' => $playerType,
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
@@ -84,11 +84,11 @@ class PlayerTypeController extends Controller
 
             return redirect()
                 ->route('player-types.index')
-                ->with('success', 'Player type berhasil diperbarui.');
+                ->with('success', __('Player type berhasil diperbarui.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui player type');
+            return $this->handleException($e, __('Gagal memperbarui player type'));
         }
     }
 
@@ -100,11 +100,11 @@ class PlayerTypeController extends Controller
 
             return redirect()
                 ->route('player-types.index')
-                ->with('success', 'Player type berhasil dihapus.');
+                ->with('success', __('Player type berhasil dihapus.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus player type', 'player-types.index');
+            return $this->handleException($e, __('Gagal menghapus player type'), 'player-types.index');
         }
     }
 }

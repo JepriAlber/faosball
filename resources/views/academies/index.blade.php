@@ -15,9 +15,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Academy List</h3>
-                <p class="card-description">Manajemen profil, tagline, dan status akademi
-                    sepak bola.</p>
+                <h3 class="card-title">{{ __('Academy List') }}</h3>
+                <p class="card-description">{{ __('Manajemen profil, tagline, dan status akademi sepak bola.') }}</p>
             </div>
             <div class="card-actions">
                 @can('academy.create')
@@ -26,7 +25,7 @@
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        Tambah Academy
+                        {{ __('Tambah Academy') }}
                     </a>
                 @endcan
             </div>
@@ -36,30 +35,30 @@
             $hasActiveFilters = !empty($filters);
 
             $subscriptionBadges = [
-                'aktif' => ['label' => 'Aktif', 'class' => 'badge-success'],
-                'akan_berakhir' => ['label' => 'Akan Berakhir', 'class' => 'badge-warning'],
-                'kadaluarsa' => ['label' => 'Kadaluarsa', 'class' => 'badge-danger'],
-                'belum_diatur' => ['label' => 'Belum Diatur', 'class' => 'badge-secondary'],
+                'aktif' => ['label' => __('Aktif'), 'class' => 'badge-success'],
+                'akan_berakhir' => ['label' => __('Akan Berakhir'), 'class' => 'badge-warning'],
+                'kadaluarsa' => ['label' => __('Kadaluarsa'), 'class' => 'badge-danger'],
+                'belum_diatur' => ['label' => __('Belum Diatur'), 'class' => 'badge-secondary'],
             ];
         @endphp
 
         <div class="border-b border-gray-100 p-4 dark:border-gray-800">
             <x-table.tabs route="academies.index" :active="$filters['status'] ?? ''" :tabs="[
-                '' => ['label' => 'Semua', 'count' => $statusCounts['active'] + $statusCounts['inactive']],
-                'active' => ['label' => 'Aktif', 'count' => $statusCounts['active']],
-                'inactive' => ['label' => 'Nonaktif', 'count' => $statusCounts['inactive']],
+                '' => ['label' => __('Semua'), 'count' => $statusCounts['active'] + $statusCounts['inactive']],
+                'active' => ['label' => __('Aktif'), 'count' => $statusCounts['active']],
+                'inactive' => ['label' => __('Nonaktif'), 'count' => $statusCounts['inactive']],
             ]" />
         </div>
 
-        <x-table.toolbar route="academies.index" :filters="$filters" placeholder="Cari nama, kode, email, atau telepon academy...">
+        <x-table.toolbar route="academies.index" :filters="$filters" :placeholder="__('Cari nama, kode, email, atau telepon academy...')">
 
             <div class="form-group">
-                <label class="form-label">Urutkan</label>
+                <label class="form-label">{{ __('Urutkan') }}</label>
                 <select name="sort" class="form-select">
-                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
-                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
-                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
-                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('Terbaru') }}</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>{{ __('Terlama') }}</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Nama A-Z') }}</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Nama Z-A') }}</option>
                 </select>
             </div>
 
@@ -70,12 +69,12 @@
             <table class="table">
                 <thead class="table-head">
                     <tr class="table-header-row">
-                        <th class="table-header-cell">Info Academy </th>
-                        <th class="table-header-cell">Kontak</th>
-                        <th class="table-header-cell">Tagline</th>
-                        <th class="table-header-cell">Langganan</th>
-                        <th class="table-header-cell">Status</th>
-                        <th class="table-header-cell text-center"> Aksi</th>
+                        <th class="table-header-cell">{{ __('Info Academy') }} </th>
+                        <th class="table-header-cell">{{ __('Kontak') }}</th>
+                        <th class="table-header-cell">{{ __('Tagline') }}</th>
+                        <th class="table-header-cell">{{ __('Langganan') }}</th>
+                        <th class="table-header-cell">{{ __('Status') }}</th>
+                        <th class="table-header-cell text-center">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="table-body">
@@ -119,17 +118,17 @@
                                     @php $badge = $subscriptionBadges[$academy->subscription_status] @endphp
                                     <span class="badge {{ $badge['class'] }} badge-sm mt-1">{{ $badge['label'] }}</span>
                                 @else
-                                    <span class="badge badge-secondary badge-sm">Belum Diatur</span>
+                                    <span class="badge badge-secondary badge-sm">{{ __('Belum Diatur') }}</span>
                                 @endif
                             </td>
                             <td class="table-cell">
                                 @if ($academy->status)
                                     <span class="badge badge-success">
-                                        Aktif
+                                        {{ __('Aktif') }}
                                     </span>
                                 @else
                                     <span class="badge badge-danger">
-                                        Nonaktif
+                                        {{ __('Nonaktif') }}
                                     </span>
                                 @endif
                             </td>
@@ -137,7 +136,7 @@
                                 <div class="table-action">
                                     @can('academy.view')
                                         <a href="{{ route('academies.show', $academy->id_academy) }}"
-                                            class="btn-icon btn-icon-primary" title="Detail">
+                                            class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path
@@ -153,7 +152,7 @@
                                     @endcan
                                     @can('academy.update')
                                         <a href="{{ route('academies.edit', $academy->id_academy) }}"
-                                            class="btn-icon btn-icon-warning" title="Edit">
+                                            class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
@@ -167,7 +166,7 @@
                                     @can('academy.update')
                                         @if (!$academy->id_owner_user)
                                             <a href="{{ route('academies.account.create', $academy->id_academy) }}"
-                                                class="btn-icon btn-icon-success" title="Buat Akun Owner">
+                                                class="btn-icon btn-icon-success" title="{{ __('Buat Akun Owner') }}">
                                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                     <path
                                                         d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
@@ -198,14 +197,13 @@
                                             stroke-linejoin="round" />
                                     </svg>
                                     @if ($hasActiveFilters)
-                                        <h4 class="empty-title">Tidak ada academy yang cocok</h4>
-                                        <p class="empty-description">Coba ubah kata kunci atau filter yang dipakai</p>
-                                        <a href="{{ route('academies.index') }}" class="empty-link">Reset Filter</a>
+                                        <h4 class="empty-title">{{ __('Tidak ada academy yang cocok') }}</h4>
+                                        <p class="empty-description">{{ __('Coba ubah kata kunci atau filter yang dipakai') }}</p>
+                                        <a href="{{ route('academies.index') }}" class="empty-link">{{ __('Reset Filter') }}</a>
                                     @else
-                                        <h4 class="empty-title">Belum ada data Academy</h4>
-                                        <p class="empty-description">Tambah academy sekarang</p>
-                                        <a href="{{ route('academies.create') }}" class="empty-link">Tambah
-                                            sekarang</a>
+                                        <h4 class="empty-title">{{ __('Belum ada data Academy') }}</h4>
+                                        <p class="empty-description">{{ __('Tambah academy sekarang') }}</p>
+                                        <a href="{{ route('academies.create') }}" class="empty-link">{{ __('Tambah sekarang') }}</a>
                                     @endif
                                 </div>
                             </td>
@@ -243,26 +241,26 @@
                         </div>
 
                         @if ($academy->status)
-                            <span class="badge badge-success shrink-0">Aktif</span>
+                            <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
                         @else
-                            <span class="badge badge-danger shrink-0">Nonaktif</span>
+                            <span class="badge badge-danger shrink-0">{{ __('Nonaktif') }}</span>
                         @endif
                     </div>
 
                     <div class="table-card-body">
                         <div class="table-card-field">
-                            <span class="table-card-label">Kontak</span>
+                            <span class="table-card-label">{{ __('Kontak') }}</span>
                             <span class="table-text">{{ $academy->email }}</span>
                             <span class="table-subtitle">{{ $academy->phone }}</span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Tagline</span>
+                            <span class="table-card-label">{{ __('Tagline') }}</span>
                             <span class="table-description">"{{ $academy->tagline }}"</span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Langganan</span>
+                            <span class="table-card-label">{{ __('Langganan') }}</span>
                             @if ($academy->subscription_type)
                                 <span class="table-text">{{ $subscriptionTypes[$academy->subscription_type] }}</span>
                                 <span class="table-subtitle">
@@ -271,7 +269,7 @@
                                 @php $badge = $subscriptionBadges[$academy->subscription_status] @endphp
                                 <span class="badge {{ $badge['class'] }} badge-sm mt-1">{{ $badge['label'] }}</span>
                             @else
-                                <span class="badge badge-secondary badge-sm">Belum Diatur</span>
+                                <span class="badge badge-secondary badge-sm">{{ __('Belum Diatur') }}</span>
                             @endif
                         </div>
                     </div>
@@ -279,7 +277,7 @@
                     <div class="table-card-actions">
                         @can('academy.view')
                             <a href="{{ route('academies.show', $academy->id_academy) }}"
-                                class="btn-icon btn-icon-primary" title="Detail">
+                                class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -295,7 +293,7 @@
                         @endcan
                         @can('academy.update')
                             <a href="{{ route('academies.edit', $academy->id_academy) }}"
-                                class="btn-icon btn-icon-warning" title="Edit">
+                                class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
@@ -308,7 +306,7 @@
                         @can('academy.update')
                             @if (!$academy->id_owner_user)
                                 <a href="{{ route('academies.account.create', $academy->id_academy) }}"
-                                    class="btn-icon btn-icon-success" title="Buat Akun Owner">
+                                    class="btn-icon btn-icon-success" title="{{ __('Buat Akun Owner') }}">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                         <path
                                             d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
@@ -337,14 +335,13 @@
                                 stroke-linejoin="round" />
                         </svg>
                         @if ($hasActiveFilters)
-                            <h4 class="empty-title">Tidak ada academy yang cocok</h4>
-                            <p class="empty-description">Coba ubah kata kunci atau filter yang dipakai</p>
-                            <a href="{{ route('academies.index') }}" class="empty-link">Reset Filter</a>
+                            <h4 class="empty-title">{{ __('Tidak ada academy yang cocok') }}</h4>
+                            <p class="empty-description">{{ __('Coba ubah kata kunci atau filter yang dipakai') }}</p>
+                            <a href="{{ route('academies.index') }}" class="empty-link">{{ __('Reset Filter') }}</a>
                         @else
-                            <h4 class="empty-title">Belum ada data Academy</h4>
-                            <p class="empty-description">Tambah academy sekarang</p>
-                            <a href="{{ route('academies.create') }}" class="empty-link">Tambah
-                                sekarang</a>
+                            <h4 class="empty-title">{{ __('Belum ada data Academy') }}</h4>
+                            <p class="empty-description">{{ __('Tambah academy sekarang') }}</p>
+                            <a href="{{ route('academies.create') }}" class="empty-link">{{ __('Tambah sekarang') }}</a>
                         @endif
                     </div>
                 </div>

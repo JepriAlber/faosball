@@ -22,19 +22,19 @@ class PlayerAccountController extends Controller
         if ($player->id_user) {
             return redirect()
                 ->route('players.index')
-                ->with('error','Player sudah memiliki akun.');
+                ->with('error',__('Player sudah memiliki akun.'));
         }
 
         return view('players.account.create',[
-            'title'=>'Buat Akun Player',
+            'title'=>__('Buat Akun Player'),
             'player'=>$player,
             'breadcrumb'=>[
                 [
-                    'label'=>'Players',
+                    'label'=>__('Players'),
                     'url'=>route('players.index')
                 ],
                 [
-                    'label'=>'Buat Akun'
+                    'label'=>__('Buat Akun')
                 ]
             ],
         ]);
@@ -47,7 +47,7 @@ class PlayerAccountController extends Controller
             if ($player->id_user) {
                 return redirect()
                     ->route('players.index')
-                    ->with('error','Player sudah memiliki akun.');
+                    ->with('error',__('Player sudah memiliki akun.'));
             }
 
             DB::transaction(function() use ($request,$player){
@@ -68,12 +68,12 @@ class PlayerAccountController extends Controller
                 ->route('players.index')
                 ->with(
                     'success',
-                    'Akun player berhasil dibuat.'
+                    __('Akun player berhasil dibuat.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal membuat akun player');
+            return $this->handleException($e, __('Gagal membuat akun player'));
         }
     }
 
@@ -83,16 +83,16 @@ class PlayerAccountController extends Controller
         if (!$player->user) {
             return redirect()
                 ->route('players.show',$player)
-                ->with('error','Player belum memiliki akun.');
+                ->with('error',__('Player belum memiliki akun.'));
         }
 
         return view('players.account.edit',[
-            'title'=>'Edit Akun Player',
+            'title'=>__('Edit Akun Player'),
             'player'=>$player,
             'user'=>$player->user,
             'breadcrumb'=>[
                 [
-                    'label'=>'Players',
+                    'label'=>__('Players'),
                     'url'=>route('players.index')
                 ],
                 [
@@ -100,7 +100,7 @@ class PlayerAccountController extends Controller
                     'url'=>route('players.show',$player)
                 ],
                 [
-                    'label'=>'Edit Account'
+                    'label'=>__('Edit Account')
                 ]
             ],
         ]);
@@ -114,7 +114,7 @@ class PlayerAccountController extends Controller
             if (!$player->user) {
                 return redirect()
                     ->route('players.show',$player)
-                    ->with('error','Player belum memiliki akun.');
+                    ->with('error',__('Player belum memiliki akun.'));
             }
 
             $this->accountService->update(
@@ -126,12 +126,12 @@ class PlayerAccountController extends Controller
                 ->route('players.show',$player)
                 ->with(
                     'success',
-                    'Account player berhasil diperbarui.'
+                    __('Account player berhasil diperbarui.')
                 );
 
         } catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal update account');
+            return $this->handleException($e, __('Gagal update account'));
 
         }
     }
@@ -143,7 +143,7 @@ class PlayerAccountController extends Controller
             if (!$player->user) {
                 return redirect()
                     ->route('players.show',$player)
-                    ->with('error','Player belum memiliki akun.');
+                    ->with('error',__('Player belum memiliki akun.'));
             }
 
 
@@ -160,13 +160,13 @@ class PlayerAccountController extends Controller
                 ->route('players.show',$player)
                 ->with(
                     'success',
-                    'Password berhasil direset. Password baru: '.$newPassword
+                    __('Password berhasil direset. Password baru: ').$newPassword
                 );
 
 
         } catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal reset password', 'players.show', [$player]);
+            return $this->handleException($e, __('Gagal reset password'), 'players.show', [$player]);
 
         }
     }
@@ -178,7 +178,7 @@ class PlayerAccountController extends Controller
             if (!$player->user) {
                 return redirect()
                     ->route('players.show',$player)
-                    ->with('error','Player belum memiliki akun.');
+                    ->with('error',__('Player belum memiliki akun.'));
             }
 
 
@@ -196,14 +196,14 @@ class PlayerAccountController extends Controller
                 ->with(
                     'success',
                     $status
-                        ? 'Account player berhasil diaktifkan.'
-                        : 'Account player berhasil dinonaktifkan.'
+                        ? __('Account player berhasil diaktifkan.')
+                        : __('Account player berhasil dinonaktifkan.')
                 );
 
 
         } catch(\Exception $e){
 
-            return $this->handleException($e, 'Gagal mengubah status account', 'players.show', [$player]);
+            return $this->handleException($e, __('Gagal mengubah status account'), 'players.show', [$player]);
 
         }
     }

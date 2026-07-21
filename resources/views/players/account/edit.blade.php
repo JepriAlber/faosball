@@ -14,17 +14,17 @@
 
             <div>
                 <h3 class="card-title">
-                    Edit Akun Player
+                    {{ __('Edit Akun Player') }}
                 </h3>
 
                 <p class="card-description">
-                    Mengubah informasi akun login untuk <strong>{{ $player->name }}</strong>.
+                    {{ __('Mengubah informasi akun login untuk') }} <strong>{{ $player->name }}</strong>.
                 </p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('players.show', $player) }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
 
@@ -42,7 +42,7 @@
                 <div class="form-group">
 
                     <label class="form-label">
-                        Nama Account <span class="text-error-500">*</span>
+                        {{ __('Nama Account') }} <span class="text-error-500">*</span>
                     </label>
 
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
@@ -60,7 +60,7 @@
                 <div class="form-group">
 
                     <label class="form-label">
-                        Email <span class="text-error-500">*</span>
+                        {{ __('Email') }} <span class="text-error-500">*</span>
                     </label>
 
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
@@ -78,12 +78,12 @@
                 <div class="mt-6 flex justify-end gap-3 border-t pt-5">
 
                     <a href="{{ route('players.show', $player) }}" class="btn btn-secondary">
-                        Batal
+                        {{ __('Batal') }}
                     </a>
 
 
                     <button type="submit" class="btn btn-primary">
-                        Simpan Perubahan
+                        {{ __('Simpan Perubahan') }}
                     </button>
 
                 </div>

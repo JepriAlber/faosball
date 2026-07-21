@@ -127,7 +127,7 @@ class PlayerPositionService
                 || $playerPosition->secondaryPlayers()->withoutGlobalScopes()->exists();
 
             if ($dipakai) {
-                throw new \Exception('Posisi masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan posisi ini kalau sudah tidak dipakai.');
+                throw new \Exception(__('Posisi masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan posisi ini kalau sudah tidak dipakai.'));
             }
 
             return $playerPosition->delete();

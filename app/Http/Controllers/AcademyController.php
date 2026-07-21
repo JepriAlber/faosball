@@ -26,10 +26,10 @@ class AcademyController extends Controller
         $filters = array_filter($request->only(['search', 'status', 'sort']));
 
         return view('academies.index',[
-            'title'=>'Manajemen Academy',
+            'title'=>__('Manajemen Academy'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Manajemen Academy'
+                    'label'=>__('Manajemen Academy')
                 ]
             ],
             'academies' => $this->academyManagementService->paginate($filters),
@@ -46,14 +46,14 @@ class AcademyController extends Controller
     public function create()
     {
         return view('academies.create',[
-            'title'=>'Tambah Academy',
+            'title'=>__('Tambah Academy'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Manajemen Academy',
+                    'label'=>__('Manajemen Academy'),
                     'url'=>route('academies.index')
                 ],
                 [
-                    'label'=>'Tambah Academy'
+                    'label'=>__('Tambah Academy')
                 ]
             ],
             'subscriptionTypes' => AcademyManagementService::SUBSCRIPTION_TYPES,
@@ -75,12 +75,12 @@ class AcademyController extends Controller
                 ->route('academies.index')
                 ->with(
                     'success',
-                    'Academy berhasil ditambahkan.'
+                    __('Academy berhasil ditambahkan.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menambahkan academy');
+            return $this->handleException($e, __('Gagal menambahkan academy'));
         }
     }
 
@@ -93,14 +93,14 @@ class AcademyController extends Controller
         $academy->load('owner');
 
         return view('academies.show',[
-            'title'=>'Detail Academy',
+            'title'=>__('Detail Academy'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Manajemen Academy',
+                    'label'=>__('Manajemen Academy'),
                     'url'=>route('academies.index')
                 ],
                 [
-                    'label'=>'Detail Academy'
+                    'label'=>__('Detail Academy')
                 ]
             ],
             'academy'=>$academy,
@@ -116,14 +116,14 @@ class AcademyController extends Controller
     public function edit(Academy $academy)
     {
         return view('academies.edit',[
-            'title'=>'Edit Academy',
+            'title'=>__('Edit Academy'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Manajemen Academy',
+                    'label'=>__('Manajemen Academy'),
                     'url'=>route('academies.index')
                 ],
                 [
-                    'label'=>'Edit Academy'
+                    'label'=>__('Edit Academy')
                 ]
             ],
             'academy'=>$academy,
@@ -149,13 +149,13 @@ class AcademyController extends Controller
                 ->route('academies.index')
                 ->with(
                     'success',
-                    'Academy berhasil diperbarui.'
+                    __('Academy berhasil diperbarui.')
                 );
 
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui academy');
+            return $this->handleException($e, __('Gagal memperbarui academy'));
         }
     }
 
@@ -176,13 +176,13 @@ class AcademyController extends Controller
                 ->route('academies.index')
                 ->with(
                     'success',
-                    'Academy berhasil dihapus.'
+                    __('Academy berhasil dihapus.')
                 );
 
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus academy', 'academies.index');
+            return $this->handleException($e, __('Gagal menghapus academy'), 'academies.index');
         }
     }
 }

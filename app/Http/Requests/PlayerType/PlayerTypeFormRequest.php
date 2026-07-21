@@ -51,23 +51,23 @@ class PlayerTypeFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'id_academy.required' => 'Academy wajib dipilih.',
-            'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
-            'id_academy.uuid' => 'Academy tidak valid.',
-            'id_academy.exists' => 'Academy tidak ditemukan.',
+            'id_academy.required' => __('Academy wajib dipilih.'),
+            'id_academy.prohibited' => __('Academy tidak dapat dipilih.'),
+            'id_academy.uuid' => __('Academy tidak valid.'),
+            'id_academy.exists' => __('Academy tidak ditemukan.'),
 
-            'name.required' => 'Nama type wajib diisi.',
-            'name.string' => 'Nama type harus berupa teks.',
-            'name.max' => 'Nama type maksimal :max karakter.',
-            'name.unique' => 'Nama type sudah digunakan pada academy ini.',
+            'name.required' => __('Nama type wajib diisi.'),
+            'name.string' => __('Nama type harus berupa teks.'),
+            'name.max' => __('Nama type maksimal :max karakter.'),
+            'name.unique' => __('Nama type sudah digunakan pada academy ini.'),
 
-            'description.string' => 'Deskripsi harus berupa teks.',
+            'description.string' => __('Deskripsi harus berupa teks.'),
 
-            'is_billable.required' => 'Status tagihan wajib ditentukan.',
-            'is_billable.boolean' => 'Status tagihan tidak valid.',
+            'is_billable.required' => __('Status tagihan wajib ditentukan.'),
+            'is_billable.boolean' => __('Status tagihan tidak valid.'),
 
-            'status.required' => 'Status wajib ditentukan.',
-            'status.boolean' => 'Status tidak valid.',
+            'status.required' => __('Status wajib ditentukan.'),
+            'status.boolean' => __('Status tidak valid.'),
         ];
     }
 }

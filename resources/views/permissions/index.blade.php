@@ -11,8 +11,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Permission List</h3>
-                <p class="card-description">Daftar hak akses (permission) yang tersedia pada sistem.</p>
+                <h3 class="card-title">{{ __('Permission List') }}</h3>
+                <p class="card-description">{{ __('Daftar hak akses (permission) yang tersedia pada sistem.') }}</p>
             </div>
 
             @can('permission.create')
@@ -22,7 +22,7 @@
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        Tambah Permission
+                        {{ __('Tambah Permission') }}
                     </a>
                 </div>
             @endcan
@@ -33,12 +33,12 @@
 
                 <thead class="table-head">
                     <tr class="table-header-row">
-                        <th class="table-header-cell">Permission</th>
-                        <th class="table-header-cell">Module</th>
-                        <th class="table-header-cell">Action</th>
-                        <th class="table-header-cell">Guard</th>
-                        <th class="table-header-cell">Role</th>
-                        <th class="table-header-cell text-center">Aksi</th>
+                        <th class="table-header-cell">{{ __('Permission') }}</th>
+                        <th class="table-header-cell">{{ __('Module') }}</th>
+                        <th class="table-header-cell">{{ __('Action') }}</th>
+                        <th class="table-header-cell">{{ __('Guard') }}</th>
+                        <th class="table-header-cell">{{ __('Role') }}</th>
+                        <th class="table-header-cell text-center">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
 
@@ -73,7 +73,7 @@
                             </td>
 
                             <td class="table-cell">
-                                <span class="table-text">{{ $permission->roles_count }} Role</span>
+                                <span class="table-text">{{ $permission->roles_count }} {{ __('Role') }}</span>
                             </td>
 
                             <td class="table-cell text-right">
@@ -81,7 +81,7 @@
 
                                     @can('permission.view')
                                         <a href="{{ route('permissions.show', $permission) }}"
-                                            class="btn-icon btn-icon-primary" title="Detail">
+                                            class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                 <path
                                                     d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
@@ -96,7 +96,7 @@
                                     @can('permission.delete')
                                         <x-button.delete :action="route('permissions.destroy', $permission)"
                                             :name="$permission->name" :disabled="$permission->roles_count > 0"
-                                            reason="Permission masih digunakan oleh role, tidak dapat dihapus." />
+                                            reason="{{ __('Permission masih digunakan oleh role, tidak dapat dihapus.') }}" />
                                     @endcan
 
                                 </div>
@@ -115,12 +115,11 @@
                                             d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                             stroke="currentColor" stroke-width="2.5" />
                                     </svg>
-                                    <h4 class="empty-title">Belum ada Permission</h4>
-                                    <p class="empty-description">Tambahkan permission pertama.</p>
+                                    <h4 class="empty-title">{{ __('Belum ada Permission') }}</h4>
+                                    <p class="empty-description">{{ __('Tambahkan permission pertama.') }}</p>
 
                                     @can('permission.create')
-                                        <a href="{{ route('permissions.create') }}" class="empty-link">Tambah
-                                            Permission</a>
+                                        <a href="{{ route('permissions.create') }}" class="empty-link">{{ __('Tambah Permission') }}</a>
                                     @endcan
 
                                 </div>
@@ -152,27 +151,27 @@
 
                     <div class="table-card-body">
                         <div class="table-card-field">
-                            <span class="table-card-label">Module</span>
+                            <span class="table-card-label">{{ __('Module') }}</span>
                             <span class="badge badge-secondary w-fit">
                                 {{ \Illuminate\Support\Str::headline(\App\Support\PermissionPresenter::module($permission->name)) }}
                             </span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Guard</span>
+                            <span class="table-card-label">{{ __('Guard') }}</span>
                             <span class="badge badge-secondary w-fit">{{ $permission->guard_name }}</span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Role</span>
-                            <span class="table-text">{{ $permission->roles_count }} Role</span>
+                            <span class="table-card-label">{{ __('Role') }}</span>
+                            <span class="table-text">{{ $permission->roles_count }} {{ __('Role') }}</span>
                         </div>
                     </div>
 
                     <div class="table-card-actions">
                         @can('permission.view')
                             <a href="{{ route('permissions.show', $permission) }}"
-                                class="btn-icon btn-icon-primary" title="Detail">
+                                class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path
                                         d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
@@ -187,7 +186,7 @@
                         @can('permission.delete')
                             <x-button.delete :action="route('permissions.destroy', $permission)"
                                 :name="$permission->name" :disabled="$permission->roles_count > 0"
-                                reason="Permission masih digunakan oleh role, tidak dapat dihapus." />
+                                reason="{{ __('Permission masih digunakan oleh role, tidak dapat dihapus.') }}" />
                         @endcan
                     </div>
                 </div>
@@ -200,12 +199,11 @@
                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                 stroke="currentColor" stroke-width="2.5" />
                         </svg>
-                        <h4 class="empty-title">Belum ada Permission</h4>
-                        <p class="empty-description">Tambahkan permission pertama.</p>
+                        <h4 class="empty-title">{{ __('Belum ada Permission') }}</h4>
+                        <p class="empty-description">{{ __('Tambahkan permission pertama.') }}</p>
 
                         @can('permission.create')
-                            <a href="{{ route('permissions.create') }}" class="empty-link">Tambah
-                                Permission</a>
+                            <a href="{{ route('permissions.create') }}" class="empty-link">{{ __('Tambah Permission') }}</a>
                         @endcan
                     </div>
                 </div>

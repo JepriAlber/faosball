@@ -11,8 +11,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Role List</h3>
-                <p class="card-description">Manajemen hak akses berdasarkan peran pengguna dalam sistem.</p>
+                <h3 class="card-title">{{ __('Role List') }}</h3>
+                <p class="card-description">{{ __('Manajemen hak akses berdasarkan peran pengguna dalam sistem.') }}</p>
             </div>
 
             @can('role.create')
@@ -22,32 +22,32 @@
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        Tambah Role
+                        {{ __('Tambah Role') }}
                     </a>
                 </div>
             @endcan
         </div>
 
-        <x-table.toolbar route="roles.index" :filters="$filters" placeholder="Cari nama role...">
+        <x-table.toolbar route="roles.index" :filters="$filters" placeholder="{{ __('Cari nama role...') }}">
 
             <div class="form-group">
-                <label class="form-label">Urutkan</label>
+                <label class="form-label">{{ __('Urutkan') }}</label>
                 <select name="sort" class="form-select">
-                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
-                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
-                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
-                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('Terbaru') }}</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>{{ __('Terlama') }}</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Nama A-Z') }}</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Nama Z-A') }}</option>
                 </select>
             </div>
 
             @if ($isSuperAdmin)
                 <div class="form-group">
-                    <label class="form-label">Academy</label>
+                    <label class="form-label">{{ __('Academy') }}</label>
                     <select name="id_academy" class="form-select">
-                        <option value="">Semua Academy</option>
+                        <option value="">{{ __('Semua Academy') }}</option>
                         <option value="{{ \App\Services\RoleService::SYSTEM_ROLE_FILTER }}"
                             @selected(($filters['id_academy'] ?? '') === \App\Services\RoleService::SYSTEM_ROLE_FILTER)>
-                            Role System
+                            {{ __('Role System') }}
                         </option>
                         @foreach ($academies as $academy)
                             <option value="{{ $academy->id_academy }}" @selected(($filters['id_academy'] ?? '') === $academy->id_academy)>
@@ -65,13 +65,13 @@
 
                 <thead class="table-head">
                     <tr class="table-header-row">
-                        <th class="table-header-cell">Role</th>
+                        <th class="table-header-cell">{{ __('Role') }}</th>
                         @if ($isSuperAdmin)
-                            <th class="table-header-cell">Academy</th>
+                            <th class="table-header-cell">{{ __('Academy') }}</th>
                         @endif
-                        <th class="table-header-cell">Permission</th>
-                        <th class="table-header-cell">User</th>
-                        <th class="table-header-cell text-center">Aksi</th>
+                        <th class="table-header-cell">{{ __('Permission') }}</th>
+                        <th class="table-header-cell">{{ __('User') }}</th>
+                        <th class="table-header-cell text-center">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
 
@@ -93,17 +93,17 @@
                                     @if ($role->id_academy)
                                         <span class="badge badge-secondary">{{ $role->academy->name }}</span>
                                     @else
-                                        <span class="badge badge-primary">Role System</span>
+                                        <span class="badge badge-primary">{{ __('Role System') }}</span>
                                     @endif
                                 </td>
                             @endif
 
                             <td class="table-cell">
-                                <span class="table-text">{{ $role->permissions_count }} Permission</span>
+                                <span class="table-text">{{ $role->permissions_count }} {{ __('Permission') }}</span>
                             </td>
 
                             <td class="table-cell">
-                                <span class="table-text">{{ $role->users_count }} User</span>
+                                <span class="table-text">{{ $role->users_count }} {{ __('User') }}</span>
                             </td>
 
                             <td class="table-cell text-right">
@@ -111,7 +111,7 @@
 
                                     @can('role.view')
                                         <a href="{{ route('roles.show', $role) }}" class="btn-icon btn-icon-primary"
-                                            title="Detail">
+                                            title="{{ __('Detail') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                 <path
                                                     d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
@@ -126,7 +126,7 @@
                                     @can('role.update')
                                         @if ($role->name !== config('faos.super_admin_role'))
                                             <a href="{{ route('roles.edit', $role) }}" class="btn-icon btn-icon-warning"
-                                                title="Edit">
+                                                title="{{ __('Edit') }}">
                                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                     <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
                                                         stroke="currentColor" stroke-width="1.5" />
@@ -138,7 +138,7 @@
                                     @can('role.delete')
                                         @if ($role->name !== config('faos.super_admin_role'))
                                             <x-button.delete :action="route('roles.destroy', $role)" :name="$role->name" :disabled="$role->users_count > 0"
-                                                reason="Role masih digunakan oleh user, tidak dapat dihapus." />
+                                                reason="{{ __('Role masih digunakan oleh user, tidak dapat dihapus.') }}" />
                                         @endif
                                     @endcan
 
@@ -158,11 +158,11 @@
                                             d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                             stroke="currentColor" stroke-width="2.5" />
                                     </svg>
-                                    <h4 class="empty-title">Belum ada Role</h4>
-                                    <p class="empty-description">Tambahkan role pertama.</p>
+                                    <h4 class="empty-title">{{ __('Belum ada Role') }}</h4>
+                                    <p class="empty-description">{{ __('Tambahkan role pertama.') }}</p>
 
                                     @can('role.create')
-                                        <a href="{{ route('roles.create') }}" class="empty-link">Tambah Role</a>
+                                        <a href="{{ route('roles.create') }}" class="empty-link">{{ __('Tambah Role') }}</a>
                                     @endcan
 
                                 </div>
@@ -190,27 +190,27 @@
                             @if ($role->id_academy)
                                 <span class="badge badge-secondary shrink-0">{{ $role->academy->name }}</span>
                             @else
-                                <span class="badge badge-primary shrink-0">Role System</span>
+                                <span class="badge badge-primary shrink-0">{{ __('Role System') }}</span>
                             @endif
                         @endif
                     </div>
 
                     <div class="table-card-body">
                         <div class="table-card-field">
-                            <span class="table-card-label">Permission</span>
-                            <span class="table-text">{{ $role->permissions_count }} Permission</span>
+                            <span class="table-card-label">{{ __('Permission') }}</span>
+                            <span class="table-text">{{ $role->permissions_count }} {{ __('Permission') }}</span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">User</span>
-                            <span class="table-text">{{ $role->users_count }} User</span>
+                            <span class="table-card-label">{{ __('User') }}</span>
+                            <span class="table-text">{{ $role->users_count }} {{ __('User') }}</span>
                         </div>
                     </div>
 
                     <div class="table-card-actions">
                         @can('role.view')
                             <a href="{{ route('roles.show', $role) }}" class="btn-icon btn-icon-primary"
-                                title="Detail">
+                                title="{{ __('Detail') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path
                                         d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
@@ -225,7 +225,7 @@
                         @can('role.update')
                             @if ($role->name !== config('faos.super_admin_role'))
                                 <a href="{{ route('roles.edit', $role) }}" class="btn-icon btn-icon-warning"
-                                    title="Edit">
+                                    title="{{ __('Edit') }}">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                         <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
                                             stroke="currentColor" stroke-width="1.5" />
@@ -237,7 +237,7 @@
                         @can('role.delete')
                             @if ($role->name !== config('faos.super_admin_role'))
                                 <x-button.delete :action="route('roles.destroy', $role)" :name="$role->name" :disabled="$role->users_count > 0"
-                                    reason="Role masih digunakan oleh user, tidak dapat dihapus." />
+                                    reason="{{ __('Role masih digunakan oleh user, tidak dapat dihapus.') }}" />
                             @endif
                         @endcan
                     </div>
@@ -251,11 +251,11 @@
                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                 stroke="currentColor" stroke-width="2.5" />
                         </svg>
-                        <h4 class="empty-title">Belum ada Role</h4>
-                        <p class="empty-description">Tambahkan role pertama.</p>
+                        <h4 class="empty-title">{{ __('Belum ada Role') }}</h4>
+                        <p class="empty-description">{{ __('Tambahkan role pertama.') }}</p>
 
                         @can('role.create')
-                            <a href="{{ route('roles.create') }}" class="empty-link">Tambah Role</a>
+                            <a href="{{ route('roles.create') }}" class="empty-link">{{ __('Tambah Role') }}</a>
                         @endcan
                     </div>
                 </div>

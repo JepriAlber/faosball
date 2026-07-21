@@ -71,7 +71,7 @@ class PermissionService
         return DB::transaction(function () use ($permission) {
 
             if ($permission->roles()->exists()) {
-                throw new \Exception('Permission masih digunakan oleh role, tidak dapat dihapus.');
+                throw new \Exception(__('Permission masih digunakan oleh role, tidak dapat dihapus.'));
             }
 
             return $permission->delete();

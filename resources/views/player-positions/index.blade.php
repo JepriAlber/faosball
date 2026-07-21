@@ -11,8 +11,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Master Posisi Pemain</h3>
-                <p class="card-description">Daftar posisi pemain global yang dipakai bersama seluruh academy.</p>
+                <h3 class="card-title">{{ __('Master Posisi Pemain') }}</h3>
+                <p class="card-description">{{ __('Daftar posisi pemain global yang dipakai bersama seluruh academy.') }}</p>
             </div>
 
             @can('player_position.create')
@@ -22,7 +22,7 @@
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        Tambah Posisi
+                        {{ __('Tambah Posisi') }}
                     </a>
                 </div>
             @endcan
@@ -33,13 +33,13 @@
 
                 <thead class="table-head">
                     <tr class="table-header-row">
-                        <th class="table-header-cell">Kode</th>
-                        <th class="table-header-cell">Nama</th>
-                        <th class="table-header-cell">Kelompok</th>
-                        <th class="table-header-cell">Urutan</th>
-                        <th class="table-header-cell">Status</th>
-                        <th class="table-header-cell">Dipakai</th>
-                        <th class="table-header-cell text-center">Aksi</th>
+                        <th class="table-header-cell">{{ __('Kode') }}</th>
+                        <th class="table-header-cell">{{ __('Nama') }}</th>
+                        <th class="table-header-cell">{{ __('Kelompok') }}</th>
+                        <th class="table-header-cell">{{ __('Urutan') }}</th>
+                        <th class="table-header-cell">{{ __('Status') }}</th>
+                        <th class="table-header-cell">{{ __('Dipakai') }}</th>
+                        <th class="table-header-cell text-center">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
 
@@ -70,20 +70,20 @@
 
                             <td class="table-cell">
                                 @if ($playerPosition->status)
-                                    <span class="badge badge-success">Aktif</span>
+                                    <span class="badge badge-success">{{ __('Aktif') }}</span>
                                 @else
-                                    <span class="badge badge-danger">Nonaktif</span>
+                                    <span class="badge badge-danger">{{ __('Nonaktif') }}</span>
                                 @endif
                             </td>
 
                             <td class="table-cell">
                                 <span class="table-text">
                                     {{ $playerPosition->primary_players_count + $playerPosition->secondary_players_count }}
-                                    Player
+                                    {{ __('Player') }}
                                 </span>
                                 <span class="table-subtitle">
-                                    {{ $playerPosition->primary_players_count }} utama &middot;
-                                    {{ $playerPosition->secondary_players_count }} kedua
+                                    {{ $playerPosition->primary_players_count }} {{ __('utama') }} &middot;
+                                    {{ $playerPosition->secondary_players_count }} {{ __('kedua') }}
                                 </span>
                             </td>
 
@@ -92,7 +92,7 @@
 
                                     @can('player_position.update')
                                         <a href="{{ route('player-positions.edit', $playerPosition) }}"
-                                            class="btn-icon btn-icon-warning" title="Edit">
+                                            class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
                                                     stroke="currentColor" stroke-width="1.5" />
@@ -104,7 +104,7 @@
                                         <x-button.delete :action="route('player-positions.destroy', $playerPosition)"
                                             :name="$playerPosition->name"
                                             :disabled="$playerPosition->primary_players_count + $playerPosition->secondary_players_count > 0"
-                                            reason="Posisi masih digunakan oleh player, tidak dapat dihapus." />
+                                            reason="{{ __('Posisi masih digunakan oleh player, tidak dapat dihapus.') }}" />
                                     @endcan
 
                                 </div>
@@ -123,12 +123,11 @@
                                             d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                             stroke="currentColor" stroke-width="2.5" />
                                     </svg>
-                                    <h4 class="empty-title">Belum ada Posisi Pemain</h4>
-                                    <p class="empty-description">Tambahkan posisi pemain pertama.</p>
+                                    <h4 class="empty-title">{{ __('Belum ada Posisi Pemain') }}</h4>
+                                    <p class="empty-description">{{ __('Tambahkan posisi pemain pertama.') }}</p>
 
                                     @can('player_position.create')
-                                        <a href="{{ route('player-positions.create') }}" class="empty-link">Tambah
-                                            Posisi</a>
+                                        <a href="{{ route('player-positions.create') }}" class="empty-link">{{ __('Tambah Posisi') }}</a>
                                     @endcan
 
                                 </div>
@@ -160,28 +159,28 @@
 
                     <div class="table-card-body">
                         <div class="table-card-field">
-                            <span class="table-card-label">Urutan</span>
+                            <span class="table-card-label">{{ __('Urutan') }}</span>
                             <span class="table-text">{{ $playerPosition->sort_order }}</span>
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Status</span>
+                            <span class="table-card-label">{{ __('Status') }}</span>
                             @if ($playerPosition->status)
-                                <span class="badge badge-success w-fit">Aktif</span>
+                                <span class="badge badge-success w-fit">{{ __('Aktif') }}</span>
                             @else
-                                <span class="badge badge-danger w-fit">Nonaktif</span>
+                                <span class="badge badge-danger w-fit">{{ __('Nonaktif') }}</span>
                             @endif
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Dipakai</span>
+                            <span class="table-card-label">{{ __('Dipakai') }}</span>
                             <span class="table-text">
                                 {{ $playerPosition->primary_players_count + $playerPosition->secondary_players_count }}
-                                Player
+                                {{ __('Player') }}
                             </span>
                             <span class="table-subtitle">
-                                {{ $playerPosition->primary_players_count }} utama &middot;
-                                {{ $playerPosition->secondary_players_count }} kedua
+                                {{ $playerPosition->primary_players_count }} {{ __('utama') }} &middot;
+                                {{ $playerPosition->secondary_players_count }} {{ __('kedua') }}
                             </span>
                         </div>
                     </div>
@@ -189,7 +188,7 @@
                     <div class="table-card-actions">
                         @can('player_position.update')
                             <a href="{{ route('player-positions.edit', $playerPosition) }}"
-                                class="btn-icon btn-icon-warning" title="Edit">
+                                class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
                                         stroke="currentColor" stroke-width="1.5" />
@@ -201,7 +200,7 @@
                             <x-button.delete :action="route('player-positions.destroy', $playerPosition)"
                                 :name="$playerPosition->name"
                                 :disabled="$playerPosition->primary_players_count + $playerPosition->secondary_players_count > 0"
-                                reason="Posisi masih digunakan oleh player, tidak dapat dihapus." />
+                                reason="{{ __('Posisi masih digunakan oleh player, tidak dapat dihapus.') }}" />
                         @endcan
                     </div>
                 </div>
@@ -214,11 +213,11 @@
                                 d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z"
                                 stroke="currentColor" stroke-width="2.5" />
                         </svg>
-                        <h4 class="empty-title">Belum ada Posisi Pemain</h4>
-                        <p class="empty-description">Tambahkan posisi pemain pertama.</p>
+                        <h4 class="empty-title">{{ __('Belum ada Posisi Pemain') }}</h4>
+                        <p class="empty-description">{{ __('Tambahkan posisi pemain pertama.') }}</p>
 
                         @can('player_position.create')
-                            <a href="{{ route('player-positions.create') }}" class="empty-link">Tambah Posisi</a>
+                            <a href="{{ route('player-positions.create') }}" class="empty-link">{{ __('Tambah Posisi') }}</a>
                         @endcan
                     </div>
                 </div>

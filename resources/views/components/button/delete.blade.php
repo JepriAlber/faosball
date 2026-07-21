@@ -2,7 +2,7 @@
 
 @if ($disabled)
     <button type="button" class="btn-icon btn-icon-danger cursor-not-allowed opacity-40"
-        title="{{ $reason ?? 'Tidak dapat dihapus' }}" disabled>
+        title="{{ $reason ?? __('Tidak dapat dihapus') }}" disabled>
 
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
@@ -12,7 +12,7 @@
     </button>
 @else
     <button type="button" @click="$dispatch('delete-confirm',{action:'{{ $action }}',name:'{{ addslashes($name) }}'})"
-        class="btn-icon btn-icon-danger" title="Hapus">
+        class="btn-icon btn-icon-danger" title="{{ __('Hapus') }}">
 
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path

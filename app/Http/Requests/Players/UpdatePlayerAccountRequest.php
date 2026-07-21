@@ -33,12 +33,12 @@ class UpdatePlayerAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'=>'Nama akun wajib diisi.',
-            'name.max'=>'Nama maksimal :max karakter.',
+            'name.required'=>__('Nama akun wajib diisi.'),
+            'name.max'=>__('Nama maksimal :max karakter.'),
 
-            'email.required'=>'Email akun wajib diisi.',
-            'email.email'=>'Format email tidak valid.',
-            'email.unique'=>'Email sudah digunakan akun lain.',
+            'email.required'=>__('Email akun wajib diisi.'),
+            'email.email'=>__('Format email tidak valid.'),
+            'email.unique'=>__('Email sudah digunakan akun lain.'),
         ];
     }
 }

@@ -63,17 +63,17 @@ class RoleFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama role wajib diisi.',
-            'name.string' => 'Nama role harus berupa teks.',
-            'name.max' => 'Nama role maksimal 100 karakter.',
-            'name.unique' => 'Nama role sudah digunakan pada academy ini.',
+            'name.required' => __('Nama role wajib diisi.'),
+            'name.string' => __('Nama role harus berupa teks.'),
+            'name.max' => __('Nama role maksimal 100 karakter.'),
+            'name.unique' => __('Nama role sudah digunakan pada academy ini.'),
 
-            'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
-            'id_academy.uuid' => 'Academy tidak valid.',
-            'id_academy.exists' => 'Academy tidak ditemukan.',
+            'id_academy.prohibited' => __('Academy tidak dapat dipilih.'),
+            'id_academy.uuid' => __('Academy tidak valid.'),
+            'id_academy.exists' => __('Academy tidak ditemukan.'),
 
-            'permissions.array' => 'Format permission tidak valid.',
-            'permissions.*.exists' => 'Permission yang dipilih tidak ditemukan.',
+            'permissions.array' => __('Format permission tidak valid.'),
+            'permissions.*.exists' => __('Permission yang dipilih tidak ditemukan.'),
         ];
     }
 }

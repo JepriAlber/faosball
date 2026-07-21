@@ -67,26 +67,26 @@ class PlayerPositionFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'code.required' => 'Kode posisi wajib diisi.',
-            'code.max' => 'Kode posisi maksimal :max karakter.',
-            'code.unique' => 'Kode posisi sudah digunakan.',
+            'code.required' => __('Kode posisi wajib diisi.'),
+            'code.max' => __('Kode posisi maksimal :max karakter.'),
+            'code.unique' => __('Kode posisi sudah digunakan.'),
 
-            'name.required' => 'Nama posisi wajib diisi.',
-            'name.max' => 'Nama posisi maksimal :max karakter.',
-            'name.unique' => 'Nama posisi sudah digunakan.',
+            'name.required' => __('Nama posisi wajib diisi.'),
+            'name.max' => __('Nama posisi maksimal :max karakter.'),
+            'name.unique' => __('Nama posisi sudah digunakan.'),
 
-            'description.string' => 'Deskripsi harus berupa teks.',
+            'description.string' => __('Deskripsi harus berupa teks.'),
 
-            'position_group.required' => 'Kelompok posisi wajib diisi.',
-            'position_group.max' => 'Kelompok posisi maksimal :max karakter.',
+            'position_group.required' => __('Kelompok posisi wajib diisi.'),
+            'position_group.max' => __('Kelompok posisi maksimal :max karakter.'),
 
-            'sort_order.required' => 'Urutan wajib diisi.',
-            'sort_order.integer' => 'Urutan harus berupa angka.',
-            'sort_order.min' => 'Urutan tidak valid.',
-            'sort_order.max' => 'Urutan maksimal :max.',
+            'sort_order.required' => __('Urutan wajib diisi.'),
+            'sort_order.integer' => __('Urutan harus berupa angka.'),
+            'sort_order.min' => __('Urutan tidak valid.'),
+            'sort_order.max' => __('Urutan maksimal :max.'),
 
-            'status.required' => 'Status wajib ditentukan.',
-            'status.boolean' => 'Status tidak valid.',
+            'status.required' => __('Status wajib ditentukan.'),
+            'status.boolean' => __('Status tidak valid.'),
         ];
     }
 }

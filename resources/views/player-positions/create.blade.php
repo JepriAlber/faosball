@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Posisi Pemain</h3>
-                <p class="card-description">Tambahkan posisi baru ke master posisi global.</p>
+                <h3 class="card-title">{{ __('Informasi Posisi Pemain') }}</h3>
+                <p class="card-description">{{ __('Tambahkan posisi baru ke master posisi global.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('player-positions.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -32,13 +32,13 @@
 
                         <div class="form-group">
                             <label class="form-label">
-                                Kode <span class="text-error-500">*</span>
+                                {{ __('Kode') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <input type="text" name="code" value="{{ old('code') }}" placeholder="Contoh: CB"
+                            <input type="text" name="code" value="{{ old('code') }}" placeholder="{{ __('Contoh: CB') }}"
                                 maxlength="10" class="form-input @error('code') form-danger @enderror" required>
 
-                            <p class="form-helper">Singkatan standar sepak bola. Otomatis jadi huruf besar.</p>
+                            <p class="form-helper">{{ __('Singkatan standar sepak bola. Otomatis jadi huruf besar.') }}</p>
 
                             @error('code')
                                 <span class="form-error">{{ $message }}</span>
@@ -47,14 +47,13 @@
 
                         <div class="form-group">
                             <label class="form-label">
-                                Urutan <span class="text-error-500">*</span>
+                                {{ __('Urutan') }} <span class="text-error-500">*</span>
                             </label>
 
                             <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" min="0"
                                 max="9999" class="form-input @error('sort_order') form-danger @enderror" required>
 
-                            <p class="form-helper">Makin kecil makin atas. Kiper 1, bek 10-an, gelandang 20-an,
-                                penyerang 30-an.</p>
+                            <p class="form-helper">{{ __('Makin kecil makin atas. Kiper 1, bek 10-an, gelandang 20-an, penyerang 30-an.') }}</p>
 
                             @error('sort_order')
                                 <span class="form-error">{{ $message }}</span>
@@ -65,10 +64,10 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Posisi <span class="text-error-500">*</span>
+                            {{ __('Nama Posisi') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Contoh: Center Back"
+                        <input type="text" name="name" value="{{ old('name') }}" placeholder="{{ __('Contoh: Center Back') }}"
                             class="form-input @error('name') form-danger @enderror" required>
 
                         @error('name')
@@ -78,11 +77,11 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Kelompok <span class="text-error-500">*</span>
+                            {{ __('Kelompok') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" name="position_group" value="{{ old('position_group') }}"
-                            list="position-group-options" placeholder="Contoh: Defender"
+                            list="position-group-options" placeholder="{{ __('Contoh: Defender') }}"
                             class="form-input @error('position_group') form-danger @enderror" required>
 
                         <datalist id="position-group-options">
@@ -91,7 +90,7 @@
                             @endforeach
                         </datalist>
 
-                        <p class="form-helper">Dipakai untuk mengelompokkan pilihan posisi di form Player.</p>
+                        <p class="form-helper">{{ __('Dipakai untuk mengelompokkan pilihan posisi di form Player.') }}</p>
 
                         @error('position_group')
                             <span class="form-error">{{ $message }}</span>
@@ -103,9 +102,9 @@
                 <div>
 
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
+                        <label class="form-label">{{ __('Deskripsi') }}</label>
 
-                        <textarea name="description" rows="3" placeholder="Keterangan singkat tentang posisi ini"
+                        <textarea name="description" rows="3" placeholder="{{ __('Keterangan singkat tentang posisi ini') }}"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description') }}</textarea>
 
                         @error('description')
@@ -115,7 +114,7 @@
 
                     <div class="form-group" x-data="{ isActive: {{ old('status', 1) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('Status') }}</label>
 
                         <input type="hidden" name="status" :value="isActive ? 1 : 0">
 
@@ -127,7 +126,7 @@
                                 <span class="form-toggle-dot" :class="isActive && 'form-toggle-checked'"></span>
                             </div>
 
-                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? 'Aktif' : 'Nonaktif'">
+                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'">
                             </span>
 
                         </label>
@@ -145,11 +144,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Posisi
+                    {{ __('Simpan Posisi') }}
                 </button>
 
             </div>

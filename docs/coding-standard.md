@@ -22,7 +22,7 @@ Seluruh module wajib mengikuti standar ini agar struktur kode tetap konsisten, m
 - [Controller Standard](#controller-standard)
 - [Service Standard](#service-standard)
 - [Model Standard](#model-standard)
-- [Bahasa Pesan (User-Facing Messages)](#bahasa-pesan-user-facing-messages)
+- [Bahasa Pesan (User-Facing Messages) & Multi-Language](#bahasa-pesan-user-facing-messages--multi-language)
 - [Summary](#summary)
 
 ---
@@ -287,31 +287,29 @@ Model tidak boleh berisi business logic.
 
 ---
 
-## Bahasa Pesan (User-Facing Messages)
+## Bahasa Pesan (User-Facing Messages) & Multi-Language
 
-Seluruh pesan yang tampil ke user (validasi, error, status flash message) wajib Bahasa Indonesia.
+FAOSBall mendukung 2 bahasa: **Bahasa Indonesia (default)** dan **English**. Mekanismenya:
 
-FAOSBall **tidak** menggunakan sistem file terjemahan Laravel (folder `lang/`, helper `__()`/`trans()`). Pesan Indonesia ditulis langsung sebagai string literal di kode — di `messages()` milik Form Request, atau langsung di argumen `ValidationException::withMessages([...])`/`$request->validate([...], [...])` pada Controller.
+1. **String Indonesia yang sudah ada di kode TETAP ditulis apa adanya** -- cuma dibungkus `__(...)`. Ini translasi berbasis string/JSON (`lang/en.json`), BUKAN key-based (`__('messages.key')`). Tidak ada `lang/id.json` -- kalau locale aktif `id` dan tidak ada entry, `__()` mengembalikan string aslinya apa adanya.
 
-Contoh (lihat `app/Http/Requests/Auth/LoginRequest.php`):
+    ```php
+    'name.required' => __('Nama academy wajib diisi.'),
+    ```
 
-```php
-public function messages(): array
-{
-    return [
-        'email.required' => 'Email wajib diisi.',
-        'email.email' => 'Format email tidak valid.',
-    ];
-}
-```
+    ```blade
+    <h3 class="card-title">{{ __('Academy List') }}</h3>
+    ```
 
-```php
-throw ValidationException::withMessages([
-    'email' => 'Email atau password tidak valid.',
-]);
-```
+2. **Setiap string baru yang dibungkus `__()` WAJIB ditambahkan entry-nya ke `lang/en.json`** di PR yang sama -- termasuk string yang kebetulan sama di kedua bahasa (supaya jelas sudah direview, bukan kelewat).
 
-**Perhatian khusus untuk controller bawaan Laravel Breeze** (`PasswordResetLinkController`, `NewPasswordController`, `ConfirmablePasswordController`, dsb): controller ini secara default memanggil `__($status)` atau `__('auth.password')`, yang tanpa folder `lang/` akan jatuh ke string default Laravel (Bahasa Inggris). Setiap kali membuat/menyentuh controller auth bawaan Breeze, ganti pemanggilan `__()`-nya dengan string Indonesia literal, mengikuti pola yang sama seperti `LoginRequest`. Jangan menambahkan folder `lang/` sebagai solusinya.
+3. **Preferensi bahasa** disimpan di `users.locale` (user login) atau `session('locale')` (guest), diresolusi oleh `App\Http\Middleware\SetLocale` di setiap request. Jangan taruh logic ini di Controller/View manapun.
+
+4. **Controller bawaan Laravel Breeze** (`PasswordResetLinkController`, `NewPasswordController`, dst) memakai mekanisme **berbeda** -- key-based bawaan Laravel (`lang/{locale}/auth.php`, `lang/{locale}/passwords.php`), BUKAN JSON. Sudah tersedia untuk `id` dan `en` (lihat `issue7.md` Tahap 10) -- tidak perlu override manual lagi. **Catatan**: controller Breeze di codebase ini sebagian masih memakai string Indonesia literal (workaround dari standar lama, sebelum folder `lang/` ada) -- ini masih valid untuk locale `id` dan boleh dibiarkan; migrasi ke `__('auth.failed')` dkk untuk flow tersebut adalah pekerjaan terpisah, bukan otomatis ikut terbenahi.
+
+5. **`lang/{locale}/validation.php` tetap ada** (`lang/en/validation.php` bawaan Laravel + `lang/id/validation.php` terjemahannya) -- **bukan** dipakai oleh Form Request FAOSBall sendiri (yang selalu eksplisit lewat `messages()`, lihat *Model Standard*/*Request Structure* di atas), tapi sebagai fallback untuk `$request->validate([...])` bawaan controller Breeze (`ProfileController`, `RegisteredUserController`, dst) yang tidak selalu diberi custom message. **Jangan dihapus** -- pernah dicoba dihapus bersamaan dengan mengubah `APP_LOCALE`/`APP_FALLBACK_LOCALE` ke `id`, akibatnya validasi generik Breeze yang tidak di-custom message justru menampilkan key mentah (`validation.unique`) alih-alih teks yang bisa dibaca, karena tidak ada file `validation.php` yang bisa di-resolve untuk locale `id` maupun fallback-nya.
+
+Module baru **wajib** ikut pola ini sejak awal dibuat -- jangan menulis string Indonesia hardcode tanpa `__()` lagi.
 
 ---
 

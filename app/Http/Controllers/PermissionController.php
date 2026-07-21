@@ -21,10 +21,10 @@ class PermissionController extends Controller
     public function index()
     {
         return view('permissions.index', [
-            'title' => 'Permission Management',
+            'title' => __('Permission Management'),
             'breadcrumb' => [
-                ['label' => 'Administration'],
-                ['label' => 'Permission Management'],
+                ['label' => __('Administration')],
+                ['label' => __('Permission Management')],
             ],
             'permissions' => $this->permissionService->paginate(),
         ]);
@@ -36,14 +36,14 @@ class PermissionController extends Controller
     public function create()
     {
         return view('permissions.create', [
-            'title' => 'Tambah Permission',
+            'title' => __('Tambah Permission'),
             'breadcrumb' => [
                 [
-                    'label' => 'Permission Management',
+                    'label' => __('Permission Management'),
                     'url' => route('permissions.index'),
                 ],
                 [
-                    'label' => 'Tambah Permission',
+                    'label' => __('Tambah Permission'),
                 ],
             ],
             'modules' => $this->permissionService->existingModules(),
@@ -64,11 +64,11 @@ class PermissionController extends Controller
 
             return redirect()
                 ->route('permissions.index')
-                ->with('success', 'Permission berhasil ditambahkan.');
+                ->with('success', __('Permission berhasil ditambahkan.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menambahkan permission');
+            return $this->handleException($e, __('Gagal menambahkan permission'));
 
         }
     }
@@ -81,14 +81,14 @@ class PermissionController extends Controller
         $data = $this->permissionService->detail($permission);
 
         return view('permissions.show', [
-            'title' => 'Detail Permission',
+            'title' => __('Detail Permission'),
             'breadcrumb' => [
                 [
-                    'label' => 'Permission Management',
+                    'label' => __('Permission Management'),
                     'url' => route('permissions.index'),
                 ],
                 [
-                    'label' => 'Detail Permission',
+                    'label' => __('Detail Permission'),
                 ],
             ],
             'permission' => $data['permission'],
@@ -108,11 +108,11 @@ class PermissionController extends Controller
 
             return redirect()
                 ->route('permissions.index')
-                ->with('success', 'Permission berhasil dihapus.');
+                ->with('success', __('Permission berhasil dihapus.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus permission', 'permissions.index');
+            return $this->handleException($e, __('Gagal menghapus permission'), 'permissions.index');
 
         }
     }

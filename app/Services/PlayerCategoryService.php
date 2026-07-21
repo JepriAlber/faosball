@@ -145,7 +145,7 @@ class PlayerCategoryService
             // player-nya diam-diam kehilangan kelompok umur.
             // Kategori yang sudah tidak dipakai: nonaktifkan, jangan dihapus.
             if ($playerCategory->players()->exists()) {
-                throw new \Exception('Kategori masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan kategori ini kalau sudah tidak dipakai.');
+                throw new \Exception(__('Kategori masih digunakan oleh player, tidak dapat dihapus. Nonaktifkan kategori ini kalau sudah tidak dipakai.'));
             }
 
             return $playerCategory->delete();

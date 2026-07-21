@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
     'email',
     'password',
     'status',
+    'locale',
 ])]
 
 #[Hidden([

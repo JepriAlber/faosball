@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Profil Player</h3>
-                <p class="card-description">Masukkan detail lengkap untuk mendaftarkan pemain baru.</p>
+                <h3 class="card-title">{{ __('Informasi Profil Player') }}</h3>
+                <p class="card-description">{{ __('Masukkan detail lengkap untuk mendaftarkan pemain baru.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -94,13 +94,13 @@
                     @if ($isSuperAdmin)
                         <div class="form-group">
                             <label class="form-label">
-                                Academy <span class="text-error-500">*</span>
+                                {{ __('Academy') }} <span class="text-error-500">*</span>
                             </label>
 
                             <select name="id_academy" x-model="academyId"
                                 @change="playerTypeId = ''; playerCategoryId = ''"
                                 class="form-select @error('id_academy') form-danger @enderror" required>
-                                <option value="">Pilih Academy</option>
+                                <option value="">{{ __('Pilih Academy') }}</option>
                                 @foreach ($academies as $academy)
                                     <option value="{{ $academy->id_academy }}">{{ $academy->name }}</option>
                                 @endforeach
@@ -115,10 +115,10 @@
                     {{-- Nama --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Player <span class="text-error-500">*</span>
+                            {{ __('Nama Player') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama player"
+                        <input type="text" name="name" value="{{ old('name') }}" placeholder="{{ __('Masukkan nama player') }}"
                             class="form-input @error('name') form-danger @enderror" required>
 
                         @error('name')
@@ -128,10 +128,10 @@
 
                     {{-- Nickname --}}
                     <div class="form-group">
-                        <label class="form-label">Nickname</label>
+                        <label class="form-label">{{ __('Nickname') }}</label>
 
                         <input type="text" name="nick_name" value="{{ old('nick_name') }}"
-                            placeholder="Nama panggilan player"
+                            placeholder="{{ __('Nama panggilan player') }}"
                             class="form-input @error('nick_name') form-danger @enderror">
 
                         @error('nick_name')
@@ -142,19 +142,19 @@
                     {{-- Type Player --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Type Player <span class="text-error-500">*</span>
+                            {{ __('Type Player') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_player_type" x-model="playerTypeId"
                             class="form-select @error('id_player_type') form-danger @enderror" required>
-                            <option value="">Pilih Type Player</option>
+                            <option value="">{{ __('Pilih Type Player') }}</option>
                             <template x-for="type in availableTypes" :key="type.id_player_type">
                                 <option :value="type.id_player_type" x-text="type.name"></option>
                             </template>
                         </select>
 
                         <p x-show="isSuperAdmin && academyId && availableTypes.length === 0" x-cloak class="form-error">
-                            Academy ini belum punya type player. Buat dulu lewat menu Player Type.
+                            {{ __('Academy ini belum punya type player. Buat dulu lewat menu Player Type.') }}
                         </p>
 
                         @error('id_player_type')
@@ -165,12 +165,12 @@
                     {{-- Kategori Umur --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Kategori Umur <span class="text-error-500">*</span>
+                            {{ __('Kategori Umur') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_player_category" x-model="playerCategoryId"
                             class="form-select @error('id_player_category') form-danger @enderror" required>
-                            <option value="">Pilih Kategori Umur</option>
+                            <option value="">{{ __('Pilih Kategori Umur') }}</option>
                             <template x-for="category in availableCategories" :key="category.id_player_category">
                                 <option :value="category.id_player_category"
                                     x-text="`${category.name} (${category.min_age}-${category.max_age} th)`"></option>
@@ -180,22 +180,22 @@
                         {{-- Saran: tampil hanya kalau ada saran DAN belum dipilih --}}
                         <p x-show="suggestedCategory && suggestedCategory.id_player_category !== playerCategoryId"
                             x-cloak class="form-helper">
-                            Saran untuk umur <span x-text="age"></span> tahun:
+                            {{ __('Saran untuk umur') }} <span x-text="age"></span> {{ __('tahun') }}:
                             <button type="button" class="link-primary font-medium" @click="applySuggestion()">
-                                <span x-text="suggestedCategory?.name"></span> — pakai saran ini
+                                <span x-text="suggestedCategory?.name"></span> — {{ __('pakai saran ini') }}
                             </button>
                         </p>
 
                         {{-- Peringatan LUNAK: memberi tahu, tidak memblokir. Lihat issue2.md Bagian 4.2. --}}
                         <p x-show="ageOutsideRange" x-cloak class="form-helper text-warning-500">
-                            Umur pemain (<span x-text="age"></span> th) di luar rentang kategori ini
+                            {{ __('Umur pemain') }} (<span x-text="age"></span> {{ __('th') }}) {{ __('di luar rentang kategori ini') }}
                             (<span x-text="selectedCategory?.min_age"></span>–<span x-text="selectedCategory?.max_age"></span>
-                            th). Ini diperbolehkan — pastikan memang disengaja.
+                            {{ __('th') }}). {{ __('Ini diperbolehkan — pastikan memang disengaja.') }}
                         </p>
 
                         <p x-show="isSuperAdmin && academyId && availableCategories.length === 0" x-cloak
                             class="form-error">
-                            Academy ini belum punya kategori umur. Buat dulu lewat menu Player Category.
+                            {{ __('Academy ini belum punya kategori umur. Buat dulu lewat menu Player Category.') }}
                         </p>
 
                         @error('id_player_category')
@@ -206,12 +206,12 @@
                     {{-- Posisi Utama --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Posisi Utama <span class="text-error-500">*</span>
+                            {{ __('Posisi Utama') }} <span class="text-error-500">*</span>
                         </label>
 
                         <select name="id_primary_position"
                             class="form-select @error('id_primary_position') form-danger @enderror" required>
-                            <option value="">Pilih Posisi Utama</option>
+                            <option value="">{{ __('Pilih Posisi Utama') }}</option>
                             @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
                                 <optgroup label="{{ $group }}">
                                     @foreach ($positions as $position)
@@ -230,11 +230,11 @@
 
                     {{-- Posisi Kedua --}}
                     <div class="form-group">
-                        <label class="form-label">Posisi Kedua</label>
+                        <label class="form-label">{{ __('Posisi Kedua') }}</label>
 
                         <select name="id_secondary_position"
                             class="form-select @error('id_secondary_position') form-danger @enderror">
-                            <option value="">Tidak ada</option>
+                            <option value="">{{ __('Tidak ada') }}</option>
                             @foreach ($playerPositions->groupBy('position_group') as $group => $positions)
                                 <optgroup label="{{ $group }}">
                                     @foreach ($positions as $position)
@@ -246,7 +246,7 @@
                             @endforeach
                         </select>
 
-                        <p class="form-helper">Opsional. Tidak boleh sama dengan posisi utama.</p>
+                        <p class="form-helper">{{ __('Opsional. Tidak boleh sama dengan posisi utama.') }}</p>
 
                         @error('id_secondary_position')
                             <span class="form-error">{{ $message }}</span>
@@ -260,7 +260,7 @@
 
                     {{-- Tanggal Lahir --}}
                     <div class="form-group">
-                        <label class="form-label">Tanggal Lahir</label>
+                        <label class="form-label">{{ __('Tanggal Lahir') }}</label>
 
                         <input type="date" name="birth_date" x-model="birthDate"
                             @change="if (! playerCategoryId) applySuggestion()"
@@ -273,10 +273,10 @@
 
                     {{-- Gender --}}
                     <div class="form-group">
-                        <label class="form-label">Gender</label>
+                        <label class="form-label">{{ __('Gender') }}</label>
 
                         <select name="gender" class="form-select">
-                            <option value="">Pilih Gender</option>
+                            <option value="">{{ __('Pilih Gender') }}</option>
                             <option value="male" @selected(old('gender') == 'male')>Male</option>
                             <option value="female" @selected(old('gender') == 'female')>Female</option>
                         </select>
@@ -284,7 +284,7 @@
 
                     {{-- Nationality --}}
                     <div class="form-group">
-                        <label class="form-label">Nationality</label>
+                        <label class="form-label">{{ __('Nationality') }}</label>
 
                         <input type="text" name="nationality" value="{{ old('nationality', 'Indonesia') }}"
                             class="form-input">
@@ -294,13 +294,13 @@
                     <div class="form-row grid-cols-2">
 
                         <div class="form-group">
-                            <label class="form-label">Tinggi (cm)</label>
+                            <label class="form-label">{{ __('Tinggi (cm)') }}</label>
 
                             <input type="number" name="height" value="{{ old('height') }}" class="form-input">
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Berat (kg)</label>
+                            <label class="form-label">{{ __('Berat (kg)') }}</label>
 
                             <input type="number" name="weight" value="{{ old('weight') }}" class="form-input">
                         </div>
@@ -309,10 +309,10 @@
 
                     {{-- Kaki Dominan --}}
                     <div class="form-group">
-                        <label class="form-label">Kaki Dominan</label>
+                        <label class="form-label">{{ __('Kaki Dominan') }}</label>
 
                         <select name="preferred_foot" class="form-select">
-                            <option value="">Pilih</option>
+                            <option value="">{{ __('Pilih') }}</option>
                             <option value="right" @selected(old('preferred_foot') == 'right')>Right</option>
                             <option value="left" @selected(old('preferred_foot') == 'left')>Left</option>
                             <option value="both" @selected(old('preferred_foot') == 'both')>Both</option>
@@ -325,10 +325,10 @@
                     {{-- Catatan --}}
                     <div class="form-group">
                         <label class="form-label">
-                            Catatan
+                            {{ __('Catatan') }}
                         </label>
 
-                        <textarea name="notes" rows="3" placeholder="Tambahkan catatan player" class="form-textarea">{{ old('notes') }}</textarea>
+                        <textarea name="notes" rows="3" placeholder="{{ __('Tambahkan catatan player') }}" class="form-textarea">{{ old('notes') }}</textarea>
 
                         @error('notes')
                             <span class="form-error">
@@ -339,14 +339,14 @@
 
                     {{-- Tanggal Bergabung --}}
                     <div class="form-group">
-                        <label class="form-label">Tanggal Bergabung</label>
+                        <label class="form-label">{{ __('Tanggal Bergabung') }}</label>
 
                         <input type="date" name="join_date" value="{{ old('join_date') }}" class="form-input">
                     </div>
 
                     {{-- Status --}}
                     <div class="form-group">
-                        <label class="form-label">Status Player</label>
+                        <label class="form-label">{{ __('Status Player') }}</label>
                         <select name="status" class="form-select @error('status') form-danger @enderror">
                             <option value="active" @selected(old('status', 'active') == 'active')>Active</option>
                             <option value="inactive" @selected(old('status') == 'inactive')>Inactive</option>
@@ -361,7 +361,7 @@
                     {{-- Buat Akun Player --}}
                     <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
 
-                        <h4 class="section-title mb-4">Buat Akun Player</h4>
+                        <h4 class="section-title mb-4">{{ __('Buat Akun Player') }}</h4>
 
                         <div x-data="{ createAccount: false }">
 
@@ -376,7 +376,7 @@
                                     </span>
                                 </div>
 
-                                <span class="ml-3 text-sm text-gray-500" x-text="createAccount ? 'Aktif':'Nonaktif'">
+                                <span class="ml-3 text-sm text-gray-500" x-text="createAccount ? '{{ __('Aktif') }}':'{{ __('Nonaktif') }}'">
                                 </span>
 
                             </label>
@@ -385,11 +385,11 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Email Akun <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Email Akun') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
                                     <input type="email" name="email" value="{{ old('email') }}"
-                                        placeholder="Email akun" class="form-input @error('email') form-danger @enderror">
+                                        placeholder="{{ __('Email akun') }}" class="form-input @error('email') form-danger @enderror">
 
                                     @error('email')
                                         <span class="form-error">
@@ -400,10 +400,10 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Password <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Password') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
-                                    <input type="password" name="password" placeholder="Password"
+                                    <input type="password" name="password" placeholder="{{ __('Password') }}"
                                         class="form-input @error('password') form-danger @enderror">
 
                                     @error('password')
@@ -415,10 +415,10 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Konfirmasi Password <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Konfirmasi Password') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
-                                    <input type="password" name="password_confirmation" placeholder="Konfirmasi Password"
+                                    <input type="password" name="password_confirmation" placeholder="{{ __('Konfirmasi Password') }}"
                                         class="form-input">
 
                                     @error('password_confirmation')
@@ -439,11 +439,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Player
+                    {{ __('Simpan Player') }}
                 </button>
 
             </div>

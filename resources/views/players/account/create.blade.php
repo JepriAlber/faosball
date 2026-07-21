@@ -13,17 +13,17 @@
         <div class="card-header">
             <div>
                 <h3 class="card-title">
-                    Buat Akun Player
+                    {{ __('Buat Akun Player') }}
                 </h3>
 
                 <p class="card-description">
-                    Membuat akun login untuk <strong>{{ $player->name }}</strong>.
+                    {{ __('Membuat akun login untuk') }} <strong>{{ $player->name }}</strong>.
                 </p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -35,7 +35,7 @@
 
                 <div class="form-group">
                     <label class="form-label">
-                        Email <span class="text-error-500">*</span>
+                        {{ __('Email') }} <span class="text-error-500">*</span>
                     </label>
 
                     <input type="email" name="email" value="{{ old('email') }}"
@@ -50,7 +50,7 @@
                 <div class="form-group">
 
                     <label class="form-label">
-                        Password <span class="text-error-500">*</span>
+                        {{ __('Password') }} <span class="text-error-500">*</span>
                     </label>
 
                     <input type="password" name="password" class="form-input @error('password') form-danger @enderror">
@@ -65,7 +65,7 @@
                 <div class="form-group">
 
                     <label class="form-label">
-                        Konfirmasi Password <span class="text-error-500">*</span>
+                        {{ __('Konfirmasi Password') }} <span class="text-error-500">*</span>
                     </label>
 
                     <input type="password" name="password_confirmation" class="form-input">
@@ -76,11 +76,11 @@
                 <div class="mt-6 flex justify-end gap-3 border-t pt-5">
 
                     <a href="{{ route('players.index') }}" class="btn btn-secondary">
-                        Batal
+                        {{ __('Batal') }}
                     </a>
 
                     <button type="submit" class="btn btn-primary">
-                        Buat Akun
+                        {{ __('Buat Akun') }}
                     </button>
 
                 </div>

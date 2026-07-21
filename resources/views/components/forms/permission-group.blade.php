@@ -35,7 +35,7 @@
                 </h4>
 
                 <p class="mt-1 text-xs text-gray-500">
-                    {{ $items->count() }} Permission
+                    {{ $items->count() }} {{ __('Permission') }}
                 </p>
 
             </div>
@@ -48,7 +48,7 @@
                 class="form-checkbox rounded border-gray-300 text-brand-500 focus:ring-brand-500">
 
             <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
-                Pilih Semua
+                {{ __('Pilih Semua') }}
             </span>
 
         </label>

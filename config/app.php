@@ -86,6 +86,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    | Sumber kebenaran TUNGGAL daftar bahasa yang didukung -- dipakai bareng
+    | oleh SetLocale (validasi whitelist), LocaleController (validasi
+    | whitelist), dan dropdown di header (label tampilan). Jangan hardcode
+    | daftar ini di tempat lain.
+    */
+    'supported_locales' => [
+        'id' => 'Bahasa Indonesia',
+        'en' => 'English',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

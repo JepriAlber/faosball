@@ -11,13 +11,13 @@
         <div class="card-header">
 
             <div>
-                <h3 class="card-title">Informasi Profil Academy</h3>
-                <p class="card-description">Masukkan detail lengkap untuk mendaftarkan akademi baru.</p>
+                <h3 class="card-title">{{ __('Informasi Profil Academy') }}</h3>
+                <p class="card-description">{{ __('Masukkan detail lengkap untuk mendaftarkan akademi baru.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('academies.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
 
@@ -36,11 +36,11 @@
                     <div class="form-group">
 
                         <label for="name" class="form-label">
-                            Nama Academy <span class="text-error-500">*</span>
+                            {{ __('Nama Academy') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="name" name="name" value="{{ old('name') }}"
-                            placeholder="Masukkan nama akademi"
+                            placeholder="{{ __('Masukkan nama akademi') }}"
                             class="form-input @error('name') form-danger @elseif(old('name')) form-success @enderror"
                             required>
 
@@ -55,11 +55,11 @@
                     <div class="form-group">
 
                         <label for="code" class="form-label">
-                            Kode Academy <span class="text-error-500">*</span>
+                            {{ __('Kode Academy') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="code" name="code" value="{{ old('code') }}"
-                            placeholder="Contoh: FAOS" class="form-input @error('code') form-danger @enderror" required>
+                            placeholder="{{ __('Contoh: FAOS') }}" class="form-input @error('code') form-danger @enderror" required>
 
                         @error('code')
                             <span class="form-error">{{ $message }}</span>
@@ -71,11 +71,11 @@
                     <div class="form-group">
 
                         <label for="tagline" class="form-label">
-                            Tagline / Slogan <span class="text-error-500">*</span>
+                            {{ __('Tagline / Slogan') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="tagline" name="tagline" value="{{ old('tagline') }}"
-                            placeholder="Contoh: Maju Bersama Sepakbola"
+                            placeholder="{{ __('Contoh: Maju Bersama Sepakbola') }}"
                             class="form-input @error('tagline') form-danger @enderror" required>
 
                         @error('tagline')
@@ -88,11 +88,11 @@
                     <div class="form-group">
 
                         <label for="phone" class="form-label">
-                            Nomor Telepon <span class="text-error-500">*</span>
+                            {{ __('Nomor Telepon') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" id="phone" name="phone" value="{{ old('phone') }}"
-                            placeholder="Contoh: 08XX34567XX" class="form-input @error('phone') form-danger @enderror"
+                            placeholder="{{ __('Contoh: 08XX34567XX') }}" class="form-input @error('phone') form-danger @enderror"
                             required>
 
                         @error('phone')
@@ -105,11 +105,11 @@
                     <div class="form-group">
 
                         <label for="email" class="form-label">
-                            Email <span class="text-error-500">*</span>
+                            {{ __('Email') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="email" id="email" name="email" value="{{ old('email') }}"
-                            placeholder="Contoh: info@akademi.com" class="form-input @error('email') form-danger @enderror"
+                            placeholder="{{ __('Contoh: info@akademi.com') }}" class="form-input @error('email') form-danger @enderror"
                             required>
 
                         @error('email')
@@ -122,7 +122,7 @@
                     <div class="form-group">
 
                         <label class="form-label">
-                            Status Aktif
+                            {{ __('Status Aktif') }}
                         </label>
 
                         <div x-data="{ switcherOn: {{ old('status', true) ? 'true' : 'false' }} }">
@@ -137,7 +137,7 @@
                                 </div>
 
                                 <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"
-                                    x-text="switcherOn ? 'Aktif' : 'Nonaktif'"></span>
+                                    x-text="switcherOn ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'"></span>
 
                             </label>
 
@@ -148,17 +148,17 @@
                     {{-- Subscription --}}
                     <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
 
-                        <h4 class="section-title mb-4">Informasi Langganan</h4>
+                        <h4 class="section-title mb-4">{{ __('Informasi Langganan') }}</h4>
 
                         {{-- Tipe Langganan --}}
                         <div class="form-group">
                             <label for="subscription_type" class="form-label">
-                                Tipe Langganan <span class="text-error-500">*</span>
+                                {{ __('Tipe Langganan') }} <span class="text-error-500">*</span>
                             </label>
 
                             <select id="subscription_type" name="subscription_type"
                                 class="form-select @error('subscription_type') form-danger @enderror" required>
-                                <option value="">Pilih Tipe Langganan</option>
+                                <option value="">{{ __('Pilih Tipe Langganan') }}</option>
                                 @foreach ($subscriptionTypes as $value => $label)
                                     <option value="{{ $value }}" @selected(old('subscription_type') === $value)>
                                         {{ $label }}
@@ -174,12 +174,12 @@
                         {{-- Biaya Langganan --}}
                         <div class="form-group">
                             <label for="subscription_fee" class="form-label">
-                                Biaya Langganan (Rp) <span class="text-error-500">*</span>
+                                {{ __('Biaya Langganan (Rp)') }} <span class="text-error-500">*</span>
                             </label>
 
                             <input type="number" id="subscription_fee" name="subscription_fee"
                                 value="{{ old('subscription_fee') }}" min="0" step="0.01"
-                                placeholder="Contoh: 500000"
+                                placeholder="{{ __('Contoh: 500000') }}"
                                 class="form-input @error('subscription_fee') form-danger @enderror" required>
 
                             @error('subscription_fee')
@@ -192,7 +192,7 @@
 
                             <div class="form-group">
                                 <label for="subscription_started_at" class="form-label">
-                                    Mulai Langganan <span class="text-error-500">*</span>
+                                    {{ __('Mulai Langganan') }} <span class="text-error-500">*</span>
                                 </label>
 
                                 <input type="date" id="subscription_started_at" name="subscription_started_at"
@@ -206,7 +206,7 @@
 
                             <div class="form-group">
                                 <label for="subscription_ends_at" class="form-label">
-                                    Berakhir Langganan <span class="text-error-500">*</span>
+                                    {{ __('Berakhir Langganan') }} <span class="text-error-500">*</span>
                                 </label>
 
                                 <input type="date" id="subscription_ends_at" name="subscription_ends_at"
@@ -235,7 +235,7 @@
                     <div class="form-group">
 
                         <label for="primary_color" class="form-label">
-                            Warna Utama Sistem <span class="text-error-500">*</span>
+                            {{ __('Warna Utama Sistem') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="color" id="primary_color" name="primary_color"
@@ -244,7 +244,7 @@
                             required>
 
                         <p class="mt-1 text-xs text-gray-400">
-                            Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.
+                            {{ __('Dipakai untuk warna tombol, link, dan aksen utama tampilan sistem academy ini.') }}
                         </p>
 
                         @error('primary_color')
@@ -257,10 +257,10 @@
                     <div class="form-group">
 
                         <label for="address" class="form-label">
-                            Alamat <span class="text-error-500">*</span>
+                            {{ __('Alamat') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap akademi"
+                        <textarea id="address" name="address" rows="3" placeholder="{{ __('Masukkan alamat lengkap akademi') }}"
                             class="form-textarea @error('address') form-danger @enderror" required>{{ old('address') }}</textarea>
 
                         @error('address')
@@ -273,11 +273,11 @@
                     <div class="form-group">
 
                         <label for="description" class="form-label">
-                            Deskripsi
+                            {{ __('Deskripsi') }}
                         </label>
 
                         <textarea id="description" name="description" rows="3"
-                            placeholder="Jelaskan secara singkat mengenai profil akademi Anda"
+                            placeholder="{{ __('Jelaskan secara singkat mengenai profil akademi Anda') }}"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description') }}</textarea>
 
                         @error('description')
@@ -289,7 +289,7 @@
                     {{-- Buat Akun Owner --}}
                     <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
 
-                        <h4 class="section-title mb-4">Buat Akun Owner</h4>
+                        <h4 class="section-title mb-4">{{ __('Buat Akun Owner') }}</h4>
 
                         <div x-data="{ createAccount: false }">
 
@@ -304,7 +304,7 @@
                                     </span>
                                 </div>
 
-                                <span class="ml-3 text-sm text-gray-500" x-text="createAccount ? 'Aktif' : 'Nonaktif'">
+                                <span class="ml-3 text-sm text-gray-500" x-text="createAccount ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'">
                                 </span>
 
                             </label>
@@ -313,11 +313,11 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Email Owner <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Email Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
                                     <input type="email" name="owner_email" value="{{ old('owner_email') }}"
-                                        placeholder="Email akun Owner"
+                                        placeholder="{{ __('Email akun Owner') }}"
                                         class="form-input @error('owner_email') form-danger @enderror">
 
                                     @error('owner_email')
@@ -327,10 +327,10 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Password <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Password') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
-                                    <input type="password" name="owner_password" placeholder="Password"
+                                    <input type="password" name="owner_password" placeholder="{{ __('Password') }}"
                                         class="form-input @error('owner_password') form-danger @enderror">
 
                                     @error('owner_password')
@@ -340,11 +340,11 @@
 
                                 <div>
                                     <label class="form-label">
-                                        Konfirmasi Password <span class="text-error-500" x-show="createAccount">*</span>
+                                        {{ __('Konfirmasi Password') }} <span class="text-error-500" x-show="createAccount">*</span>
                                     </label>
 
                                     <input type="password" name="owner_password_confirmation"
-                                        placeholder="Konfirmasi Password" class="form-input">
+                                        placeholder="{{ __('Konfirmasi Password') }}" class="form-input">
 
                                     @error('owner_password_confirmation')
                                         <span class="form-error">{{ $message }}</span>
@@ -365,11 +365,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
 
                 <button type="reset" class="btn btn-secondary">
-                    Reset
+                    {{ __('Reset') }}
                 </button>
 
                 <button type="submit" class="btn btn-primary">
-                    Simpan Academy
+                    {{ __('Simpan Academy') }}
                 </button>
 
             </div>

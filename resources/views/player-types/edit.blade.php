@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Player Type</h3>
-                <p class="card-description">Perbarui detail jenis pemain.</p>
+                <h3 class="card-title">{{ __('Informasi Player Type') }}</h3>
+                <p class="card-description">{{ __('Perbarui detail jenis pemain.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('player-types.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
 
                     @if ($isSuperAdmin)
                         <div class="form-group">
-                            <label class="form-label">Academy</label>
+                            <label class="form-label">{{ __('Academy') }}</label>
                             <p class="form-input bg-gray-50 dark:bg-gray-800">
                                 {{ $playerType->academy->name }}
                             </p>
@@ -40,7 +40,7 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Type <span class="text-error-500">*</span>
+                            {{ __('Nama Type') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" name="name" value="{{ old('name', $playerType->name) }}"
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
+                        <label class="form-label">{{ __('Deskripsi') }}</label>
 
                         <textarea name="description" rows="3"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description', $playerType->description) }}</textarea>
@@ -69,7 +69,7 @@
                     <div class="form-group"
                         x-data="{ isBillable: {{ old('is_billable', $playerType->is_billable) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Tagihan Iuran / SPP</label>
+                        <label class="form-label">{{ __('Tagihan Iuran / SPP') }}</label>
 
                         <input type="hidden" name="is_billable" :value="isBillable ? 1 : 0">
 
@@ -82,7 +82,7 @@
                             </div>
 
                             <span class="ml-3 text-sm text-gray-500"
-                                x-text="isBillable ? 'Player dengan type ini ditagih iuran/SPP' : 'Player dengan type ini tidak ditagih'">
+                                x-text="isBillable ? '{{ __('Player dengan type ini ditagih iuran/SPP') }}' : '{{ __('Player dengan type ini tidak ditagih') }}'">
                             </span>
 
                         </label>
@@ -96,7 +96,7 @@
                     <div class="form-group"
                         x-data="{ isActive: {{ old('status', $playerType->status) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('Status') }}</label>
 
                         <input type="hidden" name="status" :value="isActive ? 1 : 0">
 
@@ -108,7 +108,7 @@
                                 <span class="form-toggle-dot" :class="isActive && 'form-toggle-checked'"></span>
                             </div>
 
-                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? 'Aktif' : 'Nonaktif'">
+                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'">
                             </span>
 
                         </label>
@@ -126,11 +126,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <a href="{{ route('player-types.index') }}" class="btn btn-secondary">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
 
                 <button type="submit" class="btn btn-primary">
-                    Update Player Type
+                    {{ __('Update Player Type') }}
                 </button>
 
             </div>

@@ -10,13 +10,13 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Informasi Player Category</h3>
-                <p class="card-description">Perbarui detail kelompok umur.</p>
+                <h3 class="card-title">{{ __('Informasi Player Category') }}</h3>
+                <p class="card-description">{{ __('Perbarui detail kelompok umur.') }}</p>
             </div>
 
             <div class="card-actions">
                 <a href="{{ route('player-categories.index') }}" class="btn btn-secondary">
-                    Kembali
+                    {{ __('Kembali') }}
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
 
                     @if ($isSuperAdmin)
                         <div class="form-group">
-                            <label class="form-label">Academy</label>
+                            <label class="form-label">{{ __('Academy') }}</label>
                             <p class="form-input bg-gray-50 dark:bg-gray-800">
                                 {{ $playerCategory->academy->name }}
                             </p>
@@ -40,7 +40,7 @@
 
                     <div class="form-group">
                         <label class="form-label">
-                            Nama Kategori <span class="text-error-500">*</span>
+                            {{ __('Nama Kategori') }} <span class="text-error-500">*</span>
                         </label>
 
                         <input type="text" name="name" value="{{ old('name', $playerCategory->name) }}"
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Deskripsi</label>
+                        <label class="form-label">{{ __('Deskripsi') }}</label>
 
                         <textarea name="description" rows="3"
                             class="form-textarea @error('description') form-danger @enderror">{{ old('description', $playerCategory->description) }}</textarea>
@@ -70,7 +70,7 @@
 
                         <div class="form-group">
                             <label class="form-label">
-                                Umur Minimal <span class="text-error-500">*</span>
+                                {{ __('Umur Minimal') }} <span class="text-error-500">*</span>
                             </label>
 
                             <input type="number" name="min_age" value="{{ old('min_age', $playerCategory->min_age) }}"
@@ -83,7 +83,7 @@
 
                         <div class="form-group">
                             <label class="form-label">
-                                Umur Maksimal <span class="text-error-500">*</span>
+                                {{ __('Umur Maksimal') }} <span class="text-error-500">*</span>
                             </label>
 
                             <input type="number" name="max_age" value="{{ old('max_age', $playerCategory->max_age) }}"
@@ -97,15 +97,14 @@
                     </div>
 
                     <p class="form-helper">
-                        Rentang ini dipakai untuk <strong>menyarankan</strong> kategori saat menambah player,
-                        berdasarkan tanggal lahirnya. Pemain tetap boleh ditempatkan di kategori yang
-                        umurnya di luar rentang ini.
+                        {{ __('Rentang ini dipakai untuk') }} <strong>{{ __('menyarankan') }}</strong>
+                        {{ __('kategori saat menambah player, berdasarkan tanggal lahirnya. Pemain tetap boleh ditempatkan di kategori yang umurnya di luar rentang ini.') }}
                     </p>
 
                     <div class="form-group"
                         x-data="{ isActive: {{ old('status', $playerCategory->status) ? 'true' : 'false' }} }">
 
-                        <label class="form-label">Status</label>
+                        <label class="form-label">{{ __('Status') }}</label>
 
                         <input type="hidden" name="status" :value="isActive ? 1 : 0">
 
@@ -117,7 +116,7 @@
                                 <span class="form-toggle-dot" :class="isActive && 'form-toggle-checked'"></span>
                             </div>
 
-                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? 'Aktif' : 'Nonaktif'">
+                            <span class="ml-3 text-sm text-gray-500" x-text="isActive ? '{{ __('Aktif') }}' : '{{ __('Nonaktif') }}'">
                             </span>
 
                         </label>
@@ -135,11 +134,11 @@
             <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
 
                 <a href="{{ route('player-categories.index') }}" class="btn btn-secondary">
-                    Batal
+                    {{ __('Batal') }}
                 </a>
 
                 <button type="submit" class="btn btn-primary">
-                    Update Player Category
+                    {{ __('Update Player Category') }}
                 </button>
 
             </div>

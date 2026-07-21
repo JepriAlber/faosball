@@ -14,8 +14,8 @@
 
         <div class="card-header">
             <div>
-                <h3 class="card-title">Player List</h3>
-                <p class="card-description">Manajemen data pemain akademi sepak bola.</p>
+                <h3 class="card-title">{{ __('Player List') }}</h3>
+                <p class="card-description">{{ __('Manajemen data pemain akademi sepak bola.') }}</p>
             </div>
 
             @can('player.create')
@@ -25,7 +25,7 @@
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                                 stroke-linejoin="round" />
                         </svg>
-                        Tambah Player
+                        {{ __('Tambah Player') }}
                     </a>
                 </div>
             @endcan
@@ -38,30 +38,30 @@
 
         <div class="border-b border-gray-100 p-4 dark:border-gray-800">
             <x-table.tabs route="players.index" :active="$filters['status'] ?? ''" :tabs="[
-                '' => ['label' => 'Semua', 'count' => $allCount],
-                'active' => ['label' => 'Aktif', 'count' => $statusCounts['active']],
-                'inactive' => ['label' => 'Nonaktif', 'count' => $statusCounts['inactive']],
-                'graduated' => ['label' => 'Lulus', 'count' => $statusCounts['graduated']],
-                'left' => ['label' => 'Keluar', 'count' => $statusCounts['left']],
+                '' => ['label' => __('Semua'), 'count' => $allCount],
+                'active' => ['label' => __('Aktif'), 'count' => $statusCounts['active']],
+                'inactive' => ['label' => __('Nonaktif'), 'count' => $statusCounts['inactive']],
+                'graduated' => ['label' => __('Lulus'), 'count' => $statusCounts['graduated']],
+                'left' => ['label' => __('Keluar'), 'count' => $statusCounts['left']],
             ]" />
         </div>
 
-        <x-table.toolbar route="players.index" :filters="$filters" placeholder="Cari nama, nickname, atau kode player...">
+        <x-table.toolbar route="players.index" :filters="$filters" :placeholder="__('Cari nama, nickname, atau kode player...')">
 
             <div class="form-group">
-                <label class="form-label">Urutkan</label>
+                <label class="form-label">{{ __('Urutkan') }}</label>
                 <select name="sort" class="form-select">
-                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Terbaru</option>
-                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>Terlama</option>
-                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>Nama A-Z</option>
-                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>Nama Z-A</option>
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('Terbaru') }}</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>{{ __('Terlama') }}</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Nama A-Z') }}</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Nama Z-A') }}</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Player Type</label>
+                <label class="form-label">{{ __('Player Type') }}</label>
                 <select name="id_player_type" class="form-select">
-                    <option value="">Semua Type</option>
+                    <option value="">{{ __('Semua Type') }}</option>
                     @foreach ($playerTypeOptions as $type)
                         <option value="{{ $type->id_player_type }}" @selected(($filters['id_player_type'] ?? '') === $type->id_player_type)>
                             {{ $type->name }}
@@ -71,9 +71,9 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Kategori Umur</label>
+                <label class="form-label">{{ __('Kategori Umur') }}</label>
                 <select name="id_player_category" class="form-select">
-                    <option value="">Semua Kategori</option>
+                    <option value="">{{ __('Semua Kategori') }}</option>
                     @foreach ($playerCategoryOptions as $category)
                         <option value="{{ $category->id_player_category }}" @selected(($filters['id_player_category'] ?? '') === $category->id_player_category)>
                             {{ $category->name }}
@@ -83,9 +83,9 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Gender</label>
+                <label class="form-label">{{ __('Gender') }}</label>
                 <select name="gender" class="form-select">
-                    <option value="">Semua Gender</option>
+                    <option value="">{{ __('Semua Gender') }}</option>
                     <option value="male" @selected(($filters['gender'] ?? '') === 'male')>Male</option>
                     <option value="female" @selected(($filters['gender'] ?? '') === 'female')>Female</option>
                 </select>
@@ -97,13 +97,13 @@
             <table class="table">
                 <thead class="table-head">
                     <tr class="table-header-row">
-                        <th class="table-header-cell">Info Player</th>
-                        <th class="table-header-cell">Profil</th>
-                        <th class="table-header-cell">Posisi</th>
-                        <th class="table-header-cell">Type</th>
-                        <th class="table-header-cell">Kategori</th>
-                        <th class="table-header-cell">Status</th>
-                        <th class="table-header-cell text-center">Aksi</th>
+                        <th class="table-header-cell">{{ __('Info Player') }}</th>
+                        <th class="table-header-cell">{{ __('Profil') }}</th>
+                        <th class="table-header-cell">{{ __('Posisi') }}</th>
+                        <th class="table-header-cell">{{ __('Type') }}</th>
+                        <th class="table-header-cell">{{ __('Kategori') }}</th>
+                        <th class="table-header-cell">{{ __('Status') }}</th>
+                        <th class="table-header-cell text-center">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="table-body">
@@ -180,11 +180,11 @@
                             <td class="table-cell">
                                 @if ($player->status)
                                     <span class="badge badge-success">
-                                        Aktif
+                                        {{ __('Aktif') }}
                                     </span>
                                 @else
                                     <span class="badge badge-danger">
-                                        Nonaktif
+                                        {{ __('Nonaktif') }}
                                     </span>
                                 @endif
                             </td>
@@ -193,7 +193,7 @@
                                     {{-- Detail --}}
                                     @can('player.view')
                                         <a href="{{ route('players.show', $player->id_player) }}"
-                                            class="btn-icon btn-icon-primary" title="Detail">
+                                            class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 
                                                 <path
@@ -210,7 +210,7 @@
                                     {{-- Edit --}}
                                     @can('player.update')
                                         <a href="{{ route('players.edit', $player->id_player) }}"
-                                            class="btn-icon btn-icon-warning" title="Edit">
+                                            class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 
                                                 <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
@@ -224,7 +224,7 @@
                                     @can('user.create')
                                         @if (!$player->id_user)
                                             <a href="{{ route('players.account.create', $player->id_player) }}"
-                                                class="btn-icon btn-icon-success" title="Buat Akun">
+                                                class="btn-icon btn-icon-success" title="{{ __('Buat Akun') }}">
                                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
 
                                                     <path
@@ -262,24 +262,24 @@
                                     </svg>
                                     @if ($hasActiveFilters)
                                         <h4 class="empty-title">
-                                            Tidak ada player yang cocok
+                                            {{ __('Tidak ada player yang cocok') }}
                                         </h4>
                                         <p class="empty-description">
-                                            Coba ubah kata kunci atau filter yang dipakai
+                                            {{ __('Coba ubah kata kunci atau filter yang dipakai') }}
                                         </p>
                                         <a href="{{ route('players.index') }}" class="empty-link">
-                                            Reset Filter
+                                            {{ __('Reset Filter') }}
                                         </a>
                                     @else
                                         <h4 class="empty-title">
-                                            Belum ada data Player
+                                            {{ __('Belum ada data Player') }}
                                         </h4>
                                         <p class="empty-description">
-                                            Tambah player sekarang
+                                            {{ __('Tambah player sekarang') }}
                                         </p>
                                         @can('player.create')
                                             <a href="{{ route('players.create') }}" class="empty-link">
-                                                Tambah sekarang
+                                                {{ __('Tambah sekarang') }}
                                             </a>
                                         @endcan
                                     @endif
@@ -323,15 +323,15 @@
                         </div>
 
                         @if ($player->status)
-                            <span class="badge badge-success shrink-0">Aktif</span>
+                            <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
                         @else
-                            <span class="badge badge-danger shrink-0">Nonaktif</span>
+                            <span class="badge badge-danger shrink-0">{{ __('Nonaktif') }}</span>
                         @endif
                     </div>
 
                     <div class="table-card-body">
                         <div class="table-card-field">
-                            <span class="table-card-label">Profil</span>
+                            <span class="table-card-label">{{ __('Profil') }}</span>
                             <span class="table-text">
                                 {{ $player->birth_date ? \Carbon\Carbon::parse($player->birth_date)->format('d M Y') : '-' }}
                             </span>
@@ -344,7 +344,7 @@
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Posisi</span>
+                            <span class="table-card-label">{{ __('Posisi') }}</span>
                             <div class="flex flex-wrap gap-1">
                                 @if ($player->primaryPosition)
                                     <span class="badge badge-primary">{{ $player->primaryPosition->code }}</span>
@@ -359,7 +359,7 @@
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Type</span>
+                            <span class="table-card-label">{{ __('Type') }}</span>
                             @if ($player->playerType)
                                 <span
                                     class="badge {{ $player->playerType->is_billable ? 'badge-primary' : 'badge-secondary' }} w-fit">
@@ -371,7 +371,7 @@
                         </div>
 
                         <div class="table-card-field">
-                            <span class="table-card-label">Kategori</span>
+                            <span class="table-card-label">{{ __('Kategori') }}</span>
                             @if ($player->playerCategory)
                                 <span class="badge badge-secondary w-fit">{{ $player->playerCategory->name }}</span>
                             @else
@@ -384,7 +384,7 @@
                         {{-- Detail --}}
                         @can('player.view')
                             <a href="{{ route('players.show', $player->id_player) }}"
-                                class="btn-icon btn-icon-primary" title="Detail">
+                                class="btn-icon btn-icon-primary" title="{{ __('Detail') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path
                                         d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
@@ -399,7 +399,7 @@
                         {{-- Edit --}}
                         @can('player.update')
                             <a href="{{ route('players.edit', $player->id_player) }}"
-                                class="btn-icon btn-icon-warning" title="Edit">
+                                class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z" stroke="currentColor"
                                         stroke-width="1.5" />
@@ -411,7 +411,7 @@
                         @can('user.create')
                             @if (!$player->id_user)
                                 <a href="{{ route('players.account.create', $player->id_player) }}"
-                                    class="btn-icon btn-icon-success" title="Buat Akun">
+                                    class="btn-icon btn-icon-success" title="{{ __('Buat Akun') }}">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                         <path
                                             d="M10 10C12.0711 10 13.75 8.32107 13.75 6.25C13.75 4.17893 12.0711 2.5 10 2.5C7.92893 2.5 6.25 4.17893 6.25 6.25C6.25 8.32107 7.92893 10 10 10Z"
@@ -444,24 +444,24 @@
                         </svg>
                         @if ($hasActiveFilters)
                             <h4 class="empty-title">
-                                Tidak ada player yang cocok
+                                {{ __('Tidak ada player yang cocok') }}
                             </h4>
                             <p class="empty-description">
-                                Coba ubah kata kunci atau filter yang dipakai
+                                {{ __('Coba ubah kata kunci atau filter yang dipakai') }}
                             </p>
                             <a href="{{ route('players.index') }}" class="empty-link">
-                                Reset Filter
+                                {{ __('Reset Filter') }}
                             </a>
                         @else
                             <h4 class="empty-title">
-                                Belum ada data Player
+                                {{ __('Belum ada data Player') }}
                             </h4>
                             <p class="empty-description">
-                                Tambah player sekarang
+                                {{ __('Tambah player sekarang') }}
                             </p>
                             @can('player.create')
                                 <a href="{{ route('players.create') }}" class="empty-link">
-                                    Tambah sekarang
+                                    {{ __('Tambah sekarang') }}
                                 </a>
                             @endcan
                         @endif

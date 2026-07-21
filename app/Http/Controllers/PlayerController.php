@@ -44,10 +44,10 @@ class PlayerController extends Controller
         ]));
 
         return view('players.index',[
-            'title'=>'Players',
+            'title'=>__('Players'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Players'
+                    'label'=>__('Players')
                 ]
             ],
             'players' => $this->playerService->paginate($filters),
@@ -67,14 +67,14 @@ class PlayerController extends Controller
     public function create()
     {
         return view('players.create',[
-            'title'=>'Create Player',
+            'title'=>__('Create Player'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Players',
+                    'label'=>__('Players'),
                     'url'=>route('players.index')
                 ],
                 [
-                    'label'=>'Create'
+                    'label'=>__('Create')
                 ]
             ],
             'isSuperAdmin'=>$this->academyService->isSuperAdmin(),
@@ -105,12 +105,12 @@ class PlayerController extends Controller
                 ->route('players.index')
                 ->with(
                     'success',
-                    'Player berhasil dibuat.'
+                    __('Player berhasil dibuat.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal membuat player');
+            return $this->handleException($e, __('Gagal membuat player'));
         }
     }
 
@@ -126,14 +126,14 @@ class PlayerController extends Controller
         ]);
 
         return view('players.show',[
-            'title'=>'Detail Player',
+            'title'=>__('Detail Player'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Players',
+                    'label'=>__('Players'),
                     'url'=>route('players.index')
                 ],
                 [
-                    'label'=>'Detail Player'
+                    'label'=>__('Detail Player')
                 ]
             ],
             'player'=>$player
@@ -143,14 +143,14 @@ class PlayerController extends Controller
     public function edit(Player $player)
     {
         return view('players.edit',[
-            'title'=>'Edit Player',
+            'title'=>__('Edit Player'),
             'breadcrumb'=>[
                 [
-                    'label'=>'Players',
+                    'label'=>__('Players'),
                     'url'=>route('players.index')
                 ],
                 [
-                    'label'=>'Edit'
+                    'label'=>__('Edit')
                 ]
             ],
             'player'=>$player,
@@ -194,12 +194,12 @@ class PlayerController extends Controller
                 ->route('players.index')
                 ->with(
                     'success',
-                    'Player berhasil diperbarui.'
+                    __('Player berhasil diperbarui.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui player');
+            return $this->handleException($e, __('Gagal memperbarui player'));
         }
     }
 
@@ -216,12 +216,12 @@ class PlayerController extends Controller
                 ->route('players.index')
                 ->with(
                     'success',
-                    'Player berhasil dihapus.'
+                    __('Player berhasil dihapus.')
                 );
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus player', 'players.index');
+            return $this->handleException($e, __('Gagal menghapus player'), 'players.index');
         }
     }
 

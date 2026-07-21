@@ -32,12 +32,12 @@ class AcademyProfileController extends Controller
     {
         $academy = $this->academyService->current();
 
-        abort_if(! $academy, 404, 'Academy tidak ditemukan untuk akun ini.');
+        abort_if(! $academy, 404, __('Academy tidak ditemukan untuk akun ini.'));
 
         return view('academy-profile.edit', [
-            'title' => 'Profil Academy',
+            'title' => __('Profil Academy'),
             'breadcrumb' => [
-                ['label' => 'Profil Academy'],
+                ['label' => __('Profil Academy')],
             ],
             'academy' => $academy,
         ]);
@@ -47,7 +47,7 @@ class AcademyProfileController extends Controller
     {
         $academy = $this->academyService->current();
 
-        abort_if(! $academy, 404, 'Academy tidak ditemukan untuk akun ini.');
+        abort_if(! $academy, 404, __('Academy tidak ditemukan untuk akun ini.'));
 
         try {
 
@@ -55,11 +55,11 @@ class AcademyProfileController extends Controller
 
             return redirect()
                 ->route('academy.profile.edit')
-                ->with('success', 'Profil academy berhasil diperbarui.');
+                ->with('success', __('Profil academy berhasil diperbarui.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui profil academy');
+            return $this->handleException($e, __('Gagal memperbarui profil academy'));
         }
     }
 }

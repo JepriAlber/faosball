@@ -178,67 +178,67 @@ class StorePlayerRequest extends FormRequest
     {
         return [
 
-            'id_academy.required' => 'Academy wajib dipilih.',
-            'id_academy.prohibited' => 'Academy tidak dapat dipilih.',
-            'id_academy.uuid' => 'Academy tidak valid.',
-            'id_academy.exists' => 'Academy tidak ditemukan.',
+            'id_academy.required' => __('Academy wajib dipilih.'),
+            'id_academy.prohibited' => __('Academy tidak dapat dipilih.'),
+            'id_academy.uuid' => __('Academy tidak valid.'),
+            'id_academy.exists' => __('Academy tidak ditemukan.'),
 
-            'id_player_type.required' => 'Type player wajib dipilih.',
-            'id_player_type.uuid' => 'Type player tidak valid.',
-            'id_player_type.exists' => 'Type player tidak ditemukan pada academy ini.',
+            'id_player_type.required' => __('Type player wajib dipilih.'),
+            'id_player_type.uuid' => __('Type player tidak valid.'),
+            'id_player_type.exists' => __('Type player tidak ditemukan pada academy ini.'),
 
-            'id_player_category.required' => 'Kategori umur wajib dipilih.',
-            'id_player_category.uuid' => 'Kategori umur tidak valid.',
-            'id_player_category.exists' => 'Kategori umur tidak ditemukan pada academy ini.',
+            'id_player_category.required' => __('Kategori umur wajib dipilih.'),
+            'id_player_category.uuid' => __('Kategori umur tidak valid.'),
+            'id_player_category.exists' => __('Kategori umur tidak ditemukan pada academy ini.'),
 
-            'name.required' => 'Nama player wajib diisi.',
-            'name.string' => 'Nama player harus berupa teks.',
-            'name.max' => 'Nama player maksimal :max karakter.',
+            'name.required' => __('Nama player wajib diisi.'),
+            'name.string' => __('Nama player harus berupa teks.'),
+            'name.max' => __('Nama player maksimal :max karakter.'),
 
-            'nick_name.string' => 'Nama panggilan harus berupa teks.',
-            'nick_name.max' => 'Nama panggilan maksimal :max karakter.',
+            'nick_name.string' => __('Nama panggilan harus berupa teks.'),
+            'nick_name.max' => __('Nama panggilan maksimal :max karakter.'),
 
-            'birth_date.required' => 'Tanggal lahir wajib diisi.',
-            'birth_date.date' => 'Tanggal lahir tidak valid.',
+            'birth_date.required' => __('Tanggal lahir wajib diisi.'),
+            'birth_date.date' => __('Tanggal lahir tidak valid.'),
 
-            'gender.required' => 'Jenis kelamin wajib dipilih.',
-            'gender.in' => 'Jenis kelamin yang dipilih tidak valid.',
+            'gender.required' => __('Jenis kelamin wajib dipilih.'),
+            'gender.in' => __('Jenis kelamin yang dipilih tidak valid.'),
 
-            'nationality.string' => 'Kewarganegaraan harus berupa teks.',
-            'nationality.max' => 'Kewarganegaraan maksimal :max karakter.',
+            'nationality.string' => __('Kewarganegaraan harus berupa teks.'),
+            'nationality.max' => __('Kewarganegaraan maksimal :max karakter.'),
 
-            'height.integer' => 'Tinggi badan harus berupa angka.',
-            'height.min' => 'Tinggi badan tidak valid.',
+            'height.integer' => __('Tinggi badan harus berupa angka.'),
+            'height.min' => __('Tinggi badan tidak valid.'),
 
-            'weight.integer' => 'Berat badan harus berupa angka.',
-            'weight.min' => 'Berat badan tidak valid.',
+            'weight.integer' => __('Berat badan harus berupa angka.'),
+            'weight.min' => __('Berat badan tidak valid.'),
 
-            'preferred_foot.in' => 'Kaki dominan tidak valid.',
+            'preferred_foot.in' => __('Kaki dominan tidak valid.'),
 
-            'id_primary_position.required' => 'Posisi utama wajib dipilih.',
-            'id_primary_position.uuid' => 'Posisi utama tidak valid.',
-            'id_primary_position.exists' => 'Posisi utama tidak ditemukan.',
+            'id_primary_position.required' => __('Posisi utama wajib dipilih.'),
+            'id_primary_position.uuid' => __('Posisi utama tidak valid.'),
+            'id_primary_position.exists' => __('Posisi utama tidak ditemukan.'),
 
-            'id_secondary_position.uuid' => 'Posisi kedua tidak valid.',
-            'id_secondary_position.exists' => 'Posisi kedua tidak ditemukan.',
-            'id_secondary_position.different' => 'Posisi kedua tidak boleh sama dengan posisi utama.',
+            'id_secondary_position.uuid' => __('Posisi kedua tidak valid.'),
+            'id_secondary_position.exists' => __('Posisi kedua tidak ditemukan.'),
+            'id_secondary_position.different' => __('Posisi kedua tidak boleh sama dengan posisi utama.'),
 
-            'join_date.date' => 'Tanggal bergabung tidak valid.',
+            'join_date.date' => __('Tanggal bergabung tidak valid.'),
 
-            'status.in' => 'Status player tidak valid.',
+            'status.in' => __('Status player tidak valid.'),
 
-            'photo.image' => 'File harus berupa gambar.',
-            'photo.max' => 'Ukuran foto maksimal 2 MB.',
+            'photo.image' => __('File harus berupa gambar.'),
+            'photo.max' => __('Ukuran foto maksimal 2 MB.'),
 
-            'notes.string' => 'Catatan harus berupa teks.',
+            'notes.string' => __('Catatan harus berupa teks.'),
 
-            'email.required_if' => 'Email akun player wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email sudah digunakan oleh akun lain.',
+            'email.required_if' => __('Email akun player wajib diisi.'),
+            'email.email' => __('Format email tidak valid.'),
+            'email.unique' => __('Email sudah digunakan oleh akun lain.'),
 
-            'password.required_if' => 'Password akun player wajib diisi.',
-            'password.min' => 'Password minimal :min karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+            'password.required_if' => __('Password akun player wajib diisi.'),
+            'password.min' => __('Password minimal :min karakter.'),
+            'password.confirmed' => __('Konfirmasi password tidak sesuai.'),
 
         ];
     }

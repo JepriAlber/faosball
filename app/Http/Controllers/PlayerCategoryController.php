@@ -22,10 +22,10 @@ class PlayerCategoryController extends Controller
     public function index()
     {
         return view('player-categories.index', [
-            'title' => 'Player Category',
+            'title' => __('Player Category'),
             'breadcrumb' => [
-                ['label' => 'Players', 'url' => route('players.index')],
-                ['label' => 'Player Category'],
+                ['label' => __('Players'), 'url' => route('players.index')],
+                ['label' => __('Player Category')],
             ],
             'playerCategories' => $this->playerCategoryService->paginate(),
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
@@ -35,10 +35,10 @@ class PlayerCategoryController extends Controller
     public function create()
     {
         return view('player-categories.create', [
-            'title' => 'Tambah Player Category',
+            'title' => __('Tambah Player Category'),
             'breadcrumb' => [
-                ['label' => 'Player Category', 'url' => route('player-categories.index')],
-                ['label' => 'Tambah Player Category'],
+                ['label' => __('Player Category'), 'url' => route('player-categories.index')],
+                ['label' => __('Tambah Player Category')],
             ],
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
             'academies' => $this->academyService->isSuperAdmin()
@@ -55,21 +55,21 @@ class PlayerCategoryController extends Controller
 
             return redirect()
                 ->route('player-categories.index')
-                ->with('success', 'Player category berhasil ditambahkan.');
+                ->with('success', __('Player category berhasil ditambahkan.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menambahkan player category');
+            return $this->handleException($e, __('Gagal menambahkan player category'));
         }
     }
 
     public function edit(PlayerCategory $playerCategory)
     {
         return view('player-categories.edit', [
-            'title' => 'Edit Player Category',
+            'title' => __('Edit Player Category'),
             'breadcrumb' => [
-                ['label' => 'Player Category', 'url' => route('player-categories.index')],
-                ['label' => 'Edit Player Category'],
+                ['label' => __('Player Category'), 'url' => route('player-categories.index')],
+                ['label' => __('Edit Player Category')],
             ],
             'playerCategory' => $playerCategory,
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
@@ -84,11 +84,11 @@ class PlayerCategoryController extends Controller
 
             return redirect()
                 ->route('player-categories.index')
-                ->with('success', 'Player category berhasil diperbarui.');
+                ->with('success', __('Player category berhasil diperbarui.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal memperbarui player category');
+            return $this->handleException($e, __('Gagal memperbarui player category'));
         }
     }
 
@@ -100,11 +100,11 @@ class PlayerCategoryController extends Controller
 
             return redirect()
                 ->route('player-categories.index')
-                ->with('success', 'Player category berhasil dihapus.');
+                ->with('success', __('Player category berhasil dihapus.'));
 
         } catch (\Exception $e) {
 
-            return $this->handleException($e, 'Gagal menghapus player category', 'player-categories.index');
+            return $this->handleException($e, __('Gagal menghapus player category'), 'player-categories.index');
         }
     }
 }
