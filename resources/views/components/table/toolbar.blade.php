@@ -12,7 +12,7 @@
     search + dropdown-nya, bukan field filter itu sendiri, supaya bisa dipakai ulang
     oleh module lain dengan field yang berbeda-beda.
 --}}
-@props(['route', 'filters' => [], 'placeholder' => 'Cari...'])
+@props(['route', 'filters' => [], 'placeholder' => null])
 
 <div class="table-toolbar">
     <form action="{{ route($route) }}" method="GET" class="table-toolbar-form">
@@ -32,8 +32,8 @@
                     stroke-linejoin="round" />
             </svg>
 
-            <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ $placeholder }}"
-                class="form-input pl-10">
+            <input type="search" name="search" value="{{ $filters['search'] ?? '' }}"
+                placeholder="{{ $placeholder ?? __('Cari...') }}" class="form-input pl-10">
         </div>
 
         <div class="relative" x-data="{ open: false }">
@@ -43,7 +43,7 @@
                         d="M2.5 5H17.5M5.83333 10H14.1667M8.33333 15H11.6667"
                         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <span>Filter &amp; Sort</span>
+                <span>{{ __('Filter & Sort') }}</span>
             </button>
 
             <div x-show="open" x-cloak @click.away="open = false" x-transition
@@ -54,11 +54,11 @@
                 <div class="flex items-center justify-between gap-2 border-t border-gray-100 pt-3 dark:border-gray-800">
                     <a href="{{ route($route, array_filter(['status' => $filters['status'] ?? null])) }}"
                         class="link-muted text-sm">
-                        Reset Filter
+                        {{ __('Reset Filter') }}
                     </a>
 
                     <button type="submit" class="btn btn-primary btn-sm">
-                        Terapkan
+                        {{ __('Terapkan') }}
                     </button>
                 </div>
 

@@ -28,6 +28,32 @@
             @endcan
         </div>
 
+        <x-table.toolbar route="permissions.index" :filters="$filters" placeholder="{{ __('Cari nama permission...') }}">
+
+            <div class="form-group">
+                <label class="form-label">{{ __('Urutkan') }}</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('Terbaru') }}</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>{{ __('Terlama') }}</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Nama A-Z') }}</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Nama Z-A') }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">{{ __('Module') }}</label>
+                <select name="module" class="form-select">
+                    <option value="">{{ __('Semua Module') }}</option>
+                    @foreach ($modules as $module)
+                        <option value="{{ $module }}" @selected(($filters['module'] ?? '') === $module)>
+                            {{ \App\Support\PermissionPresenter::moduleLabel($module) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+        </x-table.toolbar>
+
         <div class="table-wrapper">
             <table class="table">
 
@@ -212,7 +238,7 @@
 
         @if ($permissions->hasPages())
             <div class="table-footer">
-                {{ $permissions->links() }}
+                {{ $permissions->withQueryString()->links() }}
             </div>
         @endif
 
