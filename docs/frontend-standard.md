@@ -281,12 +281,14 @@ FAOSBall mendukung 1 warna utama (`primary_color`) per academy yang menggantikan
 
 ## Upload Logo Multi-Slot (Persegi + Wordmark)
 
-Academy punya 2 slot logo independen, masing-masing lewat `<x-logo-upload-field>` yang sama (reusable lewat `@props`: `name`, `aspect-ratio`, `output-width`/`output-height`, `preview-class`, dst):
+Academy punya 2 slot logo independen, masing-masing lewat `<x-logo-upload-field>` yang sama. Komponen ini **class-based** (`App\View\Components\LogoUploadField`, bukan anonymous `@props`) -- parameternya (`name`, `aspect-ratio`, `output-width`/`output-height`, `preview-class`, dst) adalah argumen constructor class itu:
 
 1. **`logo`** (persegi, aspect ratio 1) -- sumber untuk `logo_favicon` (cover crop 64x64) dan calon kebutuhan lain yang butuh logo proporsional (kartu nama, kop surat).
 2. **`logo_sidebar`** (wordmark, aspect ratio lebar ~3.77) -- dipakai apa adanya di slot sidebar/header (`scaleDown` ke bounding box 245x65, TANPA crop tambahan).
 
 **Kapan pola ini dipakai lagi**: field upload+crop baru dengan rasio berbeda dari yang sudah ada -- reuse `<x-logo-upload-field>` dengan `:aspect-ratio`/`:output-width`/`:output-height` baru, JANGAN hand-roll komponen crop baru.
+
+**Gotcha -- cek dulu ada class-nya sebelum nambah `@props`**: karena `LogoUploadField` sudah class-based (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)), Laravel SELALU resolve `<x-logo-upload-field>` lewat class itu, bukan anonymous component. Menambah `@props([...])` di `resources/views/components/logo-upload-field.blade.php` untuk prop yang tidak ada di constructor class TIDAK error dan TIDAK ada warning apapun -- prop itu cuma diam-diam gagal ke-resolve dan jatuh ke nilai default. Kalau mau tambah parameter baru ke komponen bertipe class-based mana pun, perluas **constructor class-nya**, jangan tempel `@props` di view-nya. Sebelum bikin komponen baru jadi "reusable", cek dulu `app/View/Components/` -- kalau class-nya sudah ada, itu sinyal komponennya class-based, bukan anonymous.
 
 **Fallback saat academy belum upload**: `<x-academy-logo>` (`App\View\Components\AcademyLogo`) render teks nama academy (slot lebar) atau inisial 1-2 huruf lewat `App\Support\Initials` (slot persegi kecil) kalau academy aktif belum punya logo sendiri -- BUKAN fallback ke logo generic sistem (itu cuma untuk Super Admin). Warnanya numpang di token `brand` yang sudah di-override `<x-academy-theme>` per academy, tidak re-compute warna sendiri. Method `AcademyService::sidebarLogoUrl()`/`faviconUrl()` (selalu return URL gambar) TETAP dipakai apa adanya oleh `<link rel="icon">` -- fallback teks HANYA berlaku di jalur `<x-academy-logo>` Component.
 
