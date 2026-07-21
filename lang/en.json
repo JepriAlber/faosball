@@ -465,5 +465,52 @@
     "Simpan Player Type": "Save Player Type",
 
     "Perbarui detail jenis pemain.": "Update the player type details.",
-    "Update Player Type": "Update Player Type"
+    "Update Player Type": "Update Player Type",
+
+    "Player Category": "Player Category",
+    "Tambah Player Category": "Add Player Category",
+    "Player category berhasil ditambahkan.": "Player category successfully added.",
+    "Gagal menambahkan player category": "Failed to add player category",
+    "Edit Player Category": "Edit Player Category",
+    "Player category berhasil diperbarui.": "Player category successfully updated.",
+    "Gagal memperbarui player category": "Failed to update player category",
+    "Player category berhasil dihapus.": "Player category successfully deleted.",
+    "Gagal menghapus player category": "Failed to delete player category",
+
+    "Nama kategori wajib diisi.": "Category name is required.",
+    "Nama kategori harus berupa teks.": "Category name must be text.",
+    "Nama kategori maksimal :max karakter.": "Category name may be at most :max characters.",
+    "Nama kategori sudah digunakan pada academy ini.": "Category name is already used in this academy.",
+    "Umur minimal wajib diisi.": "Minimum age is required.",
+    "Umur minimal harus berupa angka.": "Minimum age must be a number.",
+    "Umur minimal tidak valid.": "Invalid minimum age.",
+    "Umur minimal maksimal :max tahun.": "Minimum age may be at most :max years.",
+    "Umur maksimal wajib diisi.": "Maximum age is required.",
+    "Umur maksimal harus berupa angka.": "Maximum age must be a number.",
+    "Umur maksimal tidak valid.": "Invalid maximum age.",
+    "Umur maksimal maksimal :max tahun.": "Maximum age may be at most :max years.",
+    "Umur maksimal tidak boleh lebih kecil dari umur minimal.": "Maximum age may not be less than the minimum age.",
+
+    "Player Category List": "Player Category List",
+    "Manajemen kelompok umur (U-12, U-15, U-17, dsb) per academy.": "Manage age categories (U-12, U-15, U-17, etc.) per academy.",
+    "Rentang Umur": "Age Range",
+    ":min–:max tahun": ":min–:max years old",
+    "Kategori masih digunakan oleh player, tidak dapat dihapus.": "Category is still used by a player, cannot be deleted.",
+    "Belum ada Player Category": "No Player Categories yet",
+    "Tambahkan player category pertama.": "Add the first player category.",
+
+    "Informasi Player Category": "Player Category Information",
+    "Tambahkan kelompok umur baru untuk academy.": "Add a new age category for the academy.",
+    "Nama Kategori": "Category Name",
+    "Contoh: U-12, U-15, U-17": "Example: U-12, U-15, U-17",
+    "Keterangan singkat tentang kategori ini": "A brief description of this category",
+    "Umur Minimal": "Minimum Age",
+    "Umur Maksimal": "Maximum Age",
+    "Rentang ini dipakai untuk": "This range is used to",
+    "menyarankan": "suggest",
+    "kategori saat menambah player, berdasarkan tanggal lahirnya. Pemain tetap boleh ditempatkan di kategori yang umurnya di luar rentang ini.": "a category when adding a player, based on their date of birth. Players can still be placed in a category outside this range.",
+    "Simpan Player Category": "Save Player Category",
+
+    "Perbarui detail kelompok umur.": "Update the age category details.",
+    "Update Player Category": "Update Player Category"
 }
