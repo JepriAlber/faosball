@@ -23,8 +23,6 @@ class StaffFactory extends Factory
             'birth_date' => fake()->date(),
             'nationality' => 'Indonesia',
             'phone' => fake()->phoneNumber(),
-            'join_date' => now(),
-            'status' => 'active',
         ];
     }
 }

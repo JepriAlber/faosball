@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends FaosModel
@@ -14,20 +16,17 @@ class Staff extends FaosModel
     protected $primaryKey = 'id_staff';
 
     protected $fillable = [
-        'id_academy', 'id_user', 'id_employment_type', 'id_staff_position',
+        'id_academy', 'id_user',
         'staff_code', 'photo', 'full_name', 'nickname',
         'gender', 'birth_place', 'birth_date', 'nationality', 'religion', 'blood_type', 'marital_status',
         'phone', 'email', 'address', 'city', 'province', 'postal_code',
-        'join_date', 'end_date', 'salary', 'status', 'notes',
+        'notes',
     ];
 
     protected function casts(): array
     {
         return [
             'birth_date' => 'date',
-            'join_date' => 'date',
-            'end_date' => 'date',
-            'salary' => 'decimal:2',
             'deleted_at' => 'datetime',
         ];
     }
@@ -42,14 +41,31 @@ class Staff extends FaosModel
         return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 
-    public function employmentType(): BelongsTo
+    /**
+     * Seluruh histori kontrak staff ini, terbaru duluan.
+     */
+    public function contracts(): HasMany
     {
-        return $this->belongsTo(EmploymentType::class, 'id_employment_type', 'id_employment_type');
+        return $this->hasMany(EmploymentContract::class, 'id_staff', 'id_staff')->latest();
     }
 
-    public function position(): BelongsTo
+    /**
+     * Kontrak yang SEDANG berlaku. Maksimal 1 baris -- dijamin
+     * EmploymentContractService (lihat Tahap 5), bukan constraint DB
+     * (lihat issue12.md Bagian 2d).
+     */
+    public function activeContract(): HasOne
     {
-        return $this->belongsTo(StaffPosition::class, 'id_staff_position', 'id_staff_position');
+        return $this->hasOne(EmploymentContract::class, 'id_staff', 'id_staff')->where('status', 'active');
+    }
+
+    /**
+     * Kontrak yang sudah dibuat tapi belum berlaku (kalau ada).
+     * Maksimal 1 baris, dijamin Service yang sama.
+     */
+    public function draftContract(): HasOne
+    {
+        return $this->hasOne(EmploymentContract::class, 'id_staff', 'id_staff')->where('status', 'draft');
     }
 
     /**

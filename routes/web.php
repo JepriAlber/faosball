@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AcademyProfileController;
+use App\Http\Controllers\EmploymentContractController;
 use App\Http\Controllers\EmploymentTypeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PermissionController;
@@ -239,6 +240,34 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:staff.create')
         ->middlewareFor(['edit', 'update'], 'permission:staff.update')
         ->middlewareFor('destroy', 'permission:staff.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employment Contract Management (nested di bawah Staff)
+    |--------------------------------------------------------------------------
+    | TIDAK ADA route destroy -- Contract tidak pernah dihapus (Rule 3).
+    | Reuse permission staff.create/staff.update, BUKAN permission baru.
+    */
+    Route::prefix('staff/{staff}/contracts')
+        ->name('staff.contracts.')
+        ->group(function () {
+
+            Route::middleware('permission:staff.update')->group(function () {
+
+                Route::get('/create', [EmploymentContractController::class, 'create'])->name('create');
+                Route::post('/', [EmploymentContractController::class, 'store'])->name('store');
+
+                Route::get('/{contract}/edit', [EmploymentContractController::class, 'edit'])->name('edit');
+                Route::put('/{contract}', [EmploymentContractController::class, 'update'])->name('update');
+
+                Route::patch('/{contract}/activate', [EmploymentContractController::class, 'activate'])->name('activate');
+                Route::patch('/{contract}/complete', [EmploymentContractController::class, 'complete'])->name('complete');
+                Route::patch('/{contract}/terminate', [EmploymentContractController::class, 'terminate'])->name('terminate');
+                Route::patch('/{contract}/cancel', [EmploymentContractController::class, 'cancel'])->name('cancel');
+
+            });
+
+        });
 
     /*
     |--------------------------------------------------------------------------

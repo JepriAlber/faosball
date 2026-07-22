@@ -73,6 +73,10 @@ class StaffController extends Controller
             'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
             'employmentTypes' => $this->employmentTypeService->selectable($academyId),
             'staffPositions' => $this->staffPositionService->selectable($academyId),
+            // Super Admin selalu lolos otorisasi apapun (Gate::before()), tapi
+            // ditambahkan eksplisit di sini sebagai jaga-jaga untuk field
+            // sensitif -- lihat issue12.md Tahap 15b.
+            'canViewSalary' => $isSuperAdmin || auth()->user()->can('salary.view'),
         ]);
     }
 
@@ -94,7 +98,7 @@ class StaffController extends Controller
 
     public function show(Staff $staff)
     {
-        $staff->load(['academy', 'employmentType', 'position', 'user.roles']);
+        $staff->load(['academy', 'user.roles', 'contracts.employmentType', 'contracts.position']);
 
         return view('staff.show', [
             'title' => $staff->full_name,
@@ -103,6 +107,7 @@ class StaffController extends Controller
                 ['label' => $staff->full_name],
             ],
             'staff' => $staff,
+            'canViewSalary' => auth()->user()->can('viewSalary', $staff),
         ]);
     }
 
@@ -114,10 +119,9 @@ class StaffController extends Controller
                 ['label' => __('Staff'), 'url' => route('staff.index')],
                 ['label' => __('Edit Staff')],
             ],
-            'staff' => $staff,
+            'staff' => $staff->load('activeContract.employmentType', 'activeContract.position'),
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
-            'employmentTypes' => $this->employmentTypeService->selectable($staff->id_academy, $staff->id_employment_type),
-            'staffPositions' => $this->staffPositionService->selectable($staff->id_academy, $staff->id_staff_position),
+            'canViewSalary' => auth()->user()->can('viewSalary', $staff),
         ]);
     }
 

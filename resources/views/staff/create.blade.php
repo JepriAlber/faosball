@@ -311,17 +311,20 @@
                         @enderror
                     </div>
 
-                    {{-- Gaji --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Gaji') }}</label>
+                    {{-- Gaji -- disembunyikan total kalau tidak berwenang lihat gaji
+                         (issue12.md Bagian 2e/Tahap 15c) --}}
+                    @if ($canViewSalary)
+                        <div class="form-group">
+                            <label class="form-label">{{ __('Gaji') }}</label>
 
-                        <input type="number" name="salary" value="{{ old('salary') }}" step="1000" min="0"
-                            class="form-input @error('salary') form-danger @enderror">
+                            <input type="number" name="salary" value="{{ old('salary') }}" step="1000" min="0"
+                                class="form-input @error('salary') form-danger @enderror">
 
-                        @error('salary')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
+                            @error('salary')
+                                <span class="form-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    @endif
 
                     {{-- Catatan --}}
                     <div class="form-group">
@@ -337,21 +340,6 @@
 
                     {{-- Foto --}}
                     <x-staff-photo-field :current-photo-url="null" />
-
-                    {{-- Status Kepegawaian --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Status Kepegawaian') }}</label>
-
-                        <select name="status" class="form-select @error('status') form-danger @enderror">
-                            <option value="active" @selected(old('status', 'active') === 'active')>{{ __('Aktif') }}</option>
-                            <option value="inactive" @selected(old('status') === 'inactive')>{{ __('Nonaktif') }}</option>
-                            <option value="resigned" @selected(old('status') === 'resigned')>{{ __('Resign') }}</option>
-                        </select>
-
-                        @error('status')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
 
                 </div>
 

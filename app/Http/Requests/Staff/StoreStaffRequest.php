@@ -63,7 +63,6 @@ class StoreStaffRequest extends FormRequest
             'join_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:join_date'],
             'salary' => ['nullable', 'numeric', 'min:0'],
-            'status' => ['nullable', 'in:active,inactive,resigned'],
 
             'photo' => ['nullable', 'image', 'max:2048'],
             'notes' => ['nullable', 'string'],
@@ -107,7 +106,6 @@ class StoreStaffRequest extends FormRequest
             'end_date.after_or_equal' => __('Tanggal berhenti tidak boleh sebelum tanggal bergabung.'),
             'salary.numeric' => __('Gaji harus berupa angka.'),
             'salary.min' => __('Gaji tidak boleh negatif.'),
-            'status.in' => __('Status tidak valid.'),
 
             'photo.image' => __('Foto harus berupa gambar.'),
             'photo.max' => __('Ukuran foto tidak boleh lebih dari 2MB.'),

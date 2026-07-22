@@ -23,7 +23,7 @@ class EmploymentTypeService
     public function paginate(?int $perPage = null)
     {
         return EmploymentType::with('academy')
-            ->withCount('staff')
+            ->withCount('contracts')
             ->latest()
             ->paginate($perPage ?? config('faos.pagination.default'));
     }
@@ -93,8 +93,8 @@ class EmploymentTypeService
     {
         return DB::transaction(function () use ($employmentType) {
 
-            if ($employmentType->staff()->exists()) {
-                throw new \Exception(__('Employment type masih digunakan oleh staff, tidak dapat dihapus. Nonaktifkan employment type ini kalau sudah tidak dipakai.'));
+            if ($employmentType->contracts()->exists()) {
+                throw new \Exception(__('Employment type masih digunakan oleh kontrak staff, tidak dapat dihapus. Nonaktifkan employment type ini kalau sudah tidak dipakai.'));
             }
 
             return $employmentType->delete();

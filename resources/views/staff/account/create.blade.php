@@ -75,7 +75,7 @@
                         <option value="">{{ __('Pilih Role') }}</option>
                         @foreach ($roles as $role)
                             <option value="{{ $role->id }}"
-                                @selected((string) old('role_id', $staff->position->role_id) === (string) $role->id)>
+                                @selected((string) old('role_id', $staff->activeContract?->position?->role_id) === (string) $role->id)>
                                 {{ $role->name }}
                             </option>
                         @endforeach
