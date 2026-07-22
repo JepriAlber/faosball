@@ -14,7 +14,7 @@
 
              {{-- Edit Account --}}
              <a href="{{ route($routeEdit, $model) }}" class="dropdown-item">
-                 Edit Account
+                 {{ __('Edit Account') }}
              </a>
 
              {{-- Reset Password --}}
@@ -23,7 +23,7 @@
                     action:'{{ route($routePassword, $model) }}',
                     name:'{{ $model->name }}'
                 })">
-                 Reset Password
+                 {{ __('Reset Password') }}
              </button>
 
              <div class="dropdown-divider"></div>
@@ -36,7 +36,7 @@
                         name:'{{ $model->name }}',
                         status:true
                     })">
-                     Disable Account
+                     {{ __('Disable Account') }}
                  </button>
              @else
                  <button type="button" class="dropdown-item-success w-full text-left"
@@ -45,12 +45,12 @@
                         name:'{{ $model->name }}',
                         status:false
                     })">
-                     Enable Account
+                     {{ __('Enable Account') }}
                  </button>
              @endif
          @else
              <a href="{{ route($routeCreate, $model) }}" class="dropdown-item">
-                 Buat Account
+                 {{ __('Buat Account') }}
              </a>
 
          @endif

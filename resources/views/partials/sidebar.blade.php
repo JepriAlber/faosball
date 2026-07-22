@@ -11,6 +11,7 @@
                 <x-academy-logo variant="sidebar" class="dark:hidden" />
                 <x-academy-logo variant="sidebar" class="hidden dark:block" />
             </span>
+            
 
             {{-- Logo ikon kecil: hanya tampil di desktop saat sidebar collapsed --}}
             <x-academy-logo variant="favicon" class="logo-icon" ::class="sidebarToggle ? 'lg:block' : 'hidden'" />
@@ -208,6 +209,115 @@
 
                     <!-- ===== END: Football Academy ===== -->
 
+                    <h3 class="menu-group-heading">
+                        <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
+                            {{ __('office') }}
+                        </span>
+                        {{-- Dots icon saat sidebar collapsed di desktop --}}
+                        <svg :class="sidebarToggle ? 'lg:block hidden' : 'hidden'" class="menu-group-icon"
+                            width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M5.99915 10.2451C6.96564 10.2451 7.74915 11.0286 7.74915 11.9951V12.0051C7.74915 12.9716 6.96564 13.7551 5.99915 13.7551C5.03265 13.7551 4.24915 12.9716 4.24915 12.0051V11.9951C4.24915 11.0286 5.03265 10.2451 5.99915 10.2451ZM17.9991 10.2451C18.9656 10.2451 19.7491 11.0286 19.7491 11.9951V12.0051C19.7491 12.9716 18.9656 13.7551 17.9991 13.7551C17.0326 13.7551 16.2491 12.9716 16.2491 12.0051V11.9951C16.2491 11.0286 17.0326 10.2451 17.9991 10.2451ZM13.7491 11.9951C13.7491 11.0286 12.9656 10.2451 11.9991 10.2451C11.0326 10.2451 10.2491 11.0286 10.2491 11.9951V12.0051C10.2491 12.9716 11.0326 13.7551 11.9991 13.7551C12.9656 13.7551 13.7491 12.9716 13.7491 12.0051V11.9951Z"
+                                fill="" />
+                        </svg>
+                    </h3>
+
+                    <!-- ===== Menu Item: Office (dengan dropdown) ===== -->
+
+                    @php
+                        $officeRoutes = ['staff.*', 'staff-positions.*', 'employment-types.*'];
+
+                        $isOfficeActive = false;
+
+                        foreach ($officeRoutes as $route) {
+                            if (Route::is($route)) {
+                                $isOfficeActive = true;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    <li x-data="{ open: {{ $isOfficeActive ? 'true' : 'false' }} }">
+
+                        <a href="#" @click.prevent="open = !open" class="menu-item group"
+                            :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+
+                            <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 8.5C4 7.39543 4.89543 6.5 6 6.5H18C19.1046 6.5 20 7.39543 20 8.5V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V8.5Z"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M8.5 6.5V5.5C8.5 4.67157 9.17157 4 10 4H14C14.8284 4 15.5 4.67157 15.5 5.5V6.5"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 12H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+
+                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                {{ __('Office') }}
+                            </span>
+
+                            <svg class="menu-item-arrow transition-transform duration-200"
+                                :class="[
+                                    open ? 'menu-item-arrow-active rotate-180' : 'menu-item-arrow-inactive',
+                                    sidebarToggle ? 'lg:hidden' : ''
+                                ]"
+                                width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+
+                        </a>
+
+                        {{-- Dropdown submenu --}}
+
+                        <div x-show="open" x-collapse class="overflow-hidden">
+
+                            <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
+
+                                {{-- Staff --}}
+                                @can('staff.view')
+                                    <li>
+                                        <a href="{{ route('staff.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('staff.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Staff') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Staff Position --}}
+                                @can('staff_position.view')
+                                    <li>
+                                        <a href="{{ route('staff-positions.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('staff-positions.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Staff Position') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Employment Type --}}
+                                @can('employment_type.view')
+                                    <li>
+                                        <a href="{{ route('employment-types.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('employment-types.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Employment Type') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- ===== END: Office ===== -->
 
                     <!-- ===== Menu Item: Profile (tanpa dropdown) ===== -->
                     @php

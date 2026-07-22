@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class AccountService
 {
 
-    public function create(array $data,string $role): User
+    public function create(array $data, Role|string $role): User
     {
         return DB::transaction(function () use ($data,$role){
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AcademyProfileController;
+use App\Http\Controllers\EmploymentTypeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
@@ -12,6 +13,9 @@ use App\Http\Controllers\PlayerPositionController;
 use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StaffAccountController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffPositionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -173,6 +177,68 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:player_category.create')
         ->middlewareFor(['edit', 'update'], 'permission:player_category.update')
         ->middlewareFor('destroy', 'permission:player_category.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employment Type Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('employment-types', EmploymentTypeController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:employment_type.view')
+        ->middlewareFor(['create', 'store'], 'permission:employment_type.create')
+        ->middlewareFor(['edit', 'update'], 'permission:employment_type.update')
+        ->middlewareFor('destroy', 'permission:employment_type.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Position Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('staff-positions', StaffPositionController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:staff_position.view')
+        ->middlewareFor(['create', 'store'], 'permission:staff_position.create')
+        ->middlewareFor(['edit', 'update'], 'permission:staff_position.update')
+        ->middlewareFor('destroy', 'permission:staff_position.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Account Management
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('staff/{staff}/account')
+    ->name('staff.account.')
+    ->group(function () {
+
+        Route::middleware('permission:user.create')->group(function () {
+
+            Route::get('/create', [StaffAccountController::class, 'create'])->name('create');
+            Route::post('/', [StaffAccountController::class, 'store'])->name('store');
+
+        });
+
+        Route::middleware('permission:user.update')->group(function () {
+
+            Route::get('/edit', [StaffAccountController::class, 'edit'])->name('edit');
+            Route::put('/', [StaffAccountController::class, 'update'])->name('update');
+            Route::patch('/status', [StaffAccountController::class, 'status'])->name('status');
+            Route::patch('/password', [StaffAccountController::class, 'password'])->name('password');
+
+        });
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('staff', StaffController::class)
+        ->middlewareFor(['index', 'show'], 'permission:staff.view')
+        ->middlewareFor(['create', 'store'], 'permission:staff.create')
+        ->middlewareFor(['edit', 'update'], 'permission:staff.update')
+        ->middlewareFor('destroy', 'permission:staff.delete');
 
     /*
     |--------------------------------------------------------------------------
