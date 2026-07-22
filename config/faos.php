@@ -43,6 +43,7 @@ return [
             'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
             'employment_type.view', 'employment_type.create', 'employment_type.update', 'employment_type.delete',
             'staff_position.view', 'staff_position.create', 'staff_position.update', 'staff_position.delete',
+            'staff.view', 'staff.create', 'staff.update', 'staff.delete',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',

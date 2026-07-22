@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EmploymentType extends FaosModel
 {
@@ -24,6 +25,8 @@ class EmploymentType extends FaosModel
         return $this->belongsTo(Academy::class, 'id_academy', 'id_academy');
     }
 
-    // relasi staff() BELUM ada di sini -- ditambahkan issue11.md Tahap 9
-    // setelah tabel `staff` dibuat (lihat Aturan Emas brief ini).
+    public function staff(): HasMany
+    {
+        return $this->hasMany(Staff::class, 'id_employment_type', 'id_employment_type');
+    }
 }

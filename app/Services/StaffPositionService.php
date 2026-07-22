@@ -20,6 +20,7 @@ class StaffPositionService
     public function paginate(?int $perPage = null)
     {
         return StaffPosition::with(['academy', 'role'])
+            ->withCount('staff')
             ->latest()
             ->paginate($perPage ?? config('faos.pagination.default'));
     }
@@ -87,13 +88,16 @@ class StaffPositionService
         });
     }
 
-    /**
-     * Guard delete DITAMBAHKAN di issue11.md Tahap 9 (cek relasi ke staff)
-     * setelah tabel `staff` ada. Untuk sekarang, delete polos.
-     */
     public function delete(StaffPosition $staffPosition): bool
     {
-        return DB::transaction(fn () => $staffPosition->delete());
+        return DB::transaction(function () use ($staffPosition) {
+
+            if ($staffPosition->staff()->exists()) {
+                throw new \Exception(__('Staff position masih digunakan oleh staff, tidak dapat dihapus. Nonaktifkan staff position ini kalau sudah tidak dipakai.'));
+            }
+
+            return $staffPosition->delete();
+        });
     }
 
     /**

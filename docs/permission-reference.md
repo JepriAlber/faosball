@@ -18,6 +18,7 @@ Sumber kebenaran (source of truth) tetap kode — `database/seeders/RolePermissi
 - [Module: Player Category](#module-player-category)
 - [Module: Employment Type](#module-employment-type)
 - [Module: Staff Position](#module-staff-position)
+- [Module: Staff](#module-staff)
 - [Module: Player Position (Master Global)](#module-player-position-master-global)
 - [Module: Academy Management](#module-academy-management)
 - [Permission Belum Dipakai Module Manapun](#permission-belum-dipakai-module-manapun)
@@ -144,7 +145,7 @@ Status: **✅ Implemented**
 Catatan:
 - Isolasi antar academy memakai `AcademyScope` (global scope), **bukan** Policy — akses employment type academy lain menghasilkan **404**, bukan 403. Pola sama dengan Player Type/Player Category.
 - Default: 4 permission ini cuma di-assign ke role **Owner** lewat `config('faos.role_templates')`. Delegasi ke role lain lewat halaman Role Management.
-- Guard delete ("masih dipakai staff") **belum aktif** di brief ini (tabel `staff` belum ada) — ditambahkan saat `issue11.md` (modul Staff) selesai.
+- Guard delete ("masih dipakai staff") **aktif** — `EmploymentTypeService::delete()`/`StaffPositionService::delete()` menolak hapus kalau masih ada baris `staff` yang mereferensikannya.
 
 ---
 
@@ -162,7 +163,32 @@ Status: **✅ Implemented**
 Catatan:
 - Isolasi antar academy memakai `AcademyScope` — akses lintas academy = **404**. Default: Owner-only lewat `config('faos.role_templates')`.
 - Field `role_id` (Default Role) merujuk ke `roles.id` (**bigint**, bukan uuid seperti FK lain) — divalidasi ulang di `StaffPositionFormRequest` supaya role yang dipilih benar-benar milik academy yang sama (role tenant-scoped per academy, lihat `docs/authorization.md` → *Role Academy Based*).
-- Guard delete ("masih dipakai staff") **belum aktif** di brief ini — ditambahkan saat `issue11.md` selesai.
+- Guard delete ("masih dipakai staff") **aktif** — `EmploymentTypeService::delete()`/`StaffPositionService::delete()` menolak hapus kalau masih ada baris `staff` yang mereferensikannya.
+
+---
+
+## Module: Staff
+
+Status: **✅ Implemented**
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `staff.view` | Lihat daftar & detail staff | `staff.index`, `staff.show` (route middleware) |
+| `staff.create` | Tambah staff baru | `staff.create`, `staff.store` (route middleware) + `@can()` tombol "Tambah" |
+| `staff.update` | Ubah data staff | `staff.edit`, `staff.update` (route middleware) + `@can()` tombol Edit |
+| `staff.delete` | Hapus staff | `staff.destroy` (route middleware) + `@can()` tombol Hapus |
+
+### Sub-module: Staff Account (login staff, opsional)
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `user.create` | Buat akun login untuk staff yang belum punya akun | `staff.account.create`, `staff.account.store` |
+| `user.update` | Edit akun, reset password, DAN aktif/nonaktifkan akun staff | `staff.account.edit`, `staff.account.update`, `staff.account.status`, `staff.account.password` + `<x-account.dropdown>` |
+
+Catatan:
+- Sub-module Account **reuse** permission generik `user.create`/`user.update` yang sama dipakai Player Account — bukan permission baru `staff_account.*` (pola sama Player, beda dengan Academy Account yang sengaja pakai `academy.update`).
+- Field "Default Role" (`staff_positions.role_id`, `issue10.md`) cuma jadi pilihan AWAL di dropdown Role saat buat akun — admin tetap bebas pilih role lain. Role yang dipilih divalidasi harus milik academy yang sama dengan staff (`StoreStaffAccountRequest`).
+- Isolasi antar academy memakai `AcademyScope` — akses lintas academy = **404**. Default: 4 permission CRUD Owner-only lewat `config('faos.role_templates')`.
 
 ---
 

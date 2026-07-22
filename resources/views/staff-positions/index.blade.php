@@ -103,7 +103,8 @@
 
                                     @can('staff_position.delete')
                                         <x-button.delete :action="route('staff-positions.destroy', $staffPosition)"
-                                            :name="$staffPosition->name" />
+                                            :name="$staffPosition->name" :disabled="$staffPosition->staff_count > 0"
+                                            reason="{{ __('Staff position masih digunakan oleh staff, tidak dapat dihapus.') }}" />
                                     @endcan
 
                                 </div>
@@ -198,7 +199,8 @@
 
                         @can('staff_position.delete')
                             <x-button.delete :action="route('staff-positions.destroy', $staffPosition)"
-                                :name="$staffPosition->name" />
+                                :name="$staffPosition->name" :disabled="$staffPosition->staff_count > 0"
+                                reason="{{ __('Staff position masih digunakan oleh staff, tidak dapat dihapus.') }}" />
                         @endcan
                     </div>
                 </div>

@@ -23,6 +23,7 @@ class EmploymentTypeService
     public function paginate(?int $perPage = null)
     {
         return EmploymentType::with('academy')
+            ->withCount('staff')
             ->latest()
             ->paginate($perPage ?? config('faos.pagination.default'));
     }
@@ -88,13 +89,16 @@ class EmploymentTypeService
         });
     }
 
-    /**
-     * Guard delete DITAMBAHKAN di issue11.md Tahap 9 (cek relasi ke staff)
-     * setelah tabel `staff` ada. Untuk sekarang, delete polos.
-     */
     public function delete(EmploymentType $employmentType): bool
     {
-        return DB::transaction(fn () => $employmentType->delete());
+        return DB::transaction(function () use ($employmentType) {
+
+            if ($employmentType->staff()->exists()) {
+                throw new \Exception(__('Employment type masih digunakan oleh staff, tidak dapat dihapus. Nonaktifkan employment type ini kalau sudah tidak dipakai.'));
+            }
+
+            return $employmentType->delete();
+        });
     }
 
     /**

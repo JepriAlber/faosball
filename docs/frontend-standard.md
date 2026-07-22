@@ -177,6 +177,56 @@ Tab kosong (`''`) selalu berarti "tanpa filter status". Angka tiap tab **wajib**
 
 Tabs status masuk akal untuk module yang punya kolom status/state dengan sedikit nilai tetap (Player: `active/inactive/graduated/left`). Kalau sebuah module tidak punya kolom seperti itu, cukup pasang `<x-table.toolbar>` saja tanpa `<x-table.tabs>`. Search & filter dropdown (`<x-table.toolbar>`) berlaku untuk semua module dengan data yang berpotensi banyak baris — untuk module master kecil (≤ 1 halaman pagination biasanya) boleh dilewati, diskusikan dulu dengan user kalau ragu.
 
+### Wajib: Filter Academy — khusus Super Admin
+
+Model tenant (pakai `BelongsToAcademy` → `AcademyScope`) otomatis membatasi user academy biasa ke academy-nya sendiri, tapi **tidak** membatasi Super Admin — Super Admin selalu melihat baris dari **seluruh** academy tercampur jadi satu (lihat `docs/multi-tenancy.md`). Begitu sebuah module tenant punya halaman index/list dengan `<x-table.toolbar>`, dropdown filter **"Academy" wajib ditambahkan**, supaya Super Admin bisa mempersempit ke satu academy — kalau tidak, daftar akan makin sulit dibaca seiring bertambahnya jumlah academy. Filter ini **cuma muncul untuk Super Admin** (`@if ($isSuperAdmin)`) — untuk user academy biasa dropdown ini percuma (`AcademyScope` sudah mempersempit ke 1 academy) dan wajib disembunyikan, bukan ditampilkan disabled/kosong.
+
+Contoh acuan: `RoleController`/`RoleService`/`resources/views/roles/index.blade.php` (pola pertama), dicontoh ulang persis di `StaffController`/`StaffService`/`resources/views/staff/index.blade.php`.
+
+**1. Controller** — kirim `academies` (cuma diisi untuk Super Admin) dan masukkan `id_academy` ke whitelist filter:
+
+```php
+$filters = array_filter($request->only(['search', 'status', 'id_academy', /* ...filter lain */]));
+
+return view('staff.index', [
+    'staff' => $this->staffService->paginate($filters),
+    'isSuperAdmin' => $isSuperAdmin,
+    'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
+    // ...
+]);
+```
+
+**2. Service** — filter `id_academy` di `applyFilters()`, aman didiamkan untuk user academy biasa karena `AcademyScope` sudah lebih dulu mempersempit query:
+
+```php
+if (!empty($filters['id_academy'])) {
+    $query->where('id_academy', $filters['id_academy']);
+}
+```
+
+**3. View** — dropdown filter di dalam slot `<x-table.toolbar>`, dan kolom/field "Academy" (badge) di tabel **dan** card list supaya Super Admin tahu baris mana milik academy mana — keduanya dibungkus `@if ($isSuperAdmin)` yang sama:
+
+```blade
+<x-table.toolbar route="staff.index" :filters="$filters" :placeholder="__('Cari...')">
+    @if ($isSuperAdmin)
+        <div class="form-group">
+            <label class="form-label">{{ __('Academy') }}</label>
+            <select name="id_academy" class="form-select">
+                <option value="">{{ __('Semua Academy') }}</option>
+                @foreach ($academies as $academy)
+                    <option value="{{ $academy->id_academy }}" @selected(($filters['id_academy'] ?? '') === $academy->id_academy)>
+                        {{ $academy->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    @endif
+    {{-- field filter khusus module lain --}}
+</x-table.toolbar>
+```
+
+Kalau module bersangkutan punya sentinel filter tambahan (mis. `RoleService::SYSTEM_ROLE_FILTER` untuk "Role System"/`id_academy IS NULL`), itu spesifik semantik module itu — jangan diseragamkan ke module lain yang tidak punya konsep serupa.
+
 ---
 
 ## Urutan & Pengelompokan Field Form (Create/Edit)
@@ -304,6 +354,7 @@ Gunakan:
 - Class-based Blade Component untuk view yang butuh data dinamis/hitung sendiri, bukan View Composer.
 - Dual-render Table (desktop) + Card List (mobile/tablet) untuk semua halaman index/list module (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)).
 - `<x-table.tabs>`/`<x-table.toolbar>` untuk search/filter/sort di halaman index/list yang datanya berpotensi banyak baris, dengan state lewat query string (GET) dan business logic filter di Service (lihat [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)).
+- Dropdown filter "Academy" (+ kolom/field Academy di tabel & card list) untuk **Super Admin saja** di setiap halaman index/list module tenant yang punya `<x-table.toolbar>` (lihat [Wajib: Filter Academy — khusus Super Admin](#wajib-filter-academy--khusus-super-admin)).
 - Taksonomi urutan field (Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah) untuk semua form create/edit baru, konsisten antara create dan edit di module yang sama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
 
 Hindari:

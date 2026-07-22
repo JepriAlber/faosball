@@ -226,7 +226,7 @@
                     <!-- ===== Menu Item: Office (dengan dropdown) ===== -->
 
                     @php
-                        $officeRoutes = ['staff-positions.*', 'employment-types.*'];
+                        $officeRoutes = ['staff.*', 'staff-positions.*', 'employment-types.*'];
 
                         $isOfficeActive = false;
 
@@ -274,11 +274,19 @@
                         <div x-show="open" x-collapse class="overflow-hidden">
 
                             <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
-                                {{--
-                                    Staff disisipkan di sini oleh issue11.md -- SEBELUM item
-                                    Staff Position di bawah ini, supaya urutan akhir jadi:
-                                    Staff, Staff Position, Employment Type.
-                                --}}
+
+                                {{-- Staff --}}
+                                @can('staff.view')
+                                    <li>
+                                        <a href="{{ route('staff.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('staff.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Staff') }}
+                                        </a>
+                                    </li>
+                                @endcan
 
                                 {{-- Staff Position --}}
                                 @can('staff_position.view')

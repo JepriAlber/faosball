@@ -84,7 +84,8 @@
 
                                     @can('employment_type.delete')
                                         <x-button.delete :action="route('employment-types.destroy', $employmentType)"
-                                            :name="$employmentType->name" />
+                                            :name="$employmentType->name" :disabled="$employmentType->staff_count > 0"
+                                            reason="{{ __('Employment type masih digunakan oleh staff, tidak dapat dihapus.') }}" />
                                     @endcan
 
                                 </div>
@@ -160,7 +161,8 @@
 
                         @can('employment_type.delete')
                             <x-button.delete :action="route('employment-types.destroy', $employmentType)"
-                                :name="$employmentType->name" />
+                                :name="$employmentType->name" :disabled="$employmentType->staff_count > 0"
+                                reason="{{ __('Employment type masih digunakan oleh staff, tidak dapat dihapus.') }}" />
                         @endcan
                     </div>
                 </div>
