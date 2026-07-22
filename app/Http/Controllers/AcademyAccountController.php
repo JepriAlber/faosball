@@ -6,15 +6,18 @@ use App\Http\Requests\Academy\StoreAcademyAccountRequest;
 use App\Http\Requests\Academy\UpdateAcademyAccountRequest;
 use App\Models\Academy;
 use App\Services\AccountService;
+use App\Services\StaffService;
 use Illuminate\Support\Facades\DB;
 
 class AcademyAccountController extends Controller
 {
     protected AccountService $accountService;
+    protected StaffService $staffService;
 
-    public function __construct(AccountService $accountService)
+    public function __construct(AccountService $accountService, StaffService $staffService)
     {
         $this->accountService = $accountService;
+        $this->staffService = $staffService;
     }
 
     public function create(Academy $academy)
@@ -50,10 +53,18 @@ class AcademyAccountController extends Controller
 
                 $user = $this->accountService->create([
                     'id_academy' => $academy->id_academy,
-                    'name' => $academy->name,
+                    'name' => $request->full_name,
                     'email' => $request->email,
                     'password' => $request->password,
                 ], 'Owner');
+
+                $this->staffService->createForOwner($academy, $user, [
+                    'full_name' => $request->full_name,
+                    'gender' => $request->gender,
+                    'birth_place' => $request->birth_place,
+                    'birth_date' => $request->birth_date,
+                    'phone' => $request->phone,
+                ]);
 
                 $academy->update([
                     'id_owner_user' => $user->id_user,
@@ -104,6 +115,8 @@ class AcademyAccountController extends Controller
                 $academy->owner,
                 $request->validated()
             );
+
+            $this->staffService->syncFullName($academy->owner, $request->name);
 
             return redirect()
                 ->route('academies.show', $academy)

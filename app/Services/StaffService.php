@@ -15,11 +15,19 @@ class StaffService
 {
     protected AcademyService $academyService;
     protected EmploymentContractService $employmentContractService;
+    protected EmploymentTypeService $employmentTypeService;
+    protected StaffPositionService $staffPositionService;
 
-    public function __construct(AcademyService $academyService, EmploymentContractService $employmentContractService)
-    {
+    public function __construct(
+        AcademyService $academyService,
+        EmploymentContractService $employmentContractService,
+        EmploymentTypeService $employmentTypeService,
+        StaffPositionService $staffPositionService
+    ) {
         $this->academyService = $academyService;
         $this->employmentContractService = $employmentContractService;
+        $this->employmentTypeService = $employmentTypeService;
+        $this->staffPositionService = $staffPositionService;
     }
 
     protected function uploadPhoto($file, string $staffCode): string
@@ -179,6 +187,7 @@ class StaffService
 
             $staff = Staff::create([
                 'id_academy' => $academy->id_academy,
+                'id_user' => $data['id_user'] ?? null,
                 'staff_code' => $staffCode,
                 'photo' => $photo,
                 'full_name' => $data['full_name'],
@@ -204,6 +213,39 @@ class StaffService
 
             return $staff;
         });
+    }
+
+    /**
+     * Dipanggil dari alur pembuatan akun Owner
+     * (AcademyManagementService::create() & AcademyAccountController::store())
+     * -- Owner SELALU jadi bagian dari Staff academy-nya sendiri. Employment
+     * Type & Staff Position di-default otomatis ("Permanent" + "Academy
+     * Director") -- form pembuatan akun Owner tidak menanyakan dropdown ini
+     * sama sekali (issue13.md Bagian 2a).
+     */
+    public function createForOwner(Academy $academy, User $owner, array $data): Staff
+    {
+        $employmentType = $this->employmentTypeService->findDefaultForOwner($academy);
+        $staffPosition = $this->staffPositionService->findDefaultForOwner($academy);
+
+        return $this->create(array_merge($data, [
+            'id_academy' => $academy->id_academy,
+            'id_user' => $owner->id_user,
+            'id_employment_type' => $employmentType->id_employment_type,
+            'id_staff_position' => $staffPosition->id_staff_position,
+            'email' => $data['email'] ?? $owner->email,
+        ]));
+    }
+
+    /**
+     * Selaraskan Staff.full_name saat nama akun Owner diubah lewat
+     * AcademyAccountController::update() -- supaya data di halaman Staff
+     * tidak basi dibanding nama akun login-nya (issue13.md Bagian 2d).
+     * No-op kalau User ini tidak (lagi) tertaut ke Staff manapun.
+     */
+    public function syncFullName(User $user, string $fullName): void
+    {
+        Staff::where('id_user', $user->id_user)->update(['full_name' => $fullName]);
     }
 
     public function update(Staff $staff, array $data): Staff
@@ -248,6 +290,15 @@ class StaffService
 
     public function delete(Staff $staff): bool
     {
+        // Staff yang jadi Owner academy-nya sendiri TIDAK BOLEH dihapus lewat
+        // sini -- menghapusnya ikut menghapus User (di bawah) dan diam-diam
+        // mengosongkan academies.id_owner_user (FK nullOnDelete). Ganti/pindahkan
+        // kepemilikan academy dulu lewat Academy Account management
+        // (issue13.md Bagian 2e).
+        if ($staff->id_user && $staff->academy->id_owner_user === $staff->id_user) {
+            throw new \Exception(__('Staff ini adalah pemilik (Owner) academy dan tidak dapat dihapus. Ganti kepemilikan academy terlebih dahulu lewat menu Academy.'));
+        }
+
         return DB::transaction(function () use ($staff) {
 
             $this->deletePhoto($staff->photo);

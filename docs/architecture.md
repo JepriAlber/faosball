@@ -178,9 +178,16 @@ Parent
       │
       ▼
 AccountService
+
+Academy (Owner)
+      │
+      ▼
+AccountService
 ```
 
 Seluruh proses pembuatan akun menggunakan `AccountService` agar implementasi tetap konsisten dan tidak terjadi duplikasi kode.
+
+**Khusus Academy Owner** (`issue13.md`): pembuatan akunnya **selalu diikuti** pembuatan 1 baris `Staff` lewat `StaffService::createForOwner()`, dipanggil tepat setelah `AccountService::create()` — baik dari toggle "Buat Akun Owner" di `AcademyManagementService::create()` maupun dari halaman standalone `AcademyAccountController::store()`. Ini karena Owner secara bisnis memang bagian dari staff academy-nya sendiri, bukan entitas terpisah. Employment Type & Staff Position kontrak pertamanya di-default otomatis ke `"Permanent"`/`"Academy Director"` (template yang sudah dibuat tiap Academy baru) — form Owner tidak pernah menanyakan dropdown itu. Kalau butuh membaca kode Owner ini di halaman Staff biasa (index/show/edit) tapi bingung kenapa dia tidak pernah dibuat lewat form Staff, inilah sebabnya.
 
 ---
 

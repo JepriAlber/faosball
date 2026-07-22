@@ -360,6 +360,74 @@
                                     @enderror
                                 </div>
 
+                                <div>
+                                    <label class="form-label">
+                                        {{ __('Nama Lengkap Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
+                                    </label>
+
+                                    <input type="text" name="owner_full_name" value="{{ old('owner_full_name') }}"
+                                        class="form-input @error('owner_full_name') form-danger @enderror">
+
+                                    @error('owner_full_name')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="form-label">
+                                        {{ __('Jenis Kelamin Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
+                                    </label>
+
+                                    <select name="owner_gender" class="form-select @error('owner_gender') form-danger @enderror">
+                                        <option value="">{{ __('Pilih Jenis Kelamin') }}</option>
+                                        <option value="male" @selected(old('owner_gender') === 'male')>{{ __('Laki-laki') }}</option>
+                                        <option value="female" @selected(old('owner_gender') === 'female')>{{ __('Perempuan') }}</option>
+                                    </select>
+
+                                    @error('owner_gender')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="form-label">
+                                        {{ __('Tempat Lahir Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
+                                    </label>
+
+                                    <input type="text" name="owner_birth_place" value="{{ old('owner_birth_place') }}"
+                                        class="form-input @error('owner_birth_place') form-danger @enderror">
+
+                                    @error('owner_birth_place')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="form-label">
+                                        {{ __('Tanggal Lahir Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
+                                    </label>
+
+                                    <input type="date" name="owner_birth_date" value="{{ old('owner_birth_date') }}"
+                                        class="form-input @error('owner_birth_date') form-danger @enderror">
+
+                                    @error('owner_birth_date')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="form-label">
+                                        {{ __('Nomor Telepon Owner') }} <span class="text-error-500" x-show="createAccount">*</span>
+                                    </label>
+
+                                    <input type="text" name="owner_phone" value="{{ old('owner_phone') }}"
+                                        class="form-input @error('owner_phone') form-danger @enderror">
+
+                                    @error('owner_phone')
+                                        <span class="form-error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
                             </div>
 
                         </div>

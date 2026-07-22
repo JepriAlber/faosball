@@ -117,4 +117,24 @@ class EmploymentTypeService
             ]);
         }
     }
+
+    /**
+     * Employment Type default untuk Staff yang mewakili Owner Academy --
+     * "Permanent" sudah otomatis dibuat tiap Academy baru lewat
+     * createDefaultEmploymentTypes(). WAJIB ada; kalau somehow terhapus,
+     * lempar error jelas alih-alih diam-diam membuat Contract tanpa
+     * id_employment_type (issue13.md).
+     */
+    public function findDefaultForOwner(Academy $academy): EmploymentType
+    {
+        $employmentType = EmploymentType::where('id_academy', $academy->id_academy)
+            ->where('name', 'Permanent')
+            ->first();
+
+        if (! $employmentType) {
+            throw new \Exception(__('Employment Type default "Permanent" untuk academy ini tidak ditemukan.'));
+        }
+
+        return $employmentType;
+    }
 }
