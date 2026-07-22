@@ -17,6 +17,7 @@ Sumber kebenaran (source of truth) tetap kode — `database/seeders/RolePermissi
 - [Module: Player Type](#module-player-type)
 - [Module: Player Category](#module-player-category)
 - [Module: Employment Type](#module-employment-type)
+- [Module: Staff Position](#module-staff-position)
 - [Module: Player Position (Master Global)](#module-player-position-master-global)
 - [Module: Academy Management](#module-academy-management)
 - [Permission Belum Dipakai Module Manapun](#permission-belum-dipakai-module-manapun)
@@ -144,6 +145,24 @@ Catatan:
 - Isolasi antar academy memakai `AcademyScope` (global scope), **bukan** Policy — akses employment type academy lain menghasilkan **404**, bukan 403. Pola sama dengan Player Type/Player Category.
 - Default: 4 permission ini cuma di-assign ke role **Owner** lewat `config('faos.role_templates')`. Delegasi ke role lain lewat halaman Role Management.
 - Guard delete ("masih dipakai staff") **belum aktif** di brief ini (tabel `staff` belum ada) — ditambahkan saat `issue11.md` (modul Staff) selesai.
+
+---
+
+## Module: Staff Position
+
+Status: **✅ Implemented**
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `staff_position.view` | Lihat daftar staff position | `staff-positions.index` (route middleware) |
+| `staff_position.create` | Tambah staff position baru | `staff-positions.create`, `staff-positions.store` (route middleware) + `@can()` tombol "Tambah" |
+| `staff_position.update` | Ubah staff position | `staff-positions.edit`, `staff-positions.update` (route middleware) + `@can()` tombol Edit |
+| `staff_position.delete` | Hapus staff position | `staff-positions.destroy` (route middleware) + `@can()` tombol Hapus |
+
+Catatan:
+- Isolasi antar academy memakai `AcademyScope` — akses lintas academy = **404**. Default: Owner-only lewat `config('faos.role_templates')`.
+- Field `role_id` (Default Role) merujuk ke `roles.id` (**bigint**, bukan uuid seperti FK lain) — divalidasi ulang di `StaffPositionFormRequest` supaya role yang dipilih benar-benar milik academy yang sama (role tenant-scoped per academy, lihat `docs/authorization.md` → *Role Academy Based*).
+- Guard delete ("masih dipakai staff") **belum aktif** di brief ini — ditambahkan saat `issue11.md` selesai.
 
 ---
 

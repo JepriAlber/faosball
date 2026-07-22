@@ -42,6 +42,7 @@ return [
             'player_type.view', 'player_type.create', 'player_type.update', 'player_type.delete',
             'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
             'employment_type.view', 'employment_type.create', 'employment_type.update', 'employment_type.delete',
+            'staff_position.view', 'staff_position.create', 'staff_position.update', 'staff_position.delete',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',
@@ -172,6 +173,61 @@ return [
         'Volunteer' => ['description' => 'Staff sukarelawan, tanpa gaji tetap.'],
         'Part Time' => ['description' => 'Staff paruh waktu.'],
         'Freelance' => ['description' => 'Staff lepas, dibayar per proyek/sesi.'],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Position Template
+    |--------------------------------------------------------------------------
+    | Staff Position default yang otomatis dibuat untuk setiap academy baru.
+    |
+    | 'default_role' merujuk ke NAMA role di config('role_templates') di atas
+    | (Owner/Coach/Staff/Finance/Player/Parent) -- di-resolve jadi role_id
+    | (bigint) saat academy baru dibuat, lihat
+    | StaffPositionService::createDefaultStaffPositions().
+    |
+    | Tidak ada role default bernama "Admin" -- posisi "Admin" sengaja
+    | dipetakan ke role "Staff" (cakupan izin paling dekat), BUKAN dibiarkan
+    | null dan BUKAN bikin role baru.
+    */
+
+    'staff_position_templates' => [
+
+        'Head Coach' => [
+            'code' => 'HC', 'is_coach' => true, 'default_role' => 'Coach',
+            'description' => 'Pelatih kepala, penanggung jawab utama program latihan.',
+        ],
+
+        'Assistant Coach' => [
+            'code' => 'AC', 'is_coach' => true, 'default_role' => 'Coach',
+            'description' => 'Pelatih asisten, membantu Head Coach.',
+        ],
+
+        'Goalkeeper Coach' => [
+            'code' => 'GK', 'is_coach' => true, 'default_role' => 'Coach',
+            'description' => 'Pelatih khusus penjaga gawang.',
+        ],
+
+        'Finance Manager' => [
+            'code' => 'FM', 'is_coach' => false, 'default_role' => 'Finance',
+            'description' => 'Penanggung jawab keuangan academy.',
+        ],
+
+        'Finance Staff' => [
+            'code' => 'FS', 'is_coach' => false, 'default_role' => 'Finance',
+            'description' => 'Staff administrasi keuangan.',
+        ],
+
+        'Academy Director' => [
+            'code' => 'AD', 'is_coach' => false, 'default_role' => 'Owner',
+            'description' => 'Direktur/penanggung jawab academy.',
+        ],
+
+        'Admin' => [
+            'code' => 'ADM', 'is_coach' => false, 'default_role' => 'Staff',
+            'description' => 'Staff administrasi umum academy.',
+        ],
 
     ],
 

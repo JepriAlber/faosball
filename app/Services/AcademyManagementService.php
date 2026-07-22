@@ -36,6 +36,7 @@ class AcademyManagementService
     protected PlayerTypeService $playerTypeService;
     protected PlayerCategoryService $playerCategoryService;
     protected EmploymentTypeService $employmentTypeService;
+    protected StaffPositionService $staffPositionService;
     protected AccountService $accountService;
 
     public function __construct(
@@ -43,12 +44,14 @@ class AcademyManagementService
         PlayerTypeService $playerTypeService,
         PlayerCategoryService $playerCategoryService,
         EmploymentTypeService $employmentTypeService,
+        StaffPositionService $staffPositionService,
         AccountService $accountService
     ) {
         $this->roleService = $roleService;
         $this->playerTypeService = $playerTypeService;
         $this->playerCategoryService = $playerCategoryService;
         $this->employmentTypeService = $employmentTypeService;
+        $this->staffPositionService = $staffPositionService;
         $this->accountService = $accountService;
     }
 
@@ -417,6 +420,7 @@ class AcademyManagementService
             $this->playerTypeService->createDefaultPlayerTypes($academy);
             $this->playerCategoryService->createDefaultPlayerCategories($academy);
             $this->employmentTypeService->createDefaultEmploymentTypes($academy);
+            $this->staffPositionService->createDefaultStaffPositions($academy);
 
             if (!empty($data['create_account'])) {
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\PlayerPositionController;
 use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StaffPositionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -186,6 +187,18 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:employment_type.create')
         ->middlewareFor(['edit', 'update'], 'permission:employment_type.update')
         ->middlewareFor('destroy', 'permission:employment_type.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Staff Position Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('staff-positions', StaffPositionController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:staff_position.view')
+        ->middlewareFor(['create', 'store'], 'permission:staff_position.create')
+        ->middlewareFor(['edit', 'update'], 'permission:staff_position.update')
+        ->middlewareFor('destroy', 'permission:staff_position.delete');
 
     /*
     |--------------------------------------------------------------------------
