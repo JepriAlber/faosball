@@ -20,7 +20,7 @@ class StaffPositionService
     public function paginate(?int $perPage = null)
     {
         return StaffPosition::with(['academy', 'role'])
-            ->withCount('staff')
+            ->withCount('contracts')
             ->latest()
             ->paginate($perPage ?? config('faos.pagination.default'));
     }
@@ -92,8 +92,8 @@ class StaffPositionService
     {
         return DB::transaction(function () use ($staffPosition) {
 
-            if ($staffPosition->staff()->exists()) {
-                throw new \Exception(__('Staff position masih digunakan oleh staff, tidak dapat dihapus. Nonaktifkan staff position ini kalau sudah tidak dipakai.'));
+            if ($staffPosition->contracts()->exists()) {
+                throw new \Exception(__('Staff position masih digunakan oleh kontrak staff, tidak dapat dihapus. Nonaktifkan staff position ini kalau sudah tidak dipakai.'));
             }
 
             return $staffPosition->delete();

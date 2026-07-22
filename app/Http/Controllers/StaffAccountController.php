@@ -26,10 +26,10 @@ class StaffAccountController extends Controller
 
         return view('staff.account.create', [
             'title' => __('Buat Akun Staff'),
-            'staff' => $staff,
-            // Default Role staff position (kalau ada) jadi pilihan AWAL di
-            // view lewat old('role_id', $staff->position->role_id) -- bukan
-            // dipaksa di sini, admin tetap bisa pilih role lain.
+            'staff' => $staff->load('activeContract.position'),
+            // Default Role staff position (kalau ada, dari Contract Active) jadi
+            // pilihan AWAL di view lewat old('role_id', $staff->activeContract?->position?->role_id)
+            // -- bukan dipaksa di sini, admin tetap bisa pilih role lain.
             'roles' => Role::where('id_academy', $staff->id_academy)->orderBy('name')->get(),
             'breadcrumb' => [
                 ['label' => __('Staff'), 'url' => route('staff.index')],

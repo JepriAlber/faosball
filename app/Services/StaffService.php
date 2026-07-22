@@ -14,10 +14,12 @@ use Illuminate\Support\Str;
 class StaffService
 {
     protected AcademyService $academyService;
+    protected EmploymentContractService $employmentContractService;
 
-    public function __construct(AcademyService $academyService)
+    public function __construct(AcademyService $academyService, EmploymentContractService $employmentContractService)
     {
         $this->academyService = $academyService;
+        $this->employmentContractService = $employmentContractService;
     }
 
     protected function uploadPhoto($file, string $staffCode): string
@@ -78,25 +80,35 @@ class StaffService
         }
 
         if (! empty($filters['id_employment_type'])) {
-            $query->where('id_employment_type', $filters['id_employment_type']);
+            $query->whereHas('contracts', fn ($q) => $q
+                ->where('status', 'active')
+                ->where('id_employment_type', $filters['id_employment_type']));
         }
 
         if (! empty($filters['id_staff_position'])) {
-            $query->where('id_staff_position', $filters['id_staff_position']);
+            $query->whereHas('contracts', fn ($q) => $q
+                ->where('status', 'active')
+                ->where('id_staff_position', $filters['id_staff_position']));
         }
 
         if (! empty($filters['gender'])) {
             $query->where('gender', $filters['gender']);
         }
 
+        // Status sekarang cuma 2 nilai, diturunkan dari ada/tidaknya
+        // Contract Active -- lihat issue12.md Bagian 2a.
         if ($includeStatus && isset($filters['status']) && $filters['status'] !== '') {
-            $query->where('status', $filters['status']);
+            match ($filters['status']) {
+                'active' => $query->has('activeContract'),
+                'inactive' => $query->doesntHave('activeContract'),
+                default => null,
+            };
         }
     }
 
     public function paginate(array $filters = []): LengthAwarePaginator
     {
-        $query = Staff::with(['academy', 'employmentType', 'position', 'user']);
+        $query = Staff::with(['academy', 'user', 'activeContract.employmentType', 'activeContract.position']);
 
         $this->applyFilters($query, $filters);
 
@@ -118,13 +130,12 @@ class StaffService
 
             $this->applyFilters($query, $filters, includeStatus: false);
 
-            return $query->where('status', $status)->count();
+            return $status === 'active' ? $query->has('activeContract')->count() : $query->doesntHave('activeContract')->count();
         };
 
         return [
             'active' => $countFor('active'),
             'inactive' => $countFor('inactive'),
-            'resigned' => $countFor('resigned'),
         ];
     }
 
@@ -166,10 +177,8 @@ class StaffService
 
             $photo = isset($data['photo']) ? $this->uploadPhoto($data['photo'], $staffCode) : null;
 
-            return Staff::create([
+            $staff = Staff::create([
                 'id_academy' => $academy->id_academy,
-                'id_employment_type' => $data['id_employment_type'],
-                'id_staff_position' => $data['id_staff_position'],
                 'staff_code' => $staffCode,
                 'photo' => $photo,
                 'full_name' => $data['full_name'],
@@ -187,12 +196,13 @@ class StaffService
                 'city' => $data['city'] ?? null,
                 'province' => $data['province'] ?? null,
                 'postal_code' => $data['postal_code'] ?? null,
-                'join_date' => $data['join_date'] ?? now(),
-                'end_date' => $data['end_date'] ?? null,
-                'salary' => $data['salary'] ?? null,
-                'status' => $data['status'] ?? 'active',
                 'notes' => $data['notes'] ?? null,
             ]);
+
+            // Kontrak pertama -- langsung Active (issue12.md Bagian 2b).
+            $this->employmentContractService->createFirstContract($staff, $data);
+
+            return $staff;
         });
     }
 
@@ -209,8 +219,6 @@ class StaffService
 
             $staff->update([
                 // id_academy & staff_code sengaja TIDAK ikut diubah.
-                'id_employment_type' => $data['id_employment_type'],
-                'id_staff_position' => $data['id_staff_position'],
                 'photo' => $photo,
                 'full_name' => $data['full_name'],
                 'nickname' => $data['nickname'] ?? null,
@@ -227,14 +235,9 @@ class StaffService
                 'city' => $data['city'] ?? null,
                 'province' => $data['province'] ?? null,
                 'postal_code' => $data['postal_code'] ?? null,
-                'join_date' => $data['join_date'] ?? $staff->join_date,
-                'end_date' => $data['end_date'] ?? null,
-                'salary' => $data['salary'] ?? null,
-                'status' => $data['status'] ?? $staff->status,
                 'notes' => $data['notes'] ?? null,
             ]);
 
-            // Hapus foto lama SETELAH update sukses -- pola sama PlayerService.
             if (isset($data['photo']) && $oldPhoto) {
                 $this->deletePhoto($oldPhoto);
             }

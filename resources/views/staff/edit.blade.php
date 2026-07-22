@@ -41,7 +41,7 @@
 
             <div class="form-row">
 
-                {{-- LEFT COLUMN: Scope, Identitas, Klasifikasi, Kontak --}}
+                {{-- LEFT COLUMN: Scope, Identitas, Kontak --}}
                 <div>
 
                     <div class="form-group">
@@ -81,48 +81,6 @@
                             class="form-input @error('nickname') form-danger @enderror">
 
                         @error('nickname')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- Employment Type --}}
-                    <div class="form-group">
-                        <label class="form-label">
-                            {{ __('Employment Type') }} <span class="text-error-500">*</span>
-                        </label>
-
-                        <select name="id_employment_type"
-                            class="form-select @error('id_employment_type') form-danger @enderror" required>
-                            <option value="">{{ __('Pilih Employment Type') }}</option>
-                            @foreach ($employmentTypes as $type)
-                                <option value="{{ $type->id_employment_type }}" @selected(old('id_employment_type', $staff->id_employment_type) === $type->id_employment_type)>
-                                    {{ $type->name }}@unless ($type->status) ({{ __('nonaktif') }})@endunless
-                                </option>
-                            @endforeach
-                        </select>
-
-                        @error('id_employment_type')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- Staff Position --}}
-                    <div class="form-group">
-                        <label class="form-label">
-                            {{ __('Staff Position') }} <span class="text-error-500">*</span>
-                        </label>
-
-                        <select name="id_staff_position"
-                            class="form-select @error('id_staff_position') form-danger @enderror" required>
-                            <option value="">{{ __('Pilih Staff Position') }}</option>
-                            @foreach ($staffPositions as $position)
-                                <option value="{{ $position->id_staff_position }}" @selected(old('id_staff_position', $staff->id_staff_position) === $position->id_staff_position)>
-                                    {{ $position->name }}@unless ($position->status) ({{ __('nonaktif') }})@endunless
-                                </option>
-                            @endforeach
-                        </select>
-
-                        @error('id_staff_position')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
                     </div>
@@ -193,7 +151,7 @@
 
                 </div>
 
-                {{-- RIGHT COLUMN: Deskriptif, Kepegawaian, Media, Status --}}
+                {{-- RIGHT COLUMN: Deskriptif, Media, Ringkasan Kontrak --}}
                 <div>
 
                     {{-- Gender --}}
@@ -304,39 +262,6 @@
                         @enderror
                     </div>
 
-                    {{-- Tanggal Bergabung --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Tanggal Bergabung') }}</label>
-
-                        <input type="date" name="join_date"
-                            value="{{ old('join_date', $staff->join_date?->format('Y-m-d')) }}" class="form-input">
-                    </div>
-
-                    {{-- Tanggal Keluar --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Tanggal Keluar') }}</label>
-
-                        <input type="date" name="end_date"
-                            value="{{ old('end_date', $staff->end_date?->format('Y-m-d')) }}"
-                            class="form-input @error('end_date') form-danger @enderror">
-
-                        @error('end_date')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    {{-- Gaji --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Gaji') }}</label>
-
-                        <input type="number" name="salary" value="{{ old('salary', $staff->salary) }}" step="1000"
-                            min="0" class="form-input @error('salary') form-danger @enderror">
-
-                        @error('salary')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-
                     {{-- Catatan --}}
                     <div class="form-group">
                         <label class="form-label">{{ __('Catatan') }}</label>
@@ -352,19 +277,33 @@
                     {{-- Foto --}}
                     <x-staff-photo-field :current-photo-url="$staff->photo ? asset('storage/' . $staff->photo) : null" />
 
-                    {{-- Status Kepegawaian --}}
-                    <div class="form-group">
-                        <label class="form-label">{{ __('Status Kepegawaian') }}</label>
+                    {{-- Ringkasan Contract Active (read-only) -- perubahan employment
+                         (posisi/gaji/kontrak baru) dikelola lewat halaman Detail Staff,
+                         bukan form ini (issue12.md Bagian 2b). --}}
+                    <div class="rounded-xl border border-gray-100 p-4 dark:border-gray-800">
+                        <h4 class="section-title mb-3">{{ __('Kontrak Aktif Saat Ini') }}</h4>
 
-                        <select name="status" class="form-select @error('status') form-danger @enderror">
-                            <option value="active" @selected(old('status', $staff->status) === 'active')>{{ __('Aktif') }}</option>
-                            <option value="inactive" @selected(old('status', $staff->status) === 'inactive')>{{ __('Nonaktif') }}</option>
-                            <option value="resigned" @selected(old('status', $staff->status) === 'resigned')>{{ __('Resign') }}</option>
-                        </select>
-
-                        @error('status')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
+                        @if ($staff->activeContract)
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">{{ __('Staff Position') }}</span>
+                                    <span class="font-medium">{{ $staff->activeContract->position->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">{{ __('Employment Type') }}</span>
+                                    <span class="font-medium">{{ $staff->activeContract->employmentType->name ?? '-' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">{{ __('Gaji') }}</span>
+                                    <span class="font-medium"><x-salary-amount :staff="$staff" :amount="$staff->activeContract->salary" /></span>
+                                </div>
+                            </div>
+                            <p class="mt-3 text-xs text-gray-400">
+                                {{ __('Untuk mengubah posisi, gaji, atau membuat kontrak baru, kelola lewat halaman Detail Staff.') }}
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Staff ini belum punya kontrak aktif.') }}</p>
+                        @endif
                     </div>
 
                 </div>

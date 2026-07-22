@@ -44,6 +44,7 @@ return [
             'employment_type.view', 'employment_type.create', 'employment_type.update', 'employment_type.delete',
             'staff_position.view', 'staff_position.create', 'staff_position.update', 'staff_position.delete',
             'staff.view', 'staff.create', 'staff.update', 'staff.delete',
+            'salary.view',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',
@@ -74,6 +75,7 @@ return [
         'Finance' => [
             'payment.view', 'payment.create', 'payment.update', 'payment.report',
             'report.view', 'report.export',
+            'salary.view',
         ],
 
         'Player' => [

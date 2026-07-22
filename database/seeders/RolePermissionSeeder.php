@@ -103,6 +103,9 @@ class RolePermissionSeeder extends Seeder
             'staff.update',
             'staff.delete',
 
+            // Salary Visibility
+            'salary.view',
+
             // Coach
             'coach.view',
             'coach.create',

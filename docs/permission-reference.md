@@ -190,6 +190,28 @@ Catatan:
 - Field "Default Role" (`staff_positions.role_id`, `issue10.md`) cuma jadi pilihan AWAL di dropdown Role saat buat akun — admin tetap bebas pilih role lain. Role yang dipilih divalidasi harus milik academy yang sama dengan staff (`StoreStaffAccountRequest`).
 - Isolasi antar academy memakai `AcademyScope` — akses lintas academy = **404**. Default: 4 permission CRUD Owner-only lewat `config('faos.role_templates')`.
 
+### Sub-module: Employment Contract (histori kontrak kerja staff)
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `staff.update` | Buat/edit/aktifkan/selesaikan/hentikan/batalkan kontrak | `staff.contracts.*` (route middleware) |
+
+Catatan:
+- **Reuse** permission `staff.update` — bukan permission baru `employment_contract.*` (pola sama Staff Account yang reuse `user.create`/`user.update`).
+- Tidak ada permission/route untuk hapus kontrak — Contract adalah histori permanen (Rule 3), tidak pernah dihapus lewat UI maupun API.
+
+### Sub-module: Salary Visibility (masking nominal gaji)
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `salary.view` | Lihat nominal gaji **siapapun** (bukan cuma milik sendiri) | `StaffPolicy@viewSalary`, dipanggil `@can('viewSalary', $staff)`/`<x-salary-amount>` di manapun nominal gaji ditampilkan |
+
+Catatan:
+- Ini **bukan** permission per-module CRUD biasa — ini kontrol lintas tampilan (ringkasan Contract di halaman Edit Staff, tab Kepegawaian & Riwayat Kontrak di halaman Show Staff, form Edit Contract).
+- User TANPA `salary.view` tetap bisa melihat gaji **miliknya sendiri** (staff yang `id_user`-nya = user yang login) — keputusan ini ada di `StaffPolicy@viewSalary`, bukan di permission itu sendiri.
+- Default: **Owner** dan **Finance** dapat `salary.view` lewat `config('faos.role_templates')`. Role lain (Coach/Staff/Player/Parent) sengaja tidak — delegasikan lewat halaman Role Management kalau dibutuhkan.
+- Super Admin selalu lolos (`Gate::before()`), tidak pernah kena masking.
+
 ---
 
 ## Module: Player Position (Master Global)

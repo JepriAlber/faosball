@@ -41,20 +41,22 @@ class StaffTest extends TestCase
 
         $this->assertStringStartsWith('FCX' . now()->format('y'), $staff->staff_code);
         $this->assertSame('Indonesia', $staff->nationality);
-        $this->assertSame('active', $staff->status);
+
+        // Kepegawaian sekarang milik EmploymentContract, bukan kolom staff
+        // langsung (issue12.md Bagian 2a) -- staff baru harus otomatis
+        // punya 1 Contract berstatus Active.
+        $this->assertNotNull($staff->activeContract);
+        $this->assertSame('active', $staff->activeContract->status);
     }
 
     public function test_hapus_staff_ikut_menghapus_akun_terkait(): void
     {
         $academy = Academy::factory()->create();
-        $prereqs = $this->makeStaffPrereqs($academy);
         $user = User::factory()->create(['id_academy' => $academy->id_academy]);
 
         $staff = Staff::factory()->create([
             'id_academy' => $academy->id_academy,
             'id_user' => $user->id_user,
-            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
-            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
         ]);
 
         app(StaffService::class)->delete($staff);

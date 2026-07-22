@@ -38,8 +38,8 @@ class StaffPosition extends FaosModel
         return $this->belongsTo(Role::class, 'role_id');
     }
 
-    public function staff(): HasMany
+    public function contracts(): HasMany
     {
-        return $this->hasMany(Staff::class, 'id_staff_position', 'id_staff_position');
+        return $this->hasMany(EmploymentContract::class, 'id_staff_position', 'id_staff_position');
     }
 }

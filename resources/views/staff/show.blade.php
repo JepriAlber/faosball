@@ -28,7 +28,7 @@
                     </h3>
 
                     <p class="card-description">
-                        {{ $staff->position->name ?? __('Staff') }}
+                        {{ $staff->activeContract?->position?->name ?? __('Staff') }}
                     </p>
                 </div>
             </div>
@@ -85,6 +85,11 @@
                         <button type="button" class="focus:outline-none" @click="tab='employment'"
                             :class="tab === 'employment' ? 'tab tab-active' : 'tab'">
                             {{ __('Kepegawaian') }}
+                        </button>
+
+                        <button type="button" class="focus:outline-none" @click="tab='contracts'"
+                            :class="tab === 'contracts' ? 'tab tab-active' : 'tab'">
+                            {{ __('Riwayat Kontrak') }}
                         </button>
 
                     </div>
@@ -198,48 +203,128 @@
 
                     <div x-show="tab==='employment'" x-cloak class="tab-panel">
 
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        @if ($staff->activeContract)
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Employment Type') }}</span>
-                                <span class="table-text">{{ $staff->employmentType->name ?? '-' }}</span>
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Employment Type') }}</span>
+                                    <span class="table-text">{{ $staff->activeContract->employmentType->name ?? '-' }}</span>
+                                </div>
+
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Staff Position') }}</span>
+                                    <span class="table-text">{{ $staff->activeContract->position->name ?? '-' }}</span>
+                                </div>
+
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Tanggal Bergabung') }}</span>
+                                    <span class="table-text">{{ $staff->activeContract->start_date?->format('d M Y') ?? '-' }}</span>
+                                </div>
+
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Tanggal Keluar') }}</span>
+                                    <span class="table-text">{{ $staff->activeContract->end_date?->format('d M Y') ?? '-' }}</span>
+                                </div>
+
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Gaji') }}</span>
+                                    <span class="table-text">
+                                        <x-salary-amount :staff="$staff" :amount="$staff->activeContract->salary" />
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="block mb-1 text-xs text-gray-400">{{ __('Status Kepegawaian') }}</span>
+                                    <span class="badge badge-success">{{ __('Aktif') }}</span>
+                                </div>
+
                             </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ __('Staff ini belum punya kontrak aktif.') }}
+                            </p>
+                        @endif
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Staff Position') }}</span>
-                                <span class="table-text">{{ $staff->position->name ?? '-' }}</span>
-                            </div>
+                    </div>
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Tanggal Bergabung') }}</span>
-                                <span class="table-text">{{ $staff->join_date?->format('d M Y') ?? '-' }}</span>
-                            </div>
+                    <div x-show="tab==='contracts'" x-cloak class="tab-panel">
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Tanggal Keluar') }}</span>
-                                <span class="table-text">{{ $staff->end_date?->format('d M Y') ?? '-' }}</span>
-                            </div>
+                        <div class="mb-4 flex justify-end">
+                            @can('staff.update')
+                                <a href="{{ route('staff.contracts.create', $staff) }}" class="btn btn-primary btn-sm">
+                                    {{ __('Buat Kontrak Baru') }}
+                                </a>
+                            @endcan
+                        </div>
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Gaji') }}</span>
-                                <span class="table-text">
-                                    {{ $staff->salary !== null ? 'Rp ' . number_format($staff->salary, 0, ',', '.') : '-' }}
-                                </span>
-                            </div>
+                        <div class="space-y-3">
+                            @forelse ($staff->contracts as $contract)
+                                <div class="rounded-lg border border-gray-100 p-4 dark:border-gray-800">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <span class="table-title">{{ $contract->contract_code }}</span>
+                                            <span class="table-subtitle">
+                                                {{ $contract->position->name ?? '-' }} &middot; {{ $contract->employmentType->name ?? '-' }}
+                                            </span>
+                                        </div>
 
-                            <div>
-                                <span class="block mb-1 text-xs text-gray-400">{{ __('Status Kepegawaian') }}</span>
-                                @php
-                                    $showStatusBadge = match ($staff->status) {
-                                        'active' => ['label' => __('Aktif'), 'class' => 'badge-success'],
-                                        'inactive' => ['label' => __('Nonaktif'), 'class' => 'badge-danger'],
-                                        'resigned' => ['label' => __('Resign'), 'class' => 'badge-secondary'],
-                                        default => ['label' => '-', 'class' => 'badge-secondary'],
-                                    };
-                                @endphp
-                                <span class="badge {{ $showStatusBadge['class'] }}">{{ $showStatusBadge['label'] }}</span>
-                            </div>
+                                        @php
+                                            $contractStatusBadge = match ($contract->status) {
+                                                'draft' => ['label' => __('Draft'), 'class' => 'badge-secondary'],
+                                                'active' => ['label' => __('Active'), 'class' => 'badge-success'],
+                                                'completed' => ['label' => __('Completed'), 'class' => 'badge-primary'],
+                                                'terminated' => ['label' => __('Terminated'), 'class' => 'badge-danger'],
+                                                'cancelled' => ['label' => __('Cancelled'), 'class' => 'badge-secondary'],
+                                            };
+                                        @endphp
+                                        <span class="badge {{ $contractStatusBadge['class'] }}">{{ $contractStatusBadge['label'] }}</span>
+                                    </div>
 
+                                    <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-400 md:grid-cols-4">
+                                        <span>{{ __('Mulai') }}: {{ $contract->start_date?->format('d M Y') }}</span>
+                                        <span>{{ __('Berakhir') }}: {{ $contract->end_date?->format('d M Y') ?? '-' }}</span>
+                                        <span>{{ __('Gaji') }}: <x-salary-amount :staff="$staff" :amount="$contract->salary" /></span>
+                                    </div>
+
+                                    {{-- Aksi transisi -- form polos + confirm() bawaan browser,
+                                         boleh diselaraskan ke pola x-modal/$dispatch kalau mau
+                                         konsisten dengan interaksi lain (issue12.md Tahap 11d). --}}
+                                    <div class="mt-3 flex gap-2">
+                                        @can('staff.update')
+                                            @if ($contract->status === 'draft')
+                                                <a href="{{ route('staff.contracts.edit', [$staff, $contract]) }}" class="btn-icon btn-icon-warning" title="{{ __('Edit') }}">
+                                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                        <path d="M13.75 2.5L17.5 6.25L6.25 17.5H2.5V13.75L13.75 2.5Z"
+                                                            stroke="currentColor" stroke-width="1.5" />
+                                                    </svg>
+                                                </a>
+
+                                                <form action="{{ route('staff.contracts.activate', [$staff, $contract]) }}" method="POST" onsubmit="return confirm('{{ __('Aktifkan kontrak ini?') }}')">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn btn-success btn-sm">{{ __('Aktifkan') }}</button>
+                                                </form>
+
+                                                <form action="{{ route('staff.contracts.cancel', [$staff, $contract]) }}" method="POST" onsubmit="return confirm('{{ __('Batalkan kontrak Draft ini?') }}')">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn btn-secondary btn-sm">{{ __('Batalkan') }}</button>
+                                                </form>
+                                            @elseif ($contract->status === 'active')
+                                                <form action="{{ route('staff.contracts.complete', [$staff, $contract]) }}" method="POST" onsubmit="return confirm('{{ __('Tandai kontrak ini selesai?') }}')">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn btn-primary btn-sm">{{ __('Selesaikan') }}</button>
+                                                </form>
+
+                                                <form action="{{ route('staff.contracts.terminate', [$staff, $contract]) }}" method="POST" onsubmit="return confirm('{{ __('Hentikan kontrak ini sebelum waktunya?') }}')">
+                                                    @csrf @method('PATCH')
+                                                    <button type="submit" class="btn btn-danger btn-sm">{{ __('Hentikan') }}</button>
+                                                </form>
+                                            @endif
+                                        @endcan
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Belum ada kontrak.') }}</p>
+                            @endforelse
                         </div>
 
                     </div>
@@ -273,8 +358,8 @@
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">{{ __('Employment Type') }}</span>
 
-                            @if ($staff->employmentType)
-                                <span class="badge badge-secondary">{{ $staff->employmentType->name }}</span>
+                            @if ($staff->activeContract?->employmentType)
+                                <span class="badge badge-secondary">{{ $staff->activeContract->employmentType->name }}</span>
                             @else
                                 <span class="table-text">-</span>
                             @endif
@@ -283,8 +368,8 @@
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">{{ __('Staff Position') }}</span>
 
-                            @if ($staff->position)
-                                <span class="badge badge-secondary">{{ $staff->position->name }}</span>
+                            @if ($staff->activeContract?->position)
+                                <span class="badge badge-secondary">{{ $staff->activeContract->position->name }}</span>
                             @else
                                 <span class="table-text">-</span>
                             @endif
@@ -293,16 +378,11 @@
                         <div>
                             <span class="mb-1 block text-xs text-gray-400">{{ __('Status Kepegawaian') }}</span>
 
-                            @php
-                                $sideStatusBadge = match ($staff->status) {
-                                    'active' => ['label' => __('Aktif'), 'class' => 'badge-success'],
-                                    'inactive' => ['label' => __('Nonaktif'), 'class' => 'badge-danger'],
-                                    'resigned' => ['label' => __('Resign'), 'class' => 'badge-secondary'],
-                                    default => ['label' => '-', 'class' => 'badge-secondary'],
-                                };
-                            @endphp
-
-                            <span class="badge {{ $sideStatusBadge['class'] }}">{{ $sideStatusBadge['label'] }}</span>
+                            @if ($staff->activeContract)
+                                <span class="badge badge-success">{{ __('Aktif') }}</span>
+                            @else
+                                <span class="badge badge-danger">{{ __('Nonaktif') }}</span>
+                            @endif
                         </div>
 
                     </div>

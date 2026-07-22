@@ -38,7 +38,6 @@
                 '' => ['label' => __('Semua'), 'count' => $allStaffCount],
                 'active' => ['label' => __('Aktif'), 'count' => $statusCounts['active']],
                 'inactive' => ['label' => __('Nonaktif'), 'count' => $statusCounts['inactive']],
-                'resigned' => ['label' => __('Resign'), 'count' => $statusCounts['resigned']],
             ]" />
         </div>
 
@@ -138,11 +137,11 @@
                             @endif
 
                             <td class="table-cell">
-                                <span class="table-text">{{ $item->employmentType->name ?? '-' }}</span>
+                                <span class="table-text">{{ $item->activeContract?->employmentType?->name ?? '-' }}</span>
                             </td>
 
                             <td class="table-cell">
-                                <span class="table-text">{{ $item->position->name ?? '-' }}</span>
+                                <span class="table-text">{{ $item->activeContract?->position?->name ?? '-' }}</span>
                             </td>
 
                             <td class="table-cell">
@@ -150,15 +149,11 @@
                             </td>
 
                             <td class="table-cell">
-                                @php
-                                    $statusBadge = match ($item->status) {
-                                        'active' => ['label' => __('Aktif'), 'class' => 'badge-success'],
-                                        'inactive' => ['label' => __('Nonaktif'), 'class' => 'badge-danger'],
-                                        'resigned' => ['label' => __('Resign'), 'class' => 'badge-secondary'],
-                                        default => ['label' => '-', 'class' => 'badge-secondary'],
-                                    };
-                                @endphp
-                                <span class="badge {{ $statusBadge['class'] }}">{{ $statusBadge['label'] }}</span>
+                                @if ($item->activeContract)
+                                    <span class="badge badge-success">{{ __('Aktif') }}</span>
+                                @else
+                                    <span class="badge badge-danger">{{ __('Nonaktif') }}</span>
+                                @endif
                             </td>
 
                             <td class="table-cell">
@@ -253,15 +248,11 @@
                             </div>
                         </div>
 
-                        @php
-                            $statusBadgeCard = match ($item->status) {
-                                'active' => ['label' => __('Aktif'), 'class' => 'badge-success'],
-                                'inactive' => ['label' => __('Nonaktif'), 'class' => 'badge-danger'],
-                                'resigned' => ['label' => __('Resign'), 'class' => 'badge-secondary'],
-                                default => ['label' => '-', 'class' => 'badge-secondary'],
-                            };
-                        @endphp
-                        <span class="badge {{ $statusBadgeCard['class'] }} shrink-0">{{ $statusBadgeCard['label'] }}</span>
+                        @if ($item->activeContract)
+                            <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
+                        @else
+                            <span class="badge badge-danger shrink-0">{{ __('Nonaktif') }}</span>
+                        @endif
                     </div>
 
                     <div class="table-card-body">
@@ -273,11 +264,11 @@
                         @endif
                         <div class="table-card-field">
                             <span class="table-card-label">{{ __('Employment Type') }}</span>
-                            <span class="table-text">{{ $item->employmentType->name ?? '-' }}</span>
+                            <span class="table-text">{{ $item->activeContract?->employmentType?->name ?? '-' }}</span>
                         </div>
                         <div class="table-card-field">
                             <span class="table-card-label">{{ __('Staff Position') }}</span>
-                            <span class="table-text">{{ $item->position->name ?? '-' }}</span>
+                            <span class="table-text">{{ $item->activeContract?->position?->name ?? '-' }}</span>
                         </div>
                         <div class="table-card-field">
                             <span class="table-card-label">{{ __('Telepon') }}</span>

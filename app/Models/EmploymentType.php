@@ -25,8 +25,8 @@ class EmploymentType extends FaosModel
         return $this->belongsTo(Academy::class, 'id_academy', 'id_academy');
     }
 
-    public function staff(): HasMany
+    public function contracts(): HasMany
     {
-        return $this->hasMany(Staff::class, 'id_employment_type', 'id_employment_type');
+        return $this->hasMany(EmploymentContract::class, 'id_employment_type', 'id_employment_type');
     }
 }

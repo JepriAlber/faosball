@@ -3,10 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Academy;
-use App\Models\EmploymentType;
 use App\Models\Role;
 use App\Models\Staff;
-use App\Models\StaffPosition;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -51,7 +49,6 @@ class StaffAccountTest extends TestCase
     public function test_buat_akun_staff_dengan_role_dari_dropdown(): void
     {
         $academy = Academy::factory()->create();
-        $employmentType = EmploymentType::factory()->create(['id_academy' => $academy->id_academy]);
 
         $coachRole = Role::create([
             'id_academy' => $academy->id_academy,
@@ -59,15 +56,7 @@ class StaffAccountTest extends TestCase
             'guard_name' => 'web',
         ]);
 
-        $staffPosition = StaffPosition::factory()->create([
-            'id_academy' => $academy->id_academy, 'role_id' => $coachRole->id,
-        ]);
-
-        $staff = Staff::factory()->create([
-            'id_academy' => $academy->id_academy,
-            'id_employment_type' => $employmentType->id_employment_type,
-            'id_staff_position' => $staffPosition->id_staff_position,
-        ]);
+        $staff = Staff::factory()->create(['id_academy' => $academy->id_academy]);
 
         $this->actingAsOwner($academy);
 
@@ -89,20 +78,13 @@ class StaffAccountTest extends TestCase
         $academyA = Academy::factory()->create();
         $academyB = Academy::factory()->create();
 
-        $employmentType = EmploymentType::factory()->create(['id_academy' => $academyA->id_academy]);
-        $staffPosition = StaffPosition::factory()->create(['id_academy' => $academyA->id_academy]);
-
         $roleAcademyB = Role::create([
             'id_academy' => $academyB->id_academy,
             'name' => 'RoleB',
             'guard_name' => 'web',
         ]);
 
-        $staff = Staff::factory()->create([
-            'id_academy' => $academyA->id_academy,
-            'id_employment_type' => $employmentType->id_employment_type,
-            'id_staff_position' => $staffPosition->id_staff_position,
-        ]);
+        $staff = Staff::factory()->create(['id_academy' => $academyA->id_academy]);
 
         $this->actingAsOwner($academyA);
 
