@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AcademyProfileController;
+use App\Http\Controllers\EmploymentTypeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlayerAccountController;
@@ -173,6 +174,18 @@ Route::middleware('auth')->group(function () {
         ->middlewareFor(['create', 'store'], 'permission:player_category.create')
         ->middlewareFor(['edit', 'update'], 'permission:player_category.update')
         ->middlewareFor('destroy', 'permission:player_category.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employment Type Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('employment-types', EmploymentTypeController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:employment_type.view')
+        ->middlewareFor(['create', 'store'], 'permission:employment_type.create')
+        ->middlewareFor(['edit', 'update'], 'permission:employment_type.update')
+        ->middlewareFor('destroy', 'permission:employment_type.delete');
 
     /*
     |--------------------------------------------------------------------------

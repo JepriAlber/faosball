@@ -85,6 +85,12 @@ class RolePermissionSeeder extends Seeder
             'player_category.update',
             'player_category.delete',
 
+            // Employment Type
+            'employment_type.view',
+            'employment_type.create',
+            'employment_type.update',
+            'employment_type.delete',
+
             // Coach
             'coach.view',
             'coach.create',

@@ -41,6 +41,7 @@ return [
             'player.view', 'player.create', 'player.update', 'player.delete',
             'player_type.view', 'player_type.create', 'player_type.update', 'player_type.delete',
             'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
+            'employment_type.view', 'employment_type.create', 'employment_type.update', 'employment_type.delete',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
             'team.view', 'team.create', 'team.update', 'team.delete',
             'training.view', 'training.create', 'training.update', 'training.delete',
@@ -152,6 +153,25 @@ return [
             'min_age' => 16,
             'max_age' => 17,
         ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Employment Type Template
+    |--------------------------------------------------------------------------
+    | Employment Type default yang otomatis dibuat untuk setiap academy baru.
+    | Academy bebas menambah/mengubah lewat menu Employment Type.
+    */
+
+    'employment_type_templates' => [
+
+        'Permanent' => ['description' => 'Staff tetap dengan kontrak jangka panjang.'],
+        'Contract' => ['description' => 'Staff kontrak dengan jangka waktu tertentu.'],
+        'Intern' => ['description' => 'Staff magang/on-the-job training.'],
+        'Volunteer' => ['description' => 'Staff sukarelawan, tanpa gaji tetap.'],
+        'Part Time' => ['description' => 'Staff paruh waktu.'],
+        'Freelance' => ['description' => 'Staff lepas, dibayar per proyek/sesi.'],
 
     ],
 
