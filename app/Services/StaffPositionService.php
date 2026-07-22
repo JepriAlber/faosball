@@ -131,4 +131,24 @@ class StaffPositionService
             ]);
         }
     }
+
+    /**
+     * Staff Position default untuk Owner Academy -- "Academy Director"
+     * (code "AD") sudah otomatis dibuat tiap Academy baru lewat
+     * createDefaultStaffPositions(). Cari pakai `code`, bukan `name` --
+     * code lebih stabil kalau label pernah diterjemahkan/diubah nanti
+     * (issue13.md).
+     */
+    public function findDefaultForOwner(Academy $academy): StaffPosition
+    {
+        $staffPosition = StaffPosition::where('id_academy', $academy->id_academy)
+            ->where('code', 'AD')
+            ->first();
+
+        if (! $staffPosition) {
+            throw new \Exception(__('Staff Position default "Academy Director" untuk academy ini tidak ditemukan.'));
+        }
+
+        return $staffPosition;
+    }
 }

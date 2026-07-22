@@ -61,16 +61,31 @@ class AcademyAccountTest extends TestCase
         ], $overrides);
     }
 
+    /**
+     * Biodata Owner (issue13.md) -- WAJIB ikut dikirim tiap kali
+     * 'create_account' => 1, karena Owner sekarang otomatis jadi Staff.
+     */
+    protected function ownerBiodataPayload(): array
+    {
+        return [
+            'owner_full_name' => 'Budi Owner',
+            'owner_gender' => 'male',
+            'owner_birth_place' => 'Jakarta',
+            'owner_birth_date' => '1985-01-01',
+            'owner_phone' => '081234567890',
+        ];
+    }
+
     public function test_super_admin_bisa_buat_academy_sekaligus_akun_owner(): void
     {
         $superAdmin = $this->makeSuperAdmin();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'create_account' => 1,
             'owner_email' => 'owner@tes.com',
             'owner_password' => 'password123',
             'owner_password_confirmation' => 'password123',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $response = $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -82,6 +97,15 @@ class AcademyAccountTest extends TestCase
         $this->assertSame('owner@tes.com', $academy->owner->email);
         $this->assertTrue($academy->owner->hasRole('Owner'));
         $this->assertTrue($academy->owner->status);
+
+        // Owner sekarang otomatis jadi Staff (issue13.md).
+        $staff = \App\Models\Staff::where('id_user', $academy->owner->id_user)->first();
+
+        $this->assertNotNull($staff);
+        $this->assertSame('Budi Owner', $staff->full_name);
+        $this->assertSame('active', $staff->activeContract->status);
+        $this->assertSame('AD', $staff->activeContract->position->code);
+        $this->assertSame('Permanent', $staff->activeContract->employmentType->name);
     }
 
     public function test_academy_tanpa_toggle_create_account_tidak_membuat_user(): void
@@ -117,13 +141,13 @@ class AcademyAccountTest extends TestCase
     {
         $superAdmin = $this->makeSuperAdmin();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'email' => 'kontak@academytes.com',
             'create_account' => 1,
             'owner_email' => 'owner@academytes.com',
             'owner_password' => 'password123',
             'owner_password_confirmation' => 'password123',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -153,12 +177,12 @@ class AcademyAccountTest extends TestCase
     {
         $superAdmin = $this->makeSuperAdmin();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'create_account' => 1,
             'owner_email' => 'owner@tes.com',
             'owner_password' => 'password-lama',
             'owner_password_confirmation' => 'password-lama',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -174,12 +198,12 @@ class AcademyAccountTest extends TestCase
     {
         $superAdmin = $this->makeSuperAdmin();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'create_account' => 1,
             'owner_email' => 'owner@tes.com',
             'owner_password' => 'password123',
             'owner_password_confirmation' => 'password123',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -207,12 +231,12 @@ class AcademyAccountTest extends TestCase
     {
         $superAdmin = $this->makeSuperAdmin();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'create_account' => 1,
             'owner_email' => 'owner@tes.com',
             'owner_password' => 'password123',
             'owner_password_confirmation' => 'password123',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -236,12 +260,12 @@ class AcademyAccountTest extends TestCase
 
         $academyTanpaOwner = Academy::factory()->create();
 
-        $payload = $this->baseAcademyPayload([
+        $payload = $this->baseAcademyPayload(array_merge([
             'create_account' => 1,
             'owner_email' => 'owner@tes.com',
             'owner_password' => 'password123',
             'owner_password_confirmation' => 'password123',
-        ]);
+        ], $this->ownerBiodataPayload()));
 
         $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
 
@@ -252,5 +276,63 @@ class AcademyAccountTest extends TestCase
         $response->assertOk();
         $response->assertSee(route('academies.account.create', $academyTanpaOwner), false);
         $response->assertDontSee(route('academies.account.create', $academyDenganOwner), false);
+    }
+
+    public function test_akun_owner_standalone_juga_membuat_staff(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+        $academy = Academy::factory()->create();
+
+        // academies.account.store cuma membuat User+Staff -- role "Owner",
+        // Employment Type "Permanent", dan Staff Position "Academy Director"
+        // sendiri baru ada kalau academy dibuat lewat
+        // AcademyManagementService::create(). Academy::factory() di sini
+        // bypass alur itu, jadi disiapkan manual supaya
+        // AccountService::assignRole() & StaffService::createForOwner()
+        // (lewat findDefaultForOwner()) berhasil.
+        Role::create(['id_academy' => $academy->id_academy, 'name' => 'Owner', 'guard_name' => 'web']);
+        app(\App\Services\EmploymentTypeService::class)->createDefaultEmploymentTypes($academy);
+        app(\App\Services\StaffPositionService::class)->createDefaultStaffPositions($academy);
+
+        $this->actingAs($superAdmin)->post(route('academies.account.store', $academy), [
+            'email' => 'owner@tes.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'full_name' => 'Citra Owner',
+            'gender' => 'female',
+            'birth_place' => 'Bandung',
+            'birth_date' => '1990-05-05',
+            'phone' => '089876543210',
+        ]);
+
+        $academy->refresh();
+        $staff = \App\Models\Staff::where('id_user', $academy->id_owner_user)->first();
+
+        $this->assertNotNull($staff);
+        $this->assertSame('Citra Owner', $staff->full_name);
+        $this->assertSame('active', $staff->activeContract->status);
+        $this->assertSame('AD', $staff->activeContract->position->code);
+        $this->assertSame('Permanent', $staff->activeContract->employmentType->name);
+    }
+
+    public function test_hapus_staff_pemilik_academy_ditolak(): void
+    {
+        $superAdmin = $this->makeSuperAdmin();
+
+        $payload = $this->baseAcademyPayload(array_merge([
+            'create_account' => 1,
+            'owner_email' => 'owner@tes.com',
+            'owner_password' => 'password123',
+            'owner_password_confirmation' => 'password123',
+        ], $this->ownerBiodataPayload()));
+
+        $this->actingAs($superAdmin)->post(route('academies.store'), $payload);
+
+        $academy = Academy::where('code', $payload['code'])->first();
+        $staff = \App\Models\Staff::where('id_user', $academy->id_owner_user)->first();
+
+        $this->expectException(\Exception::class);
+
+        app(\App\Services\StaffService::class)->delete($staff);
     }
 }

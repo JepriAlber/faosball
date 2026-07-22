@@ -48,6 +48,74 @@
 
                 <div class="form-group">
                     <label class="form-label">
+                        {{ __('Nama Lengkap') }} <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="text" name="full_name" value="{{ old('full_name') }}"
+                        class="form-input @error('full_name') form-danger @enderror">
+
+                    @error('full_name')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ __('Jenis Kelamin') }} <span class="text-error-500">*</span>
+                    </label>
+
+                    <select name="gender" class="form-select @error('gender') form-danger @enderror">
+                        <option value="">{{ __('Pilih Jenis Kelamin') }}</option>
+                        <option value="male" @selected(old('gender') === 'male')>{{ __('Laki-laki') }}</option>
+                        <option value="female" @selected(old('gender') === 'female')>{{ __('Perempuan') }}</option>
+                    </select>
+
+                    @error('gender')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ __('Tempat Lahir') }} <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="text" name="birth_place" value="{{ old('birth_place') }}"
+                        class="form-input @error('birth_place') form-danger @enderror">
+
+                    @error('birth_place')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ __('Tanggal Lahir') }} <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="date" name="birth_date" value="{{ old('birth_date') }}"
+                        class="form-input @error('birth_date') form-danger @enderror">
+
+                    @error('birth_date')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        {{ __('Nomor Telepon') }} <span class="text-error-500">*</span>
+                    </label>
+
+                    <input type="text" name="phone" value="{{ old('phone') }}"
+                        class="form-input @error('phone') form-danger @enderror">
+
+                    @error('phone')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
                         {{ __('Password') }} <span class="text-error-500">*</span>
                     </label>
 

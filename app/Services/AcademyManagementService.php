@@ -38,6 +38,7 @@ class AcademyManagementService
     protected EmploymentTypeService $employmentTypeService;
     protected StaffPositionService $staffPositionService;
     protected AccountService $accountService;
+    protected StaffService $staffService;
 
     public function __construct(
         RoleService $roleService,
@@ -45,7 +46,8 @@ class AcademyManagementService
         PlayerCategoryService $playerCategoryService,
         EmploymentTypeService $employmentTypeService,
         StaffPositionService $staffPositionService,
-        AccountService $accountService
+        AccountService $accountService,
+        StaffService $staffService
     ) {
         $this->roleService = $roleService;
         $this->playerTypeService = $playerTypeService;
@@ -53,6 +55,7 @@ class AcademyManagementService
         $this->employmentTypeService = $employmentTypeService;
         $this->staffPositionService = $staffPositionService;
         $this->accountService = $accountService;
+        $this->staffService = $staffService;
     }
 
     /**
@@ -426,10 +429,18 @@ class AcademyManagementService
 
                 $owner = $this->accountService->create([
                     'id_academy' => $academy->id_academy,
-                    'name' => $academy->name,
+                    'name' => $data['owner_full_name'],
                     'email' => $data['owner_email'],
                     'password' => $data['owner_password'],
                 ], 'Owner');
+
+                $this->staffService->createForOwner($academy, $owner, [
+                    'full_name' => $data['owner_full_name'],
+                    'gender' => $data['owner_gender'],
+                    'birth_place' => $data['owner_birth_place'],
+                    'birth_date' => $data['owner_birth_date'],
+                    'phone' => $data['owner_phone'],
+                ]);
 
                 $academy->update([
                     'id_owner_user' => $owner->id_user,

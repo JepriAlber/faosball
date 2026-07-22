@@ -136,6 +136,39 @@ class AcademyFormRequest extends FormRequest
                 'min:8',
                 'confirmed',
             ],
+
+            'owner_full_name' => [
+                'required_if:create_account,1',
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'owner_gender' => [
+                'required_if:create_account,1',
+                'nullable',
+                'in:male,female',
+            ],
+
+            'owner_birth_place' => [
+                'required_if:create_account,1',
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'owner_birth_date' => [
+                'required_if:create_account,1',
+                'nullable',
+                'date',
+            ],
+
+            'owner_phone' => [
+                'required_if:create_account,1',
+                'nullable',
+                'string',
+                'max:50',
+            ],
         ];
     }
 
@@ -195,6 +228,20 @@ class AcademyFormRequest extends FormRequest
             'owner_password.required_if' => __('Password akun Owner wajib diisi.'),
             'owner_password.min' => __('Password akun Owner minimal :min karakter.'),
             'owner_password.confirmed' => __('Konfirmasi password akun Owner tidak sesuai.'),
+
+            'owner_full_name.required_if' => __('Nama lengkap Owner wajib diisi.'),
+            'owner_full_name.max' => __('Nama lengkap Owner tidak boleh lebih dari 255 karakter.'),
+
+            'owner_gender.required_if' => __('Jenis kelamin Owner wajib dipilih.'),
+            'owner_gender.in' => __('Jenis kelamin Owner tidak valid.'),
+
+            'owner_birth_place.required_if' => __('Tempat lahir Owner wajib diisi.'),
+
+            'owner_birth_date.required_if' => __('Tanggal lahir Owner wajib diisi.'),
+            'owner_birth_date.date' => __('Tanggal lahir Owner tidak valid.'),
+
+            'owner_phone.required_if' => __('Nomor telepon Owner wajib diisi.'),
+            'owner_phone.max' => __('Nomor telepon Owner tidak boleh lebih dari 50 karakter.'),
         ];
     }
 }
