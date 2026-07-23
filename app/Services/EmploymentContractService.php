@@ -4,10 +4,91 @@ namespace App\Services;
 
 use App\Models\EmploymentContract;
 use App\Models\Staff;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class EmploymentContractService
 {
+    /**
+     * Search cocok ke nama staff ATAU kode kontrak. Filter bulan berakhir
+     * (`end_month`, format "YYYY-MM" dari <input type="month">) pakai
+     * whereYear()+whereMonth() -- end_date bertipe date, BUKAN string
+     * matching (lihat issue14.md Aturan Emas).
+     */
+    protected function applyFilters(Builder $query, array $filters, bool $includeStatus = true): void
+    {
+        if (! empty($filters['search'])) {
+
+            $search = $filters['search'];
+
+            $query->where(function ($q) use ($search) {
+                $q->where('contract_code', 'like', "%{$search}%")
+                    ->orWhereHas('staff', fn ($sq) => $sq->where('full_name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($includeStatus && ! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (! empty($filters['id_academy'])) {
+            $query->where('id_academy', $filters['id_academy']);
+        }
+
+        if (! empty($filters['end_month'])) {
+
+            [$year, $month] = explode('-', $filters['end_month']);
+
+            $query->whereYear('end_date', $year)->whereMonth('end_date', $month);
+        }
+    }
+
+    /**
+     * Daftar kontrak lintas-staff untuk halaman index (issue14.md).
+     */
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = EmploymentContract::with(['staff', 'employmentType', 'position', 'academy']);
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'oldest' => $query->oldest(),
+            'end_date_asc' => $query->orderBy('end_date'),
+            'end_date_desc' => $query->orderByDesc('end_date'),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
+    }
+
+    /**
+     * Jumlah kontrak per status (5 nilai), untuk badge di tab halaman
+     * index. $includeStatus=false -- hitungan tiap tab tidak boleh ikut
+     * kefilter oleh status tab yang sedang aktif. Pola sama
+     * EmploymentTypeService::statusCounts().
+     */
+    public function statusCounts(array $filters = []): array
+    {
+        $countFor = function (string $status) use ($filters) {
+
+            $query = EmploymentContract::query();
+
+            $this->applyFilters($query, $filters, includeStatus: false);
+
+            return $query->where('status', $status)->count();
+        };
+
+        return [
+            'draft' => $countFor('draft'),
+            'active' => $countFor('active'),
+            'completed' => $countFor('completed'),
+            'terminated' => $countFor('terminated'),
+            'cancelled' => $countFor('cancelled'),
+        ];
+    }
+
     /**
      * Kunci baris staff sebagai mutex per-staff -- mencegah race condition
      * saat 2 request nyaris bersamaan mencoba membuat/meng-activate

@@ -19,6 +19,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)
 - [Theming Per-Academy (CSS Custom Property Override)](#theming-per-academy-css-custom-property-override)
 - [Upload Logo Multi-Slot (Persegi + Wordmark)](#upload-logo-multi-slot-persegi--wordmark)
+- [Input Nominal Rupiah (Pemisah Ribuan)](#input-nominal-rupiah-pemisah-ribuan)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -313,6 +314,18 @@ class AuthSidebar extends Component
 
 Dipakai di Blade sebagai `<x-auth-sidebar />`. View-nya taruh di `resources/views/components/`, business logic/query tetap di Service (constructor Component cuma manggil Service, sama seperti Controller).
 
+**Gotcha -- `@error`/`@if` di dalam attribute `class="..."` pada tag `<x-component>` TIDAK ter-compile (pernah kejadian nyata, lihat `<x-currency-input>` di bawah)**: pada elemen HTML polos, `class="form-input @error('salary') form-danger @enderror"` bekerja normal. Tapi pada **tag custom component** (`<x-nama-component class="@error(...) ... @enderror" />`), Blade meng-compile tag component lebih dulu sebelum directive `@error`/`@enderror` diproses -- akibatnya seluruh teks itu ikut ter-embed **literal** sebagai string di dalam attribute bag, dan browser membaca `form-danger` sebagai class token yang sah apa pun kondisinya (styling error jadi selalu aktif, padahal tidak ada error). Fix-nya: pakai attribute dinamis `:class` (ekspresi PHP), bukan `class` statis berisi directive:
+
+```blade
+{{-- SALAH -- form-danger literal, selalu aktif --}}
+<x-currency-input name="salary" class="@error('salary') form-danger @enderror" />
+
+{{-- BENAR --}}
+<x-currency-input name="salary" :class="$errors->has('salary') ? 'form-danger' : ''" />
+```
+
+Berlaku untuk **semua** custom component tag (`<x-...>`), bukan cuma `<x-currency-input>` -- kalau bikin component baru yang perlu class kondisional dari `@error`/`@if`, selalu pakai `:class` dengan ekspresi PHP, jangan `class` dengan directive Blade di dalamnya.
+
 **Kenapa bukan View Composer** (`View::composer(...)` di `AppServiceProvider`): View Composer memang bisa mengikat data ke view tanpa mengubah titik pemanggilan (`@include(...)` tetap sama), tapi asal data jadi tidak terlihat dari sisi pemanggil maupun dari file view itu sendiri — orang harus tahu dulu ada wiring tersembunyi di `AppServiceProvider` untuk nemuin sumbernya. Blade Component lebih eksplisit: tinggal buka file component-nya, langsung ketemu.
 
 ---
@@ -344,6 +357,47 @@ Academy punya 2 slot logo independen, masing-masing lewat `<x-logo-upload-field>
 
 ---
 
+## Input Nominal Rupiah (Pemisah Ribuan)
+
+### Masalah
+
+Field nominal (`Gaji` di `staff/contracts`, `Biaya Langganan (Rp)` di `academies`) awalnya `<input type="number">` polos. Admin gampang salah hitung jumlah nol saat mengetik/membaca angka besar tanpa pemisah ribuan (`1000000` vs `1.000.000`) -- risiko salah input nominal gaji/biaya langganan cukup serius untuk ditangani lewat komponen, bukan dibiarkan per-module menulis solusinya sendiri-sendiri.
+
+### Solusi: `<x-currency-input>` -- Alpine global, tanpa dependency pihak ketiga
+
+`App\View\Components\CurrencyInput` (`resources/views/components/currency-input.blade.php`) -- class-based Blade Component (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis) soal kapan class-based dipakai; komponen ini tetap class-based walau tidak query DB, supaya konsisten 1 cara resolve `<x-currency-input>` dan menghindari jebakan `@props` yang didiamkan seperti kasus `LogoUploadField`).
+
+Mekanismenya:
+
+1. **Visible input** (`type="text" inputmode="numeric"`) menampilkan nominal terformat (`1.000.000`), diformat oleh Alpine `currencyInput()` (`resources/js/components/currency-input.js`, didaftarkan di `resources/js/app.js`) lewat `Intl.NumberFormat('id-ID')` bawaan browser -- **bukan library pihak ketiga** (Cleave.js/AutoNumeric/dst). Formatting titik-ribuan itu sendiri cukup sederhana (regex strip non-digit + `Intl.NumberFormat`) sehingga menambah dependency baru untuk ini dianggap berlebihan; `cropperjs` (satu-satunya dependency non-trivial di project ini) dipertahankan karena crop gambar memang kompleks, currency formatting tidak.
+2. **Hidden input** dengan `name` yang sama seperti field aslinya (`salary`, `subscription_fee`) menyimpan nilai numerik polos yang benar-benar dikirim ke server saat submit -- Form Request, Service, dan validasi **tidak berubah sama sekali**, karena dari sudut pandang backend field ini tetap datang sebagai angka biasa.
+3. Nilai awal (`old($name, $model->$name)`) di-passthrough apa adanya ke hidden input lewat constructor Component (`$rawValue`), lalu Alpine yang mem-format ke tampilan saat hydrate (`init()`) -- kalau user tidak menyentuh field ini sama sekali, nilai asli (termasuk desimal, kalau ada data lama) tetap utuh, tidak diubah oleh PHP maupun JS.
+
+Pemakaian (lihat `resources/views/staff/contracts/create.blade.php` & `resources/views/academies/edit.blade.php`):
+
+```blade
+<x-currency-input name="subscription_fee" id="subscription_fee"
+    :value="old('subscription_fee', $academy->subscription_fee)"
+    placeholder="{{ __('Contoh: 500.000') }}"
+    :class="$errors->has('subscription_fee') ? 'form-danger' : ''" required />
+
+@error('subscription_fee')
+    <span class="form-error">{{ $message }}</span>
+@enderror
+```
+
+**Perhatikan `:class` (bukan `class`)** untuk styling error -- lihat gotcha `@error` di dalam attribute component tag pada [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis).
+
+Label, asterisk wajib, dan slot `@error` **tetap ditulis manual** di form pemanggil seperti input polos lainnya -- komponen ini cuma menggantikan tag `<input>`, bukan seluruh `form-group`, supaya tetap mengikuti taksonomi field & konsistensi create/edit yang sudah ada (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
+
+**Trade-off yang disengaja -- nominal diperlakukan sebagai Rupiah bulat (tanpa sen)**: begitu user mengetik ulang field ini, digit non-angka (termasuk koma desimal) dibuang -- konsisten dengan kebiasaan input nominal nyata (gaji/biaya langganan di Indonesia praktiknya tidak pernah pakai sen). Kolom `salary`/`subscription_fee` di database tetap `decimal(12,2)` untuk headroom standar kolom uang, tapi UI ini tidak menyediakan cara mengetik sen -- kalau suatu saat ada kebutuhan nominal dengan desimal (bukan Rupiah, atau butuh presisi sen), diskusikan dulu sebelum memperluas komponen ini, jangan asumsikan boleh langsung dipakai apa adanya.
+
+### Kapan pola ini dipakai lagi
+
+Field nominal mata uang baru di module manapun (harga, biaya, tarif, dst) -- reuse `<x-currency-input>` dengan `name`/`value`/`id` yang sesuai, **jangan** hand-roll ulang `<input type="number">` atau bikin formatting Alpine baru dari nol.
+
+---
+
 ## Development Rules
 
 Gunakan:
@@ -356,6 +410,7 @@ Gunakan:
 - `<x-table.tabs>`/`<x-table.toolbar>` untuk search/filter/sort di halaman index/list yang datanya berpotensi banyak baris, dengan state lewat query string (GET) dan business logic filter di Service (lihat [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)).
 - Dropdown filter "Academy" (+ kolom/field Academy di tabel & card list) untuk **Super Admin saja** di setiap halaman index/list module tenant yang punya `<x-table.toolbar>` (lihat [Wajib: Filter Academy — khusus Super Admin](#wajib-filter-academy--khusus-super-admin)).
 - Taksonomi urutan field (Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah) untuk semua form create/edit baru, konsisten antara create dan edit di module yang sama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
+- `<x-currency-input>` untuk semua field nominal mata uang (gaji, biaya, tarif, dst), bukan `<input type="number">` polos (lihat [Input Nominal Rupiah](#input-nominal-rupiah-pemisah-ribuan)).
 
 Hindari:
 
@@ -365,7 +420,7 @@ Hindari:
 - `View::composer()` untuk mengikat data ke partial — pakai Blade Component (lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)).
 - Halaman index/list baru yang hanya mengandalkan tabel dengan scroll horizontal tanpa Card List di mobile/tablet.
 - Field form yang saling berhubungan (identitas & kode, klasifikasi & relasi) dipisah oleh field dari kategori lain, atau urutan/kolom field yang berbeda antara create dan edit di module yang sama.
-- Hand-roll ulang markup upload/komponen form yang sudah ada (`<x-logo-upload-field>`, dst) — reuse komponen yang sudah ada.
+- Hand-roll ulang markup upload/komponen form yang sudah ada (`<x-logo-upload-field>`, `<x-currency-input>`, dst) — reuse komponen yang sudah ada.
 - Membungkus setiap kelompok kecil field (2-3 field) jadi section berjudul — section hanya untuk sub-entitas/concern yang benar-benar terpisah (subscription, permission matrix, dst).
 
 ---

@@ -4,26 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EmploymentContract\StoreEmploymentContractRequest;
 use App\Http\Requests\EmploymentContract\UpdateEmploymentContractRequest;
+use App\Models\Academy;
 use App\Models\EmploymentContract;
 use App\Models\Staff;
+use App\Services\AcademyService;
 use App\Services\EmploymentContractService;
 use App\Services\EmploymentTypeService;
 use App\Services\StaffPositionService;
+use Illuminate\Http\Request;
 
 class EmploymentContractController extends Controller
 {
     protected EmploymentContractService $employmentContractService;
     protected EmploymentTypeService $employmentTypeService;
     protected StaffPositionService $staffPositionService;
+    protected AcademyService $academyService;
 
     public function __construct(
         EmploymentContractService $employmentContractService,
         EmploymentTypeService $employmentTypeService,
-        StaffPositionService $staffPositionService
+        StaffPositionService $staffPositionService,
+        AcademyService $academyService
     ) {
         $this->employmentContractService = $employmentContractService;
         $this->employmentTypeService = $employmentTypeService;
         $this->staffPositionService = $staffPositionService;
+        $this->academyService = $academyService;
+    }
+
+    public function index(Request $request)
+    {
+        $filters = array_filter($request->only(['search', 'status', 'id_academy', 'sort', 'end_month']));
+
+        $isSuperAdmin = $this->academyService->isSuperAdmin();
+
+        return view('employment-contracts.index', [
+            'title' => __('Kontrak Kerja'),
+            'breadcrumb' => [
+                ['label' => __('Office')],
+                ['label' => __('Kontrak Kerja')],
+            ],
+            'contracts' => $this->employmentContractService->paginate($filters),
+            'statusCounts' => $this->employmentContractService->statusCounts($filters),
+            'filters' => $filters,
+            'isSuperAdmin' => $isSuperAdmin,
+            // Opsi dropdown filter Academy -- cuma dibutuhkan Super Admin,
+            // yang melihat kontrak lintas seluruh academy.
+            'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
+        ]);
     }
 
     public function create(Staff $staff)

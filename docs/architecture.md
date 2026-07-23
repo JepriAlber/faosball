@@ -300,6 +300,10 @@ Contoh:
 PLAYER001-550e8400-e29b-41d4-a716-446655440000.jpg
 ```
 
+### File Storage Privat (Document)
+
+Untuk file yang TIDAK boleh diakses publik (dokumen pribadi: ijazah, akte, KTP, dst -- beda dari foto profil/logo yang memang publik), pakai `App\Models\Document` (polymorphic) + `App\Services\DocumentService::upload()`/`delete()`, disk `local` (root `storage/app/private`, TIDAK di-symlink), bukan disk `public`. Akses file WAJIB lewat route `documents.show` yang mengecek `App\Policies\DocumentPolicy` dulu (`Storage::disk('local')->response(...)`), tidak pernah lewat URL statis. Lihat `issue15.md` untuk detail lengkap & `<x-document-manager>` sebagai UI reusable-nya.
+
 ---
 
 ## Model Responsibility

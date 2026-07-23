@@ -226,7 +226,7 @@
                     <!-- ===== Menu Item: Office (dengan dropdown) ===== -->
 
                     @php
-                        $officeRoutes = ['staff.*', 'staff-positions.*', 'employment-types.*'];
+                        $officeRoutes = ['staff.*', 'employment-contracts.*', 'staff-positions.*', 'employment-types.*'];
 
                         $isOfficeActive = false;
 
@@ -284,6 +284,19 @@
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
                                             {{ __('Staff') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Kontrak Kerja --}}
+                                @can('staff.view')
+                                    <li>
+                                        <a href="{{ route('employment-contracts.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('employment-contracts.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Kontrak Kerja') }}
                                         </a>
                                     </li>
                                 @endcan

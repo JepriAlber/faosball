@@ -7,6 +7,7 @@ use App\Models\Academy;
 use App\Models\EmploymentType;
 use App\Services\AcademyService;
 use App\Services\EmploymentTypeService;
+use Illuminate\Http\Request;
 
 class EmploymentTypeController extends Controller
 {
@@ -19,16 +20,25 @@ class EmploymentTypeController extends Controller
         $this->academyService = $academyService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $filters = array_filter($request->only(['search', 'status', 'id_academy', 'sort']));
+
+        $isSuperAdmin = $this->academyService->isSuperAdmin();
+
         return view('employment-types.index', [
             'title' => __('Employment Type'),
             'breadcrumb' => [
                 ['label' => __('Office')],
                 ['label' => __('Employment Type')],
             ],
-            'employmentTypes' => $this->employmentTypeService->paginate(),
-            'isSuperAdmin' => $this->academyService->isSuperAdmin(),
+            'employmentTypes' => $this->employmentTypeService->paginate($filters),
+            'statusCounts' => $this->employmentTypeService->statusCounts($filters),
+            'filters' => $filters,
+            'isSuperAdmin' => $isSuperAdmin,
+            // Opsi dropdown filter Academy -- cuma dibutuhkan Super Admin,
+            // yang melihat employment type lintas seluruh academy.
+            'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
         ]);
     }
 

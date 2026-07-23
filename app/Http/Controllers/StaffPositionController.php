@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\StaffPosition;
 use App\Services\AcademyService;
 use App\Services\StaffPositionService;
+use Illuminate\Http\Request;
 
 class StaffPositionController extends Controller
 {
@@ -20,16 +21,25 @@ class StaffPositionController extends Controller
         $this->academyService = $academyService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $filters = array_filter($request->only(['search', 'status', 'id_academy', 'sort']));
+
+        $isSuperAdmin = $this->academyService->isSuperAdmin();
+
         return view('staff-positions.index', [
             'title' => __('Staff Position'),
             'breadcrumb' => [
                 ['label' => __('Office')],
                 ['label' => __('Staff Position')],
             ],
-            'staffPositions' => $this->staffPositionService->paginate(),
-            'isSuperAdmin' => $this->academyService->isSuperAdmin(),
+            'staffPositions' => $this->staffPositionService->paginate($filters),
+            'statusCounts' => $this->staffPositionService->statusCounts($filters),
+            'filters' => $filters,
+            'isSuperAdmin' => $isSuperAdmin,
+            // Opsi dropdown filter Academy -- cuma dibutuhkan Super Admin,
+            // yang melihat staff position lintas seluruh academy.
+            'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
         ]);
     }
 

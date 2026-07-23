@@ -135,6 +135,8 @@ Contoh:
 - `PlayerService`
 - `AccountService`
 
+**Upload dokumen sensitif** (bukan foto profil/logo publik -- ijazah, akte, KTP, bukti transaksi, dst) **wajib** reuse `App\Models\Document` + `App\Services\DocumentService` + `<x-document-manager>` yang sudah ada (`issue15.md`), bukan bikin sistem upload/tabel/service baru dari nol. Module baru tinggal: (1) tambah relasi `documents()` (MorphMany) di model-nya, (2) tambah 1 arm `match` baru di `DocumentService::resolveContext()` & `App\Policies\DocumentPolicy`, (3) tambah 2 route nested `{module}/{id}/documents` + pasang `<x-document-manager>` di view-nya.
+
 ---
 
 ## Controller Standard

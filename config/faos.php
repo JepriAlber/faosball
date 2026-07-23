@@ -248,7 +248,29 @@ return [
         'parent' => 'parents',
         'team' => 'teams',
         'training' => 'training',
-        'documents' => 'documents',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Document Types (per module)
+    |--------------------------------------------------------------------------
+    | Dipakai dropdown "Jenis Dokumen" di <x-document-manager>. Module baru
+    | yang mengintegrasikan Document (issue15.md) tinggal tambah key baru
+    | di sini, mis. 'payment' => ['bukti_transfer' => 'Bukti Transfer'].
+    */
+    'document_types' => [
+        'staff' => [
+            'ktp' => 'KTP',
+            'ijazah' => 'Ijazah',
+            'akte' => 'Akte Kelahiran',
+            'lainnya' => 'Lainnya',
+        ],
+        'player' => [
+            'akte' => 'Akte Kelahiran',
+            'kk' => 'Kartu Keluarga',
+            'ijazah' => 'Ijazah',
+            'lainnya' => 'Lainnya',
+        ],
     ],
 
     /*

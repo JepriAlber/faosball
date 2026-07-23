@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcademyAccountController;
 use App\Http\Controllers\AcademyController;
 use App\Http\Controllers\AcademyProfileController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmploymentContractController;
 use App\Http\Controllers\EmploymentTypeController;
 use App\Http\Controllers\LocaleController;
@@ -157,6 +158,15 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Document (Player) -- reusable Document, lihat issue15.md
+    |--------------------------------------------------------------------------
+    */
+    Route::post('players/{player}/documents', [DocumentController::class, 'storeForPlayer'])
+        ->name('players.documents.store')
+        ->middleware('permission:player.update');
+
+    /*
+    |--------------------------------------------------------------------------
     | Player Type Management
     |--------------------------------------------------------------------------
     */
@@ -245,9 +255,17 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     | Employment Contract Management (nested di bawah Staff)
     |--------------------------------------------------------------------------
+    | Index (`employment-contracts.index`) TIDAK nested -- daftar lintas-staff,
+    | reuse staff.view (bukan staff.update, karena cuma baca, lihat
+    | issue14.md). Aksi create/edit/activate/dst TETAP nested di bawah
+    | staff/{staff}/contracts/* seperti sebelumnya.
     | TIDAK ADA route destroy -- Contract tidak pernah dihapus (Rule 3).
-    | Reuse permission staff.create/staff.update, BUKAN permission baru.
+    | Reuse permission staff.view/staff.create/staff.update, BUKAN permission baru.
     */
+    Route::get('employment-contracts', [EmploymentContractController::class, 'index'])
+        ->name('employment-contracts.index')
+        ->middleware('permission:staff.view');
+
     Route::prefix('staff/{staff}/contracts')
         ->name('staff.contracts.')
         ->group(function () {
@@ -268,6 +286,26 @@ Route::middleware('auth')->group(function () {
             });
 
         });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Document (Staff) -- reusable Document, lihat issue15.md
+    |--------------------------------------------------------------------------
+    */
+    Route::post('staff/{staff}/documents', [DocumentController::class, 'storeForStaff'])
+        ->name('staff.documents.store')
+        ->middleware('permission:staff.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Document -- flat routes, otorisasi dinamis lewat DocumentPolicy
+    |--------------------------------------------------------------------------
+    | TIDAK ada middleware permission di sini SENGAJA -- lihat
+    | DocumentController::show()/destroy() yang authorize() manual
+    | berdasarkan documentable_type (issue15.md Aturan Emas).
+    */
+    Route::get('documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
+    Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
     /*
     |--------------------------------------------------------------------------

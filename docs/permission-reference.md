@@ -178,6 +178,8 @@ Status: **✅ Implemented**
 | `staff.update` | Ubah data staff | `staff.edit`, `staff.update` (route middleware) + `@can()` tombol Edit |
 | `staff.delete` | Hapus staff | `staff.destroy` (route middleware) + `@can()` tombol Hapus |
 
+Catatan: `staff.delete` **tidak berlaku** untuk Staff yang kebetulan Owner academy-nya sendiri (`staff.id_user === academies.id_owner_user`) — `StaffService::delete()` menolaknya walau permission-nya ada, termasuk untuk Super Admin. Lihat *Sub-module: Academy Account* di bawah.
+
 ### Sub-module: Staff Account (login staff, opsional)
 
 | Permission | Untuk apa | Digerbang di |
@@ -194,10 +196,12 @@ Catatan:
 
 | Permission | Untuk apa | Digerbang di |
 |---|---|---|
+| `staff.view` | Lihat daftar kontrak lintas-staff, cari kontrak yang akan berakhir bulan tertentu | `employment-contracts.index` (route middleware) |
 | `staff.update` | Buat/edit/aktifkan/selesaikan/hentikan/batalkan kontrak | `staff.contracts.*` (route middleware) |
 
 Catatan:
-- **Reuse** permission `staff.update` — bukan permission baru `employment_contract.*` (pola sama Staff Account yang reuse `user.create`/`user.update`).
+- **Reuse** permission `staff.view`/`staff.update` — bukan permission baru `employment_contract.*` (pola sama Staff Account yang reuse `user.create`/`user.update`).
+- `employment-contracts.index` (`issue14.md`) murni halaman baca lintas-staff — tidak ada tombol buat/edit di situ, aksi tulis tetap lewat `staff.contracts.*` dalam konteks 1 staff.
 - Tidak ada permission/route untuk hapus kontrak — Contract adalah histori permanen (Rule 3), tidak pernah dihapus lewat UI maupun API.
 
 ### Sub-module: Salary Visibility (masking nominal gaji)
@@ -264,6 +268,8 @@ Kenapa **tidak** dipisah seperti Player Account (`user.create`/`user.update` ter
 
 Akun Owner yang dibuat lewat sub-module ini otomatis diberi role **Owner** (hardcode di `AcademyManagementService::create()` dan `AcademyAccountController::store()`) — role lain **tidak bisa** dipilih lewat jalur ini. Relasi ke akun disimpan lewat kolom `academies.id_owner_user` (bukan dicari lewat role) — lihat `issue2.md` Bagian 2a. Membuat akun Owner **tidak otomatis** membuatnya bisa login — `LoginRequest` juga mensyaratkan `academies.status = true`, dua kondisi yang sengaja independen (lihat `issue2.md` Bagian 2e).
 
+Sejak `issue13.md`, pembuatan akun Owner **selalu diikuti** pembuatan 1 baris `Staff` (`StaffService::createForOwner()`, posisi "Academy Director" + jenis "Permanent" otomatis) — bukan permission baru, tapi efek samping yang perlu diingat: Staff yang tertaut ke `academies.id_owner_user` **ditolak** kalau dicoba dihapus lewat `staff.delete` (guard di `StaffService::delete()`), supaya academy tidak kehilangan Owner secara diam-diam. Guard ini bukan permission check (`@can()`), jadi berlaku untuk **siapapun** termasuk Super Admin — beda dari pola permission lain di dokumen ini yang selalu bisa dilewati `Gate::before()`.
+
 ---
 
 ## Module: Academy Profile (Self-Service)
@@ -321,6 +327,25 @@ Setiap academy baru otomatis dapat 6 role ini dari `config('faos.role_templates'
 `player_position.*` **tidak diberikan ke role manapun**, termasuk Owner — tidak seperti `player_type.*`/`player_category.*` yang bisa didelegasikan Owner ke role lain lewat Role Management, `player_position.*` memang tidak boleh didelegasikan sama sekali karena datanya dipakai bersama seluruh academy, bukan milik satu academy.
 
 Detail lengkap tiap role: lihat `config/faos.php` bagian `role_templates`.
+
+---
+
+## Module: Document (dokumen privat lintas-module)
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `staff.update` | Upload dokumen untuk Staff | `staff.documents.store` (route middleware) |
+| `staff.view` | Lihat/unduh dokumen milik Staff | `DocumentPolicy@view` (dipanggil `DocumentController::show()`) |
+| `staff.update` | Hapus dokumen milik Staff | `DocumentPolicy@delete` (dipanggil `DocumentController::destroy()`) |
+| `player.update` | Upload dokumen untuk Player | `players.documents.store` (route middleware) |
+| `player.view` | Lihat/unduh dokumen milik Player | `DocumentPolicy@view` |
+| `player.update` | Hapus dokumen milik Player | `DocumentPolicy@delete` |
+
+Catatan:
+- **Reuse** permission module pemilik dokumen (`staff.*`/`player.*`) — bukan permission baru `document.*` (pola sama Employment Contract, `issue12.md`/`issue14.md`).
+- Route `documents.show`/`documents.destroy` **flat** (tidak tahu dari URL ini dokumen siapa), jadi otorisasi dinamis di `DocumentPolicy` berdasarkan `documentable_type`, BUKAN middleware `permission:...` biasa.
+- Lapis pertama proteksi lintas-academy adalah `AcademyScope` (bawaan `FaosModel`) — akses dokumen academy lain otomatis 404 sebelum sempat sampai ke Policy.
+- Module baru (Payment, dst) yang mengintegrasikan Document tinggal tambah baris permission yang sesuai di tabel ini, ikuti pola yang sama.
 
 ---
 

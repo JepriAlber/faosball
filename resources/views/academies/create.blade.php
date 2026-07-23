@@ -177,10 +177,9 @@
                                 {{ __('Biaya Langganan (Rp)') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <input type="number" id="subscription_fee" name="subscription_fee"
-                                value="{{ old('subscription_fee') }}" min="0" step="0.01"
-                                placeholder="{{ __('Contoh: 500000') }}"
-                                class="form-input @error('subscription_fee') form-danger @enderror" required>
+                            <x-currency-input name="subscription_fee" id="subscription_fee"
+                                :value="old('subscription_fee')" placeholder="{{ __('Contoh: 500.000') }}"
+                                :class="$errors->has('subscription_fee') ? 'form-danger' : ''" required />
 
                             @error('subscription_fee')
                                 <span class="form-error">{{ $message }}</span>

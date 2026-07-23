@@ -334,6 +334,19 @@
                 <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
 
                     <h4 class="section-title">
+                        {{ __('Dokumen') }}
+                    </h4>
+
+                    <div class="mt-3">
+                        <x-document-manager :documentable="$staff" :upload-route="route('staff.documents.store', $staff)"
+                            :types="config('faos.document_types.staff')" :can-manage="auth()->user()->can('staff.update')" />
+                    </div>
+
+                </div>
+
+                <div class="rounded-xl border border-gray-100 p-5 dark:border-gray-800">
+
+                    <h4 class="section-title">
                         {{ __('Catatan') }}
                     </h4>
 
