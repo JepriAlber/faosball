@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Team\TeamFormRequest;
 use App\Models\Academy;
+use App\Models\Player;
 use App\Models\PlayerCategory;
 use App\Models\Season;
+use App\Models\Staff;
 use App\Models\Team;
+use App\Models\TeamStaffPosition;
 use App\Services\AcademyService;
 use App\Services\PlayerCategoryService;
 use App\Services\SeasonService;
@@ -65,8 +68,28 @@ class TeamController extends Controller
             ],
             'isSuperAdmin' => $this->academyService->isSuperAdmin(),
             'academies' => $this->academyService->isSuperAdmin() ? Academy::orderBy('name')->get() : collect(),
-            'seasons' => $this->seasonService->selectable($academyId),
-            'playerCategories' => $this->playerCategoryService->selectable($academyId),
+            // Super Admin: dropdown ini KOSONG di render awal, diisi AJAX oleh
+            // academyCascade() begitu Academy dipilih (issue19.md/issue18.md
+            // Temuan 3-5). User academy biasa: tetap ter-scope penuh seperti
+            // sebelumnya, TIDAK terpengaruh perubahan ini.
+            'seasons' => $this->academyService->isSuperAdmin() ? collect() : $this->seasonService->selectable($academyId),
+            'playerCategories' => $this->academyService->isSuperAdmin() ? collect() : $this->playerCategoryService->selectable($academyId),
+        ]);
+    }
+
+    public function cascadeOptions(Request $request)
+    {
+        $academyId = $this->academyService->isSuperAdmin()
+            ? $request->query('id_academy')
+            : $this->academyService->currentId();
+
+        return response()->json([
+            'id_season' => $this->seasonService->selectable($academyId)
+                ->map(fn ($season) => ['value' => $season->id_season, 'label' => $season->name])
+                ->values(),
+            'id_player_category' => $this->playerCategoryService->selectable($academyId)
+                ->map(fn ($category) => ['value' => $category->id_player_category, 'label' => $category->name])
+                ->values(),
         ]);
     }
 
@@ -94,6 +117,23 @@ class TeamController extends Controller
             'team' => $team,
             'teamPlayers' => $team->teamPlayers()->with('player')->get(),
             'teamStaff' => $team->teamStaff()->with(['staff', 'teamStaffPosition'])->get(),
+            // Dipindah dari view (issue18.md Temuan 2 -- query di Blade
+            // melanggar Thin Controller, docs/architecture.md). Exclude
+            // player/staff yang SUDAH aktif di tim ini supaya tidak bisa
+            // dipilih dobel di form "Add Player"/"Assign Staff" (TeamPlayerService/
+            // TeamStaffService sudah menolaknya, ini cuma mencegah percobaan sia-sia).
+            'availablePlayers' => Player::where('id_academy', $team->id_academy)
+                ->whereNotIn('id_player', $team->activeTeamPlayers()->pluck('id_player'))
+                ->orderBy('name')
+                ->get(),
+            'availableStaff' => Staff::where('id_academy', $team->id_academy)
+                ->whereNotIn('id_staff', $team->activeTeamStaff()->pluck('id_staff'))
+                ->orderBy('full_name')
+                ->get(),
+            'teamStaffPositions' => TeamStaffPosition::where('id_academy', $team->id_academy)
+                ->where('status', true)
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 

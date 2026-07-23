@@ -20,6 +20,8 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Theming Per-Academy (CSS Custom Property Override)](#theming-per-academy-css-custom-property-override)
 - [Upload Logo Multi-Slot (Persegi + Wordmark)](#upload-logo-multi-slot-persegi--wordmark)
 - [Input Nominal Rupiah (Pemisah Ribuan)](#input-nominal-rupiah-pemisah-ribuan)
+- [Cascading Dropdown Academy-Scoped (AJAX)](#cascading-dropdown-academy-scoped-ajax)
+- [`table-card` Tanpa `table-card-list` untuk Panel Sempit di Halaman Detail](#table-card-tanpa-table-card-list-untuk-panel-sempit-di-halaman-detail)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -398,6 +400,45 @@ Field nominal mata uang baru di module manapun (harga, biaya, tarif, dst) -- reu
 
 ---
 
+## Cascading Dropdown Academy-Scoped (AJAX)
+
+### Masalah
+
+Form create module tenant (Team, Staff, Staff Position) yang punya dropdown "anak" bergantung pada Academy (Season+Player Category, Employment Type+Staff Position, Role) tidak otomatis ter-filter begitu Super Admin memilih Academy -- dropdown anak menampilkan opsi lintas-academy tercampur sampai form disubmit (lihat `issue18.md` Temuan 3-5, `issue19.md`).
+
+### Solusi: Alpine helper `academyCascade()` + endpoint JSON kecil per module
+
+`resources/js/components/academy-cascade.js` (`Alpine.data('academyCascade', ...)`, didaftarkan di `app.js` pola sama `currencyInput`) -- dipasang di tag `<form>` create module ybs:
+
+```blade
+<form x-data="academyCascade('{{ route('teams.cascade-options') }}')"
+    x-init="init('{{ old('id_academy') }}', { id_season: '{{ old('id_season') }}' })">
+```
+
+Kontrak JSON endpoint **wajib** sama di semua module: object dengan key = `name` attribute select target, value = array `{value, label}`. Endpoint resolve `$academyId` sama seperti `resolveAcademyId()` di Service (Super Admin pakai `$request->query('id_academy')`, user academy biasa **selalu** pakai `AcademyService::currentId()`, mengabaikan query string -- supaya tidak bisa mengintip academy lain).
+
+### Kapan pola ini dipakai lagi
+
+Form create baru dengan dropdown Academy + dropdown anak yang bergantung academy tsb -- reuse `academyCascade()`, endpoint baru per module ikut kontrak JSON yang sama. **Bukan** untuk form edit (`id_academy` sudah pasti, tidak ambigu). **Bukan pengganti** pola client-side filter di `players/create.blade.php` (`@js($data)` + getter Alpine) -- itu pola valid lain untuk kasus yang sama, dua-duanya boleh hidup berdampingan (`issue18.md` Temuan 3-5).
+
+---
+
+## `table-card` Tanpa `table-card-list` untuk Panel Sempit di Halaman Detail
+
+### Masalah
+
+Pola *Tabel Responsif* (Table + Card List) dirancang untuk halaman index/list **full-width**. Kalau sebuah tab/panel ada di kolom **sempit** milik halaman detail (mis. tab "Teams" di `players/show.blade.php`, kolom kiri `lg:grid-cols-3`), memaksakan `table` (`min-w-[1000px]`) bikin scroll horizontal yang tidak perlu bahkan di desktop biasa.
+
+### Solusi: `table-card` saja, tanpa wrapper `table-card-list`
+
+`table-card` (class individual per baris data) **tidak** punya `lg:hidden` bawaan -- hanya wrapper `table-card-list` yang punya. Untuk panel sempit, pakai `table-card` langsung di dalam `<div class="space-y-3">` biasa (tanpa `table-wrapper`/`table` sama sekali) -- tampil identik di semua breakpoint, satu-satunya representasi, bukan dual-render.
+
+### Kapan pola ini dipakai lagi
+
+Konten tabular apapun yang ditampilkan di dalam kolom sempit halaman detail (bukan halaman index/list full-width) -- reuse `table-card` tanpa `table-card-list`. Kalau kontennya ada di halaman index/list biasa (full-width), tetap pakai pola Table+Card List penuh (`table-wrapper`+`table` DAN `table-card-list`), jangan dicampur.
+
+---
+
 ## Development Rules
 
 Gunakan:
@@ -411,6 +452,8 @@ Gunakan:
 - Dropdown filter "Academy" (+ kolom/field Academy di tabel & card list) untuk **Super Admin saja** di setiap halaman index/list module tenant yang punya `<x-table.toolbar>` (lihat [Wajib: Filter Academy — khusus Super Admin](#wajib-filter-academy--khusus-super-admin)).
 - Taksonomi urutan field (Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah) untuk semua form create/edit baru, konsisten antara create dan edit di module yang sama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
 - `<x-currency-input>` untuk semua field nominal mata uang (gaji, biaya, tarif, dst), bukan `<input type="number">` polos (lihat [Input Nominal Rupiah](#input-nominal-rupiah-pemisah-ribuan)).
+- Alpine helper `academyCascade()` untuk dropdown anak yang bergantung Academy di form create Super Admin (lihat [Cascading Dropdown Academy-Scoped](#cascading-dropdown-academy-scoped-ajax)).
+- `table-card` **tanpa** wrapper `table-card-list` untuk konten tabular di kolom sempit halaman detail (bukan halaman index/list full-width) (lihat [`table-card` Tanpa `table-card-list`](#table-card-tanpa-table-card-list-untuk-panel-sempit-di-halaman-detail)).
 
 Hindari:
 
@@ -427,4 +470,4 @@ Hindari:
 
 ## Summary
 
-FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar. Untuk halaman index/list module, tabel wajib didampingi Card List responsif (`table-card-list`) supaya data tidak kepotong saat diakses lewat tablet/smartphone di lapangan (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)). Untuk form create/edit, field wajib diurutkan dan dikelompokkan berdasarkan taksonomi Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah, konsisten antara create dan edit di module yang sama, dengan section berjudul hanya dipakai untuk sub-entitas yang benar-benar terpisah dari record utama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)).
+FAOSBall menggunakan Tailwind CSS v4 dengan pendekatan CSS-first (`@theme`, `@utility`). String Tailwind yang berulang atau panjang diekstrak jadi `@utility` reusable di `utilities.css` (pola sidebar/menu) atau `components.css` (komponen UI umum), sedangkan toggle dinamis Alpine yang sepele dibiarkan inline. Yang paling penting: variant breakpoint/dark untuk properti yang juga dikendalikan toggle dinamis di elemen yang sama wajib tetap jadi class Tailwind langsung, tidak boleh dibungkus ke `@utility`, karena urutan compile-nya tidak dijamin benar. Untuk halaman index/list module, tabel wajib didampingi Card List responsif (`table-card-list`) supaya data tidak kepotong saat diakses lewat tablet/smartphone di lapangan (lihat [Tabel Responsif](#tabel-responsif-table-desktop--card-list-mobiletablet)) — untuk konten tabular di kolom sempit halaman detail (bukan index/list), cukup `table-card` tanpa wrapper `table-card-list` (lihat [`table-card` Tanpa `table-card-list`](#table-card-tanpa-table-card-list-untuk-panel-sempit-di-halaman-detail)). Untuk form create/edit, field wajib diurutkan dan dikelompokkan berdasarkan taksonomi Scope → Identitas → Klasifikasi → Kontak → Deskriptif → Media → Status → Section Terpisah, konsisten antara create dan edit di module yang sama, dengan section berjudul hanya dipakai untuk sub-entitas yang benar-benar terpisah dari record utama (lihat [Urutan & Pengelompokan Field Form](#urutan--pengelompokan-field-form-createedit)). Dropdown anak yang bergantung Academy di form create Super Admin (Season, Employment Type, Role, dst) pakai cascading AJAX lewat Alpine helper `academyCascade()` + endpoint JSON kecil per module (lihat [Cascading Dropdown Academy-Scoped](#cascading-dropdown-academy-scoped-ajax)).

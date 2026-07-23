@@ -21,7 +21,9 @@
             </div>
         </div>
 
-        <form action="{{ route('teams.store') }}" method="POST">
+        <form action="{{ route('teams.store') }}" method="POST"
+            x-data="academyCascade('{{ route('teams.cascade-options') }}')"
+            x-init="init('{{ old('id_academy') }}', { id_season: '{{ old('id_season') }}', id_player_category: '{{ old('id_player_category') }}' })">
             @csrf
 
             <div class="form-row">
@@ -34,8 +36,9 @@
                                 {{ __('Academy') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror"
-                                required>
+                            <select name="id_academy" x-model="idAcademy"
+                                @change="loadOptions({ id_season: '', id_player_category: '' })"
+                                class="form-select @error('id_academy') form-danger @enderror" required>
                                 <option value="">{{ __('Pilih Academy') }}</option>
                                 @foreach ($academies as $academy)
                                     <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
@@ -71,7 +74,8 @@
                                 {{ __('Season') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_season" class="form-select @error('id_season') form-danger @enderror" required>
+                            <select name="id_season" :disabled="loading"
+                                class="form-select @error('id_season') form-danger @enderror" required>
                                 <option value="">{{ __('Pilih Season') }}</option>
                                 @foreach ($seasons as $season)
                                     <option value="{{ $season->id_season }}" @selected(old('id_season') === $season->id_season)>
@@ -79,6 +83,10 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            @if ($isSuperAdmin)
+                                <p class="form-helper" x-show="!idAcademy" x-cloak>{{ __('Pilih Academy dulu untuk melihat pilihan Season.') }}</p>
+                            @endif
 
                             @error('id_season')
                                 <span class="form-error">{{ $message }}</span>
@@ -90,7 +98,8 @@
                                 {{ __('Player Category') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_player_category" class="form-select @error('id_player_category') form-danger @enderror" required>
+                            <select name="id_player_category" :disabled="loading"
+                                class="form-select @error('id_player_category') form-danger @enderror" required>
                                 <option value="">{{ __('Pilih Player Category') }}</option>
                                 @foreach ($playerCategories as $category)
                                     <option value="{{ $category->id_player_category }}" @selected(old('id_player_category') === $category->id_player_category)>
@@ -98,6 +107,10 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            @if ($isSuperAdmin)
+                                <p class="form-helper" x-show="!idAcademy" x-cloak>{{ __('Pilih Academy dulu untuk melihat pilihan Player Category.') }}</p>
+                            @endif
 
                             @error('id_player_category')
                                 <span class="form-error">{{ $message }}</span>

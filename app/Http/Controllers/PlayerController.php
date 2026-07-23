@@ -122,7 +122,10 @@ class PlayerController extends Controller
             'playerCategory',
             'primaryPosition',
             'secondaryPosition',
-            'user.roles'
+            'user.roles',
+            // Histori keanggotaan tim (issue18.md Temuan 1) -- termasuk yang
+            // sudah leave_date (histori roster), terbaru duluan.
+            'teamPlayers' => fn ($query) => $query->with('team.season')->orderByDesc('join_date'),
         ]);
 
         return view('players.show',[

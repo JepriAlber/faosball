@@ -225,6 +225,18 @@ Route::middleware('auth')->group(function () {
     | Reuse permission team.* yang SUDAH ADA di seeder/role template sejak
     | awal (placeholder), BUKAN permission baru -- lihat issue16.md.
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Team Cascade Options (AJAX academy-scoped, issue19.md)
+    |--------------------------------------------------------------------------
+    | WAJIB didaftarkan SEBELUM Route::resource('teams', ...) di bawah ini --
+    | kalau dipindah ke bawah, "cascade-options" akan ketangkep GET
+    | teams/{team} (show) dan dianggap UUID team, bukan hit endpoint ini.
+    */
+    Route::get('teams/cascade-options', [TeamController::class, 'cascadeOptions'])
+        ->name('teams.cascade-options')
+        ->middleware('permission:team.create');
+
     Route::resource('teams', TeamController::class)
         ->middlewareFor(['index', 'show'], 'permission:team.view')
         ->middlewareFor(['create', 'store'], 'permission:team.create')
@@ -272,6 +284,10 @@ Route::middleware('auth')->group(function () {
     | Staff Position Management
     |--------------------------------------------------------------------------
     */
+    Route::get('staff-positions/cascade-options', [StaffPositionController::class, 'cascadeOptions'])
+        ->name('staff-positions.cascade-options')
+        ->middleware('permission:staff_position.create');
+
     Route::resource('staff-positions', StaffPositionController::class)
         ->except(['show'])
         ->middlewareFor('index', 'permission:staff_position.view')
@@ -311,6 +327,10 @@ Route::middleware('auth')->group(function () {
     | Staff Management
     |--------------------------------------------------------------------------
     */
+    Route::get('staff/cascade-options', [StaffController::class, 'cascadeOptions'])
+        ->name('staff.cascade-options')
+        ->middleware('permission:staff.create');
+
     Route::resource('staff', StaffController::class)
         ->middlewareFor(['index', 'show'], 'permission:staff.view')
         ->middlewareFor(['create', 'store'], 'permission:staff.create')

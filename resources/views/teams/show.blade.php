@@ -7,28 +7,66 @@
     <x-breadcrumb :title="$title" :items="$breadcrumb" />
     <x-alert />
 
-    <div class="card" x-data="{ tab: 'overview' }">
+    <div class="card" x-data="{ tab: 'players' }">
 
         <div class="card-header">
-            <div>
-                <h3 class="card-title">{{ $team->name }}</h3>
-                <p class="card-description">
-                    {{ $team->code }} &middot; {{ $team->playerCategory->name }} &middot; {{ $team->season->name }}
-                </p>
+            <div class="flex items-center gap-4">
+                <div class="avatar avatar-lg avatar-square border border-gray-100 dark:border-gray-800">
+                    <span class="avatar-placeholder">{{ strtoupper(substr($team->name, 0, 2)) }}</span>
+                </div>
+
+                <div>
+                    <h3 class="card-title text-xl">{{ $team->name }}</h3>
+                    <p class="card-description">
+                        {{ $team->code }} &middot; {{ $team->season->name }}
+                        @if ($team->academy)
+                            &middot; {{ $team->academy->name }}
+                        @endif
+                    </p>
+                </div>
             </div>
 
             @can('team.update')
                 <div class="card-actions">
-                    <a href="{{ route('teams.edit', $team) }}" class="btn btn-secondary">{{ __('Edit Team') }}</a>
+                    <a href="{{ route('teams.edit', $team) }}" class="btn btn-primary">{{ __('Edit Team') }}</a>
                 </div>
             @endcan
         </div>
 
-        <div class="border-b border-gray-100 px-5 dark:border-gray-800">
-            <div class="flex gap-2">
-                <button type="button" class="focus:outline-none" @click="tab='overview'"
-                    :class="tab === 'overview' ? 'tab tab-active' : 'tab'">{{ __('Overview') }}</button>
+        {{-- Info strip --}}
+        <div class="grid grid-cols-2 gap-4 border-b border-gray-100 p-5 sm:grid-cols-3 lg:grid-cols-6 dark:border-gray-800">
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Player Category') }}</span>
+                <span class="badge badge-secondary">{{ $team->playerCategory->name }}</span>
+            </div>
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Team Type') }}</span>
+                <span class="table-text">{{ ucfirst($team->team_type) }}</span>
+            </div>
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Status') }}</span>
+                @if ($team->status)
+                    <span class="badge badge-success">{{ __('Aktif') }}</span>
+                @else
+                    <span class="badge badge-danger">{{ __('Nonaktif') }}</span>
+                @endif
+            </div>
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Jumlah Player Aktif') }}</span>
+                <span class="table-text">{{ $teamPlayers->whereNull('leave_date')->count() }}</span>
+            </div>
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Jumlah Staff Aktif') }}</span>
+                <span class="table-text">{{ $teamStaff->whereNull('leave_date')->count() }}</span>
+            </div>
+            <div>
+                <span class="mb-1 block text-xs text-gray-400">{{ __('Dibuat') }}</span>
+                <span class="table-text">{{ $team->created_at->format('d M Y') }}</span>
+            </div>
+        </div>
 
+        <div class="border-b border-gray-100 px-5 dark:border-gray-800">
+            <div class="tabs scrollbar-brand">
                 <button type="button" class="focus:outline-none" @click="tab='players'"
                     :class="tab === 'players' ? 'tab tab-active' : 'tab'">{{ __('Players') }}</button>
 
@@ -39,59 +77,25 @@
 
         <div class="p-5">
 
-            {{-- Overview --}}
-            <div x-show="tab==='overview'" x-cloak class="tab-panel">
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Player Category') }}</span>
-                        <span class="badge badge-secondary">{{ $team->playerCategory->name }}</span>
-                    </div>
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Season') }}</span>
-                        <span class="table-text">{{ $team->season->name }}</span>
-                    </div>
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Team Type') }}</span>
-                        <span class="table-text">{{ ucfirst($team->team_type) }}</span>
-                    </div>
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Status') }}</span>
-                        @if ($team->status)
-                            <span class="badge badge-success">{{ __('Aktif') }}</span>
-                        @else
-                            <span class="badge badge-danger">{{ __('Nonaktif') }}</span>
-                        @endif
-                    </div>
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Jumlah Player Aktif') }}</span>
-                        <span class="table-text">{{ $teamPlayers->whereNull('leave_date')->count() }}</span>
-                    </div>
-                    <div>
-                        <span class="mb-1 block text-xs text-gray-400">{{ __('Jumlah Staff Aktif') }}</span>
-                        <span class="table-text">{{ $teamStaff->whereNull('leave_date')->count() }}</span>
-                    </div>
-                </div>
-            </div>
-
             {{-- Players --}}
-            <div x-show="tab==='players'" x-cloak class="tab-panel">
+            <div x-show="tab==='players'" x-cloak class="tab-panel" x-data="{ showForm: false }">
 
                 @can('team.update')
                     <div class="mb-4 flex justify-end">
-                        <button type="button" class="btn btn-primary" onclick="document.getElementById('add-player-form').classList.toggle('hidden')">
+                        <button type="button" class="btn btn-primary" @click="showForm = !showForm">
                             {{ __('Add Player') }}
                         </button>
                     </div>
 
-                    <form id="add-player-form" action="{{ route('teams.players.store', $team) }}" method="POST"
-                        class="mb-4 hidden rounded-lg border border-dashed border-gray-200 p-4 dark:border-gray-800">
+                    <form x-show="showForm" x-cloak action="{{ route('teams.players.store', $team) }}" method="POST"
+                        class="mb-4 rounded-lg border border-dashed border-gray-200 p-4 dark:border-gray-800">
                         @csrf
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 sm:items-end">
                             <div class="form-group mb-0">
                                 <label class="form-label">{{ __('Player') }}</label>
                                 <select name="id_player" class="form-select" required>
                                     <option value="">{{ __('Pilih Player') }}</option>
-                                    @foreach (\App\Models\Player::where('id_academy', $team->id_academy)->orderBy('name')->get() as $player)
+                                    @foreach ($availablePlayers as $player)
                                         <option value="{{ $player->id_player }}">{{ $player->name }}</option>
                                     @endforeach
                                 </select>
@@ -161,27 +165,83 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Card List (mobile & tablet) -->
+                <div class="table-card-list">
+                    @forelse ($teamPlayers as $teamPlayer)
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <div class="min-w-0">
+                                    <span class="table-title truncate">{{ $teamPlayer->player->name }}</span>
+                                    <span class="table-subtitle">{{ __('Nomor') }} {{ $teamPlayer->jersey_number }}</span>
+                                </div>
+
+                                @if ($teamPlayer->isActive())
+                                    <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
+                                @else
+                                    <span class="badge badge-secondary shrink-0">{{ __('Keluar') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="table-card-body">
+                                <div class="table-card-field">
+                                    <span class="table-card-label">{{ __('Captain') }}</span>
+                                    <span class="table-text">{{ $teamPlayer->is_captain ? __('Ya') : '-' }}</span>
+                                </div>
+
+                                @if (! $teamPlayer->isActive())
+                                    <div class="table-card-field">
+                                        <span class="table-card-label">{{ __('Keluar') }}</span>
+                                        <span class="table-text">{{ $teamPlayer->leave_date->format('d M Y') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            @can('team.update')
+                                @if ($teamPlayer->isActive())
+                                    <div class="table-card-actions">
+                                        <form action="{{ route('teams.players.leave', [$team, $teamPlayer]) }}" method="POST"
+                                            onsubmit="return confirm('{{ __('Keluarkan player ini dari tim?') }}')">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
+                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endcan
+                        </div>
+                    @empty
+                        <div class="table-card">
+                            <div class="empty-state">
+                                <h4 class="empty-title">{{ __('Belum ada player di tim ini.') }}</h4>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
             </div>
 
             {{-- Staff --}}
-            <div x-show="tab==='staff'" x-cloak class="tab-panel">
+            <div x-show="tab==='staff'" x-cloak class="tab-panel" x-data="{ showForm: false }">
 
                 @can('team.update')
                     <div class="mb-4 flex justify-end">
-                        <button type="button" class="btn btn-primary" onclick="document.getElementById('assign-staff-form').classList.toggle('hidden')">
+                        <button type="button" class="btn btn-primary" @click="showForm = !showForm">
                             {{ __('Assign Staff') }}
                         </button>
                     </div>
 
-                    <form id="assign-staff-form" action="{{ route('teams.staff.store', $team) }}" method="POST"
-                        class="mb-4 hidden rounded-lg border border-dashed border-gray-200 p-4 dark:border-gray-800">
+                    <form x-show="showForm" x-cloak action="{{ route('teams.staff.store', $team) }}" method="POST"
+                        class="mb-4 rounded-lg border border-dashed border-gray-200 p-4 dark:border-gray-800">
                         @csrf
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 sm:items-end">
                             <div class="form-group mb-0">
                                 <label class="form-label">{{ __('Staff') }}</label>
                                 <select name="id_staff" class="form-select" required>
                                     <option value="">{{ __('Pilih Staff') }}</option>
-                                    @foreach (\App\Models\Staff::where('id_academy', $team->id_academy)->orderBy('full_name')->get() as $staff)
+                                    @foreach ($availableStaff as $staff)
                                         <option value="{{ $staff->id_staff }}">{{ $staff->full_name }}</option>
                                     @endforeach
                                 </select>
@@ -190,7 +250,7 @@
                                 <label class="form-label">{{ __('Peran di Tim') }}</label>
                                 <select name="id_team_staff_position" class="form-select" required>
                                     <option value="">{{ __('Pilih Peran') }}</option>
-                                    @foreach (\App\Models\TeamStaffPosition::where('id_academy', $team->id_academy)->where('status', true)->orderBy('name')->get() as $position)
+                                    @foreach ($teamStaffPositions as $position)
                                         <option value="{{ $position->id_team_staff_position }}">{{ $position->name }}</option>
                                     @endforeach
                                 </select>
@@ -249,6 +309,57 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Card List (mobile & tablet) -->
+                <div class="table-card-list">
+                    @forelse ($teamStaff as $ts)
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <div class="min-w-0">
+                                    <span class="table-title truncate">{{ $ts->staff->full_name }}</span>
+                                    <span class="table-subtitle">{{ $ts->teamStaffPosition->name }}</span>
+                                </div>
+
+                                @if ($ts->isActive())
+                                    <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
+                                @else
+                                    <span class="badge badge-secondary shrink-0">{{ __('Keluar') }}</span>
+                                @endif
+                            </div>
+
+                            @if (! $ts->isActive())
+                                <div class="table-card-body">
+                                    <div class="table-card-field">
+                                        <span class="table-card-label">{{ __('Keluar') }}</span>
+                                        <span class="table-text">{{ $ts->leave_date->format('d M Y') }}</span>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @can('team.update')
+                                @if ($ts->isActive())
+                                    <div class="table-card-actions">
+                                        <form action="{{ route('teams.staff.leave', [$team, $ts]) }}" method="POST"
+                                            onsubmit="return confirm('{{ __('Keluarkan staff ini dari tim?') }}')">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
+                                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                    <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endcan
+                        </div>
+                    @empty
+                        <div class="table-card">
+                            <div class="empty-state">
+                                <h4 class="empty-title">{{ __('Belum ada staff di tim ini.') }}</h4>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
 

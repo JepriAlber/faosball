@@ -1017,5 +1017,14 @@
     "Peran di tim wajib dipilih.": "Team role is required.",
 
     "Saran": "Suggested",
-    "Saran berdasarkan umur saat ini": "Suggestion based on current age"
+    "Saran berdasarkan umur saat ini": "Suggestion based on current age",
+
+    "Pilih Academy dulu untuk melihat pilihan Season.": "Select an Academy first to see Season options.",
+    "Pilih Academy dulu untuk melihat pilihan Player Category.": "Select an Academy first to see Player Category options.",
+    "Pilih Academy dulu untuk melihat pilihan Employment Type.": "Select an Academy first to see Employment Type options.",
+    "Pilih Academy dulu untuk melihat pilihan Staff Position.": "Select an Academy first to see Staff Position options.",
+    "Pilih Academy dulu untuk melihat pilihan Role.": "Select an Academy first to see Role options.",
+    "Bergabung": "Joined",
+    "Belum menjadi anggota tim manapun.": "Not a member of any team yet.",
+    "Dibuat": "Created"
 }

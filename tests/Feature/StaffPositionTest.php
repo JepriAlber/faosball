@@ -185,4 +185,41 @@ class StaffPositionTest extends TestCase
         $responseSuperAdmin->assertSee('Freelance Analyst');
         $responseSuperAdmin->assertDontSee('Volunteer Coach');
     }
+
+    public function test_cascade_options_mengembalikan_role_sesuai_academy_yang_diminta(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        Role::create(['id_academy' => $academyA->id_academy, 'name' => 'Role A', 'guard_name' => 'web']);
+        Role::create(['id_academy' => $academyB->id_academy, 'name' => 'Role B', 'guard_name' => 'web']);
+
+        $superAdmin = $this->makeSuperAdmin();
+
+        $response = $this->actingAs($superAdmin)
+            ->getJson(route('staff-positions.cascade-options', ['id_academy' => $academyB->id_academy]));
+
+        $response->assertOk();
+        $names = collect($response->json('role_id'))->pluck('label');
+        $this->assertContains('Role B', $names);
+        $this->assertNotContains('Role A', $names);
+    }
+
+    public function test_cascade_options_user_academy_biasa_mengabaikan_id_academy_dari_query(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        Role::create(['id_academy' => $academyA->id_academy, 'name' => 'Role A', 'guard_name' => 'web']);
+        Role::create(['id_academy' => $academyB->id_academy, 'name' => 'Role B', 'guard_name' => 'web']);
+
+        $owner = $this->makeUser($academyA, ['staff_position.create']);
+
+        $response = $this->actingAs($owner)
+            ->getJson(route('staff-positions.cascade-options', ['id_academy' => $academyB->id_academy]));
+
+        $names = collect($response->json('role_id'))->pluck('label');
+        $this->assertContains('Role A', $names);
+        $this->assertNotContains('Role B', $names);
+    }
 }

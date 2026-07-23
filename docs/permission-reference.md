@@ -167,6 +167,7 @@ Catatan:
 - Isolasi antar academy memakai `AcademyScope` — akses lintas academy = **404**. Default: Owner-only lewat `config('faos.role_templates')`.
 - Field `role_id` (Default Role) merujuk ke `roles.id` (**bigint**, bukan uuid seperti FK lain) — divalidasi ulang di `StaffPositionFormRequest` supaya role yang dipilih benar-benar milik academy yang sama (role tenant-scoped per academy, lihat `docs/authorization.md` → *Role Academy Based*).
 - Guard delete ("masih dipakai staff") **aktif** — `EmploymentTypeService::delete()`/`StaffPositionService::delete()` menolak hapus kalau masih ada baris `staff` yang mereferensikannya.
+- Endpoint `staff-positions.cascade-options` (dipakai AJAX cascading dropdown Role di form create, `issue19.md`) reuse `staff_position.create`, bukan permission baru.
 
 ---
 
@@ -181,7 +182,9 @@ Status: **✅ Implemented**
 | `staff.update` | Ubah data staff | `staff.edit`, `staff.update` (route middleware) + `@can()` tombol Edit |
 | `staff.delete` | Hapus staff | `staff.destroy` (route middleware) + `@can()` tombol Hapus |
 
-Catatan: `staff.delete` **tidak berlaku** untuk Staff yang kebetulan Owner academy-nya sendiri (`staff.id_user === academies.id_owner_user`) — `StaffService::delete()` menolaknya walau permission-nya ada, termasuk untuk Super Admin. Lihat *Sub-module: Academy Account* di bawah.
+Catatan:
+- `staff.delete` **tidak berlaku** untuk Staff yang kebetulan Owner academy-nya sendiri (`staff.id_user === academies.id_owner_user`) — `StaffService::delete()` menolaknya walau permission-nya ada, termasuk untuk Super Admin. Lihat *Sub-module: Academy Account* di bawah.
+- Endpoint `staff.cascade-options` (dipakai AJAX cascading dropdown Employment Type + Staff Position di form create, `issue19.md`) reuse `staff.create`, bukan permission baru.
 
 ### Sub-module: Staff Account (login staff, opsional)
 
@@ -346,6 +349,7 @@ Catatan:
 - **Team Player**/**Team Staff** (sub-resource nested `teams/{team}/players|staff`) **reuse** `team.view`/`team.update` — bukan permission terpisah, pola sama Employment Contract reuse `staff.*` (`issue12.md`).
 - `Team` pakai `SoftDeletes` (archive), bukan hard delete — beda dari kebanyakan master data lain di dokumen ini. Guard: tidak bisa di-archive kalau masih ada Team Player/Team Staff **aktif** (`leave_date IS NULL`).
 - Tidak ada route `DELETE` untuk Team Player/Team Staff — "keluar tim" adalah `leave_date` terisi (histori permanen), bukan baris dihapus.
+- Endpoint `teams.cascade-options` (dipakai AJAX cascading dropdown Season + Player Category di form create, `issue19.md`) reuse `team.create`, bukan permission baru.
 
 ---
 

@@ -71,12 +71,29 @@ class StaffController extends Controller
             ],
             'isSuperAdmin' => $isSuperAdmin,
             'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
-            'employmentTypes' => $this->employmentTypeService->selectable($academyId),
-            'staffPositions' => $this->staffPositionService->selectable($academyId),
+            // Super Admin: diisi AJAX (issue19.md Tahap 4-5). User academy biasa: tidak berubah.
+            'employmentTypes' => $isSuperAdmin ? collect() : $this->employmentTypeService->selectable($academyId),
+            'staffPositions' => $isSuperAdmin ? collect() : $this->staffPositionService->selectable($academyId),
             // Super Admin selalu lolos otorisasi apapun (Gate::before()), tapi
             // ditambahkan eksplisit di sini sebagai jaga-jaga untuk field
             // sensitif -- lihat issue12.md Tahap 15b.
             'canViewSalary' => $isSuperAdmin || auth()->user()->can('salary.view'),
+        ]);
+    }
+
+    public function cascadeOptions(Request $request)
+    {
+        $academyId = $this->academyService->isSuperAdmin()
+            ? $request->query('id_academy')
+            : $this->academyService->currentId();
+
+        return response()->json([
+            'id_employment_type' => $this->employmentTypeService->selectable($academyId)
+                ->map(fn ($type) => ['value' => $type->id_employment_type, 'label' => $type->name])
+                ->values(),
+            'id_staff_position' => $this->staffPositionService->selectable($academyId)
+                ->map(fn ($position) => ['value' => $position->id_staff_position, 'label' => $position->name])
+                ->values(),
         ]);
     }
 

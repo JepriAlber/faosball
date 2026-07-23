@@ -60,6 +60,20 @@ class TeamTest extends TestCase
         ]);
     }
 
+    protected function actingAsSuperAdmin(): User
+    {
+        Permission::firstOrCreate(['name' => 'team.create', 'guard_name' => 'web']);
+
+        $role = Role::create(['id_academy' => null, 'name' => 'Super Admin Test', 'guard_name' => 'web']);
+        $role->syncPermissions(Permission::where('name', 'team.create')->get());
+
+        $superAdmin = User::factory()->create(['id_academy' => null, 'status' => true]);
+        $superAdmin->assignRole($role);
+        $this->actingAs($superAdmin);
+
+        return $superAdmin;
+    }
+
     protected function makePlayer(Academy $academy, string $name = 'Test Player'): Player
     {
         return Player::create([
@@ -160,5 +174,52 @@ class TeamTest extends TestCase
 
         $this->get(route('teams.index'))->assertOk();
         $this->get(route('teams.show', $team))->assertOk();
+    }
+
+    public function test_cascade_options_mengembalikan_season_dan_category_sesuai_academy_yang_diminta(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        Season::factory()->create(['id_academy' => $academyA->id_academy, 'name' => 'Season A']);
+        Season::factory()->create(['id_academy' => $academyB->id_academy, 'name' => 'Season B']);
+
+        $this->actingAsSuperAdmin();
+
+        $response = $this->getJson(route('teams.cascade-options', ['id_academy' => $academyB->id_academy]));
+
+        $response->assertOk();
+        $names = collect($response->json('id_season'))->pluck('label');
+        $this->assertContains('Season B', $names);
+        $this->assertNotContains('Season A', $names);
+    }
+
+    public function test_cascade_options_user_academy_biasa_mengabaikan_id_academy_dari_query(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        Season::factory()->create(['id_academy' => $academyA->id_academy, 'name' => 'Season A']);
+        Season::factory()->create(['id_academy' => $academyB->id_academy, 'name' => 'Season B']);
+
+        $this->actingAsOwner($academyA);
+
+        $response = $this->getJson(route('teams.cascade-options', ['id_academy' => $academyB->id_academy]));
+
+        $names = collect($response->json('id_season'))->pluck('label');
+        $this->assertContains('Season A', $names);
+        $this->assertNotContains('Season B', $names);
+    }
+
+    public function test_halaman_show_team_memuat_table_card_list_untuk_responsif(): void
+    {
+        $academy = Academy::factory()->create();
+        $team = $this->makeTeam($academy);
+
+        $this->actingAsOwner($academy);
+
+        $this->get(route('teams.show', $team))
+            ->assertOk()
+            ->assertSee('table-card-list', false);
     }
 }

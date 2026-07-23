@@ -21,7 +21,9 @@
             </div>
         </div>
 
-        <form action="{{ route('staff-positions.store') }}" method="POST">
+        <form action="{{ route('staff-positions.store') }}" method="POST"
+            x-data="academyCascade('{{ route('staff-positions.cascade-options') }}')"
+            x-init="init('{{ old('id_academy') }}', { role_id: '{{ old('role_id') }}' })">
             @csrf
 
             <div class="form-row">
@@ -34,8 +36,8 @@
                                 {{ __('Academy') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror"
-                                required>
+                            <select name="id_academy" x-model="idAcademy" @change="loadOptions({ role_id: '' })"
+                                class="form-select @error('id_academy') form-danger @enderror" required>
                                 <option value="">{{ __('Pilih Academy') }}</option>
                                 @foreach ($academies as $academy)
                                     <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
@@ -97,18 +99,11 @@
                         <label class="form-label">{{ __('Default Role') }}</label>
 
                         @if ($isSuperAdmin)
-                            <select name="role_id" class="form-select @error('role_id') form-danger @enderror">
+                            <select name="role_id" :disabled="loading" class="form-select @error('role_id') form-danger @enderror">
                                 <option value="">{{ __('Tidak ada / atur manual nanti') }}</option>
-                                @foreach ($roles as $academyName => $academyRoles)
-                                    <optgroup label="{{ $academyName }}">
-                                        @foreach ($academyRoles as $role)
-                                            <option value="{{ $role->id }}" @selected((string) old('role_id') === (string) $role->id)>
-                                                {{ $role->name }}
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
                             </select>
+
+                            <p class="form-helper" x-show="!idAcademy" x-cloak>{{ __('Pilih Academy dulu untuk melihat pilihan Role.') }}</p>
                         @else
                             <select name="role_id" class="form-select @error('role_id') form-danger @enderror">
                                 <option value="">{{ __('Tidak ada / atur manual nanti') }}</option>
