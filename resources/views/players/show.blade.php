@@ -253,13 +253,8 @@
 
                     <div x-show="tab==='dokumen'" x-cloak class="tab-panel">
 
-                        <div class="rounded-lg border border-dashed border-gray-200 p-5 dark:border-gray-800">
-
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ __('Dokumen pemain belum tersedia.') }}
-                            </p>
-
-                        </div>
+                        <x-document-manager :documentable="$player" :upload-route="route('players.documents.store', $player)"
+                            :types="config('faos.document_types.player')" :can-manage="auth()->user()->can('player.update')" />
 
                     </div>
 

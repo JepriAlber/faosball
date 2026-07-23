@@ -129,4 +129,14 @@ class Player extends FaosModel
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationship Documents
+    |--------------------------------------------------------------------------
+    */
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable')->latest();
+    }
+
 }

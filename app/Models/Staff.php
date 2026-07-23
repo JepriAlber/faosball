@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends FaosModel
@@ -66,6 +67,11 @@ class Staff extends FaosModel
     public function draftContract(): HasOne
     {
         return $this->hasOne(EmploymentContract::class, 'id_staff', 'id_staff')->where('status', 'draft');
+    }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable')->latest();
     }
 
     /**

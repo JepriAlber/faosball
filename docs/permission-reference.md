@@ -330,6 +330,25 @@ Detail lengkap tiap role: lihat `config/faos.php` bagian `role_templates`.
 
 ---
 
+## Module: Document (dokumen privat lintas-module)
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `staff.update` | Upload dokumen untuk Staff | `staff.documents.store` (route middleware) |
+| `staff.view` | Lihat/unduh dokumen milik Staff | `DocumentPolicy@view` (dipanggil `DocumentController::show()`) |
+| `staff.update` | Hapus dokumen milik Staff | `DocumentPolicy@delete` (dipanggil `DocumentController::destroy()`) |
+| `player.update` | Upload dokumen untuk Player | `players.documents.store` (route middleware) |
+| `player.view` | Lihat/unduh dokumen milik Player | `DocumentPolicy@view` |
+| `player.update` | Hapus dokumen milik Player | `DocumentPolicy@delete` |
+
+Catatan:
+- **Reuse** permission module pemilik dokumen (`staff.*`/`player.*`) — bukan permission baru `document.*` (pola sama Employment Contract, `issue12.md`/`issue14.md`).
+- Route `documents.show`/`documents.destroy` **flat** (tidak tahu dari URL ini dokumen siapa), jadi otorisasi dinamis di `DocumentPolicy` berdasarkan `documentable_type`, BUKAN middleware `permission:...` biasa.
+- Lapis pertama proteksi lintas-academy adalah `AcademyScope` (bawaan `FaosModel`) — akses dokumen academy lain otomatis 404 sebelum sempat sampai ke Policy.
+- Module baru (Payment, dst) yang mengintegrasikan Document tinggal tambah baris permission yang sesuai di tabel ini, ikuti pola yang sama.
+
+---
+
 ## Development Rules
 
 Wajib diikuti supaya dokumen ini tidak basi:
