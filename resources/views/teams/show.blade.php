@@ -26,11 +26,13 @@
                 </div>
             </div>
 
-            @can('team.update')
-                <div class="card-actions">
+            <div class="card-actions">
+                <a href="{{ route('teams.index') }}" class="btn btn-secondary">{{ __('Kembali') }}</a>
+
+                @can('team.update')
                     <a href="{{ route('teams.edit', $team) }}" class="btn btn-primary">{{ __('Edit Team') }}</a>
-                </div>
-            @endcan
+                @endcan
+            </div>
         </div>
 
         {{-- Info strip --}}
@@ -65,7 +67,7 @@
             </div>
         </div>
 
-        <div class="border-b border-gray-100 px-5 dark:border-gray-800">
+        <div class="border-b mt-1 border-gray-100 px-5 dark:border-gray-800">
             <div class="tabs scrollbar-brand">
                 <button type="button" class="focus:outline-none" @click="tab='players'"
                     :class="tab === 'players' ? 'tab tab-active' : 'tab'">{{ __('Players') }}</button>
@@ -102,11 +104,13 @@
                             </div>
                             <div class="form-group mb-0">
                                 <label class="form-label">{{ __('Nomor Punggung') }}</label>
-                                <input type="number" name="jersey_number" min="1" max="99" class="form-input" required>
+                                <input type="number" name="jersey_number" min="1" max="99" class="form-input"
+                                    required>
                             </div>
                             <div class="form-group mb-0">
                                 <label class="form-label">{{ __('Tanggal Bergabung') }}</label>
-                                <input type="date" name="join_date" value="{{ now()->format('Y-m-d') }}" class="form-input" required>
+                                <input type="date" name="join_date" value="{{ now()->format('Y-m-d') }}" class="form-input"
+                                    required>
                             </div>
                             <button type="submit" class="btn btn-primary">{{ __('Simpan') }}</button>
                         </div>
@@ -140,18 +144,25 @@
                                         @if ($teamPlayer->isActive())
                                             <span class="badge badge-success">{{ __('Aktif') }}</span>
                                         @else
-                                            <span class="badge badge-secondary">{{ __('Keluar') }} ({{ $teamPlayer->leave_date->format('d M Y') }})</span>
+                                            <span class="badge badge-secondary">{{ __('Keluar') }}
+                                                ({{ $teamPlayer->leave_date->format('d M Y') }})</span>
                                         @endif
                                     </td>
                                     <td class="table-cell text-right">
                                         @can('team.update')
                                             @if ($teamPlayer->isActive())
-                                                <form action="{{ route('teams.players.leave', [$team, $teamPlayer]) }}" method="POST"
-                                                    onsubmit="return confirm('{{ __('Keluarkan player ini dari tim?') }}')" class="inline">
+                                                <form action="{{ route('teams.players.leave', [$team, $teamPlayer]) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('{{ __('Keluarkan player ini dari tim?') }}')"
+                                                    class="inline">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
+                                                    <button type="submit" class="btn-icon btn-icon-danger"
+                                                        title="{{ __('Keluarkan') }}">
                                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                            <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                            <path
+                                                                d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5"
+                                                                stroke="currentColor" stroke-width="1.5"
+                                                                stroke-linecap="round" stroke-linejoin="round" />
                                                         </svg>
                                                     </button>
                                                 </form>
@@ -160,7 +171,9 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="table-empty">{{ __('Belum ada player di tim ini.') }}</td></tr>
+                                <tr>
+                                    <td colspan="5" class="table-empty">{{ __('Belum ada player di tim ini.') }}</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -173,7 +186,8 @@
                             <div class="table-card-header">
                                 <div class="min-w-0">
                                     <span class="table-title truncate">{{ $teamPlayer->player->name }}</span>
-                                    <span class="table-subtitle">{{ __('Nomor') }} {{ $teamPlayer->jersey_number }}</span>
+                                    <span class="table-subtitle">{{ __('Nomor') }}
+                                        {{ $teamPlayer->jersey_number }}</span>
                                 </div>
 
                                 @if ($teamPlayer->isActive())
@@ -189,7 +203,7 @@
                                     <span class="table-text">{{ $teamPlayer->is_captain ? __('Ya') : '-' }}</span>
                                 </div>
 
-                                @if (! $teamPlayer->isActive())
+                                @if (!$teamPlayer->isActive())
                                     <div class="table-card-field">
                                         <span class="table-card-label">{{ __('Keluar') }}</span>
                                         <span class="table-text">{{ $teamPlayer->leave_date->format('d M Y') }}</span>
@@ -200,12 +214,17 @@
                             @can('team.update')
                                 @if ($teamPlayer->isActive())
                                     <div class="table-card-actions">
-                                        <form action="{{ route('teams.players.leave', [$team, $teamPlayer]) }}" method="POST"
+                                        <form action="{{ route('teams.players.leave', [$team, $teamPlayer]) }}"
+                                            method="POST"
                                             onsubmit="return confirm('{{ __('Keluarkan player ini dari tim?') }}')">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
+                                            <button type="submit" class="btn-icon btn-icon-danger"
+                                                title="{{ __('Keluarkan') }}">
                                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                    <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <path
+                                                        d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5"
+                                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
                                                 </svg>
                                             </button>
                                         </form>
@@ -251,13 +270,15 @@
                                 <select name="id_team_staff_position" class="form-select" required>
                                     <option value="">{{ __('Pilih Peran') }}</option>
                                     @foreach ($teamStaffPositions as $position)
-                                        <option value="{{ $position->id_team_staff_position }}">{{ $position->name }}</option>
+                                        <option value="{{ $position->id_team_staff_position }}">{{ $position->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group mb-0">
                                 <label class="form-label">{{ __('Tanggal Bergabung') }}</label>
-                                <input type="date" name="join_date" value="{{ now()->format('Y-m-d') }}" class="form-input" required>
+                                <input type="date" name="join_date" value="{{ now()->format('Y-m-d') }}"
+                                    class="form-input" required>
                             </div>
                             <button type="submit" class="btn btn-primary">{{ __('Simpan') }}</button>
                         </div>
@@ -285,18 +306,25 @@
                                         @if ($ts->isActive())
                                             <span class="badge badge-success">{{ __('Aktif') }}</span>
                                         @else
-                                            <span class="badge badge-secondary">{{ __('Keluar') }} ({{ $ts->leave_date->format('d M Y') }})</span>
+                                            <span class="badge badge-secondary">{{ __('Keluar') }}
+                                                ({{ $ts->leave_date->format('d M Y') }})</span>
                                         @endif
                                     </td>
                                     <td class="table-cell text-right">
                                         @can('team.update')
                                             @if ($ts->isActive())
                                                 <form action="{{ route('teams.staff.leave', [$team, $ts]) }}" method="POST"
-                                                    onsubmit="return confirm('{{ __('Keluarkan staff ini dari tim?') }}')" class="inline">
+                                                    onsubmit="return confirm('{{ __('Keluarkan staff ini dari tim?') }}')"
+                                                    class="inline">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                            <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <button type="submit" class="btn-icon btn-icon-danger"
+                                                        title="{{ __('Keluarkan') }}">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20"
+                                                            fill="none">
+                                                            <path
+                                                                d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5"
+                                                                stroke="currentColor" stroke-width="1.5"
+                                                                stroke-linecap="round" stroke-linejoin="round" />
                                                         </svg>
                                                     </button>
                                                 </form>
@@ -305,7 +333,9 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="table-empty">{{ __('Belum ada staff di tim ini.') }}</td></tr>
+                                <tr>
+                                    <td colspan="4" class="table-empty">{{ __('Belum ada staff di tim ini.') }}</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -328,7 +358,7 @@
                                 @endif
                             </div>
 
-                            @if (! $ts->isActive())
+                            @if (!$ts->isActive())
                                 <div class="table-card-body">
                                     <div class="table-card-field">
                                         <span class="table-card-label">{{ __('Keluar') }}</span>
@@ -343,9 +373,13 @@
                                         <form action="{{ route('teams.staff.leave', [$team, $ts]) }}" method="POST"
                                             onsubmit="return confirm('{{ __('Keluarkan staff ini dari tim?') }}')">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="btn-icon btn-icon-danger" title="{{ __('Keluarkan') }}">
+                                            <button type="submit" class="btn-icon btn-icon-danger"
+                                                title="{{ __('Keluarkan') }}">
                                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                    <path d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                    <path
+                                                        d="M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5M7.5 2.5H5.83333C4.44926 2.5 3.75721 2.5 3.29027 2.89675C2.5 3.5719 2.5 4.72038 2.5 6.66667V13.3333C2.5 15.2796 2.5 16.4281 3.29027 17.1032C3.75721 17.5 4.44926 17.5 5.83333 17.5H7.5"
+                                                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
                                                 </svg>
                                             </button>
                                         </form>
