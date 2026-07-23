@@ -15,6 +15,8 @@ Seluruh module baru wajib mengikuti alur pengembangan yang sama agar struktur pr
 - [Step 2 - Model](#step-2---model)
 - [Step 3 - Form Request](#step-3---form-request)
 - [Step 4 - Service](#step-4---service)
+  - [Pola Master-Data Module](#pola-master-data-module)
+  - [Row-Lock Guard untuk Business Rule Lintas Baris](#row-lock-guard-untuk-business-rule-lintas-baris)
 - [Step 5 - Controller](#step-5---controller)
 - [Step 6 - View](#step-6---view)
 - [Step 6a - Multi-Language](#step-6a---multi-language)
@@ -101,6 +103,7 @@ Model hanya digunakan untuk:
 - Scope
 - Cast
 - UUID Generation
+- `SoftDeletes` (kalau "hapus" untuk entity ini berarti archive, bukan musnah permanen — lihat `docs/architecture.md#model-responsibility`)
 
 Business logic tidak ditempatkan pada Model.
 
@@ -167,6 +170,20 @@ Player
         ▼
 AccountService
 ```
+
+### Pola Master-Data Module
+
+Banyak module di FAOSBall (`Season`, `TeamStaffPosition`, `PlayerType`, `PlayerCategory`, `EmploymentType`, `StaffPosition`) adalah **master data sederhana** yang mengikuti pola Service yang sama persis:
+
+- `paginate(array $filters)` + `statusCounts(array $filters)` untuk halaman index (Tabs Status + Toolbar, lihat `docs/frontend-standard.md`).
+- `selectable(?string $academyId, ?string $includeId)` — daftar untuk dropdown di form module lain (`$includeId` supaya record yang sedang dipakai tetap muncul walau sudah dinonaktifkan).
+- `createDefault*(Academy $academy)` — seed data default tiap academy baru, dipanggil dari `AcademyManagementService::create()`. **Kecuali** kalau data itu memang tidak punya "default universal" yang masuk akal ditebak sistem (mis. `Season` — musim berganti tiap tahun, Owner harus buat sendiri).
+
+Sebelum membuat Service master-data baru dari nol, cek dulu apakah polanya persis sama dengan salah satu contoh di atas — kalau ya, ikuti strukturnya, jangan mengarang pola baru.
+
+### Row-Lock Guard untuk Business Rule Lintas Baris
+
+Kalau Service mengelola sub-resource yang punya business rule "unik/singleton di antara baris yang masih aktif" (mis. nomor punggung unik, 1 captain aktif, 1 kontrak aktif per staff) — rule ini tidak bisa ditegakkan lewat unique index database biasa (MySQL tidak punya *partial unique index*). Kunci baris **induk** (`lockForUpdate()`) di dalam `DB::transaction()` sebagai mutex sebelum insert/update. Detail & contoh lengkap: `docs/architecture.md#row-lock-guard-untuk-business-rule-lintas-baris`.
 
 ---
 
@@ -421,6 +438,8 @@ Sebelum module dinyatakan selesai, pastikan seluruh poin berikut telah dipenuhi.
 - Business logic berada pada Service.
 - Menggunakan Transaction apabila diperlukan.
 - Menggunakan `AccountService` jika membuat akun.
+- Master data sederhana mengikuti [Pola Master-Data Module](#pola-master-data-module) yang sudah ada, bukan pola baru.
+- Business rule "unik di antara baris aktif" pada sub-resource ditegakkan lewat [Row-Lock Guard](#row-lock-guard-untuk-business-rule-lintas-baris), bukan unique index database.
 
 ### Controller
 

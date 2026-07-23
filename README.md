@@ -190,7 +190,7 @@ Status pengembangan module.
 - [ ] Coach Management
 - [ ] Parent Management
 - [x] Staff Management
-- [ ] Team Management
+- [x] Team Management
 - [ ] Training Management
 - [ ] Attendance Management
 - [ ] Evaluation Management

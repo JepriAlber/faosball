@@ -75,8 +75,9 @@ Contoh:
 |--------|---------------|
 | users | id_academy |
 | players | id_academy |
-| coaches | id_academy |
-| parents | id_academy |
+| staff | id_academy |
+| teams | id_academy |
+| seasons | id_academy |
 | roles | id_academy (nullable, lihat [Role: Tenant Tanpa BelongsToAcademy](#role-tenant-tanpa-belongstoacademy)) |
 
 Tabel global tidak menggunakan `id_academy`.

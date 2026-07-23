@@ -14,6 +14,7 @@ Dokumen ini menjelaskan standar penulisan query pada FAOSBall: eager loading, N+
 - [Select Kolom Secukupnya](#select-kolom-secukupnya)
 - [Index Database](#index-database)
 - [Query di Dalam Loop](#query-di-dalam-loop)
+  - [Contoh Kanonik: Indikator/Saran Per-Baris di Halaman Index](#contoh-kanonik-indikatorsaran-per-baris-di-halaman-index)
 - [Join Manual vs Eloquent Relationship](#join-manual-vs-eloquent-relationship)
 - [Tools untuk Deteksi: Laravel Debugbar](#tools-untuk-deteksi-laravel-debugbar)
 - [Checklist Sebelum PR](#checklist-sebelum-pr)
@@ -151,6 +152,35 @@ Kalau butuh data terkait untuk banyak baris sekaligus, ambil semua dulu di luar 
 
 Untuk operasi massal pada data besar (mis. job/command yang memproses ribuan baris), pakai `chunk()`/`lazy()` supaya tidak menarik seluruh tabel ke memory sekaligus — bukan `get()` lalu `foreach`.
 
+### Contoh Kanonik: Indikator/Saran Per-Baris di Halaman Index
+
+Kasus yang sama seringnya terjadi tapi lebih halus: menghitung indikator/saran per baris (mis. badge "⚠ Saran kategori berbeda dari umur saat ini" di index Player) yang butuh mencocokkan 1 baris data ke sekumpulan master data (kategori umur). Kalau logic pencocokannya sudah ada sebagai method Service yang query DB (`PlayerCategoryService::suggestFor($birthDate, $academyId)`, dipakai di halaman Edit yang cuma 1 baris), method itu **tidak boleh** dipanggil lagi per baris di `@foreach` halaman index — itu N+1 walau dibungkus rapi di Service.
+
+Solusinya: buat versi **in-memory** yang menerima collection yang **sudah** di-fetch sekali (biasanya collection yang sama dipakai untuk dropdown filter di halaman itu), bukan query baru per baris:
+
+```php
+// SALAH -- query DB sekali per baris player
+@foreach ($players as $player)
+    {{ app(PlayerCategoryService::class)->suggestFor($player->birth_date, $player->id_academy) }}
+@endforeach
+
+// BENAR -- suggestFromCollection() cuma filter/sortBy di memori,
+// $playerCategoryOptions sudah di-fetch SEKALI sebelum loop
+public function suggestFromCollection(Collection $categories, Carbon|string|null $birthDate): ?PlayerCategory
+{
+    if (! $birthDate) return null;
+    $age = Carbon::parse($birthDate)->age;
+
+    return $categories
+        ->where('status', true)
+        ->filter(fn ($c) => $c->min_age <= $age && $c->max_age >= $age)
+        ->sortBy('min_age')
+        ->first();
+}
+```
+
+Pola ini dipakai lagi kalau ada kebutuhan serupa: method Service yang query DB dan sudah dipakai di halaman "1 baris" (show/edit), lalu ada kebutuhan baru menampilkannya sebagai indikator di halaman index/list (banyak baris) — buat versi in-memory-nya, jangan panggil versi query-nya di dalam loop.
+
 ---
 
 ## Join Manual vs Eloquent Relationship
@@ -180,7 +210,7 @@ Ini wajib dicek terutama untuk halaman index/list module baru (yang juga sudah p
 - [ ] Semua relasi yang diakses di Blade (`$model->relasi->field`) sudah di-eager-load lewat `with()`/`load()` di Controller/Service.
 - [ ] Kalau Blade cuma butuh jumlah relasi, pakai `withCount()`, bukan load relasi penuh.
 - [ ] Halaman index/list pakai `paginate()`, bukan `get()`/`all()`.
-- [ ] Tidak ada query (Eloquent atau `DB::table`) di dalam `foreach`/`for`.
+- [ ] Tidak ada query (Eloquent atau `DB::table`) di dalam `foreach`/`for`, termasuk method Service yang query DB dipanggil per baris untuk indikator/saran (pakai versi in-memory, lihat [Contoh Kanonik](#contoh-kanonik-indikatorsaran-per-baris-di-halaman-index)).
 - [ ] Migration tabel tenant baru sudah punya index pada `id_academy` dan foreign key lain yang sering dipakai untuk filter/join.
 - [ ] Sudah dicek lewat tab Queries di Laravel Debugbar — jumlah query tidak proporsional dengan jumlah baris data.
 
