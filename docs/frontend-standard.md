@@ -13,6 +13,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Kapan Membuat @utility Baru](#kapan-membuat-utility-baru)
 - [Gotcha: Varian Breakpoint vs Toggle Dinamis](#gotcha-varian-breakpoint-vs-toggle-dinamis)
 - [Konsistensi Warna & Token](#konsistensi-warna--token)
+- [Focus Ring: Global, Bukan Per-Component](#focus-ring-global-bukan-per-component)
 - [Tabel Responsif: Table Desktop + Card List Mobile/Tablet](#tabel-responsif-table-desktop--card-list-mobiletablet)
 - [Tabs Status + Toolbar Filter/Search](#tabs-status--toolbar-filtersearch)
 - [Urutan & Pengelompokan Field Form (Create/Edit)](#urutan--pengelompokan-field-form-createedit)
@@ -90,6 +91,14 @@ Sebelum membuat `@utility` baru, selalu cek: apakah elemen ini juga punya `:clas
 
 - Jangan hardcode nilai warna/shadow/z-index kalau token-nya sudah ada di `variables.css` (mis. pakai `z-9` bukan `z-[9]`, pakai `--color-gray-700` bukan `#344054`).
 - Kalau butuh nilai arbitrary yang genuinely spesifik untuk satu komponen (mis. lebar sidebar `w-[290px]`, tinggi panel notifikasi `h-[480px]`), itu wajar dan tidak perlu dipaksakan jadi token baru — bukan semua angka harus jadi design token, hanya yang benar-benar dipakai berulang lintas komponen.
+
+---
+
+## Focus Ring: Global, Bukan Per-Component
+
+Outline fokus default browser (biasanya hitam/biru sistem) untuk `<a>`/`<button>`/`[role="button"]`/`<summary>` di-reset **sekali di `base.css`** (`@layer base`), diganti ring warna brand yang cuma tampil untuk navigasi keyboard (`:focus-visible`, bukan klik mouse biasa) — berlaku otomatis di **seluruh** halaman termasuk auth/login (`layouts/app-auth`), tanpa perlu ditambahkan manual per Blade Component/class baru. Checkbox/radio native dapat perlakuan serupa lewat selector khusus di block yang sama.
+
+**Jangan** tambahkan `focus:outline-none`/ring manual ke component baru untuk sekadar menghilangkan outline hitam — itu sudah beres secara global. Cuma override kalau component itu genuinely butuh warna/ukuran ring yang beda dari default (seperti `btn-primary`/`btn-success` yang punya ring warna sendiri sesuai warna tombolnya, tapi tetap wajib pasang `outline-none` eksplisit di utility-nya sendiri juga — jangan cuma mengandalkan reset global, supaya component tetap benar kalau dipakai di luar konteks yang ke-cover reset itu).
 
 ---
 
