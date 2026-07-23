@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Academy;
 use App\Models\Role;
 use App\Models\StaffPosition;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -17,12 +19,64 @@ class StaffPositionService
         $this->academyService = $academyService;
     }
 
-    public function paginate(?int $perPage = null)
+    /**
+     * Filter id_academy di sini aman dipakai siapa saja -- AcademyScope
+     * sudah membatasi user academy biasa ke academy-nya sendiri, jadi
+     * filter ini praktis cuma berguna (dan cuma ditampilkan) untuk Super
+     * Admin. Pola sama RoleService::applyFilters().
+     */
+    protected function applyFilters(Builder $query, array $filters, bool $includeStatus = true): void
     {
-        return StaffPosition::with(['academy', 'role'])
-            ->withCount('contracts')
-            ->latest()
-            ->paginate($perPage ?? config('faos.pagination.default'));
+        if (! empty($filters['search'])) {
+            $query->where('name', 'like', "%{$filters['search']}%");
+        }
+
+        if ($includeStatus && isset($filters['status']) && $filters['status'] !== '') {
+            $query->where('status', $filters['status'] === 'active');
+        }
+
+        if (! empty($filters['id_academy'])) {
+            $query->where('id_academy', $filters['id_academy']);
+        }
+    }
+
+    public function paginate(array $filters = []): LengthAwarePaginator
+    {
+        $query = StaffPosition::with(['academy', 'role'])->withCount('contracts');
+
+        $this->applyFilters($query, $filters);
+
+        match ($filters['sort'] ?? 'newest') {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'oldest' => $query->oldest(),
+            default => $query->latest(),
+        };
+
+        return $query->paginate(config('faos.pagination.default'));
+    }
+
+    /**
+     * Jumlah staff position per status, untuk badge di tab halaman index.
+     * $includeStatus=false -- hitungan tiap tab tidak boleh ikut kefilter
+     * oleh status tab yang sedang aktif. Pola sama
+     * AcademyManagementService::statusCounts().
+     */
+    public function statusCounts(array $filters = []): array
+    {
+        $countFor = function (bool $status) use ($filters) {
+
+            $query = StaffPosition::query();
+
+            $this->applyFilters($query, $filters, includeStatus: false);
+
+            return $query->where('status', $status)->count();
+        };
+
+        return [
+            'active' => $countFor(true),
+            'inactive' => $countFor(false),
+        ];
     }
 
     /**
