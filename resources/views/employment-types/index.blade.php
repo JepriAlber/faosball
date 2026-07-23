@@ -28,6 +28,42 @@
             @endcan
         </div>
 
+        <div class="border-b border-gray-100 p-4 dark:border-gray-800">
+            <x-table.tabs route="employment-types.index" :active="$filters['status'] ?? ''" :tabs="[
+                '' => ['label' => __('Semua'), 'count' => $statusCounts['active'] + $statusCounts['inactive']],
+                'active' => ['label' => __('Aktif'), 'count' => $statusCounts['active']],
+                'inactive' => ['label' => __('Nonaktif'), 'count' => $statusCounts['inactive']],
+            ]" />
+        </div>
+
+        <x-table.toolbar route="employment-types.index" :filters="$filters" placeholder="{{ __('Cari nama employment type...') }}">
+
+            <div class="form-group">
+                <label class="form-label">{{ __('Urutkan') }}</label>
+                <select name="sort" class="form-select">
+                    <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('Terbaru') }}</option>
+                    <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>{{ __('Terlama') }}</option>
+                    <option value="name_asc" @selected(($filters['sort'] ?? '') === 'name_asc')>{{ __('Nama A-Z') }}</option>
+                    <option value="name_desc" @selected(($filters['sort'] ?? '') === 'name_desc')>{{ __('Nama Z-A') }}</option>
+                </select>
+            </div>
+
+            @if ($isSuperAdmin)
+                <div class="form-group">
+                    <label class="form-label">{{ __('Academy') }}</label>
+                    <select name="id_academy" class="form-select">
+                        <option value="">{{ __('Semua Academy') }}</option>
+                        @foreach ($academies as $academy)
+                            <option value="{{ $academy->id_academy }}" @selected(($filters['id_academy'] ?? '') === $academy->id_academy)>
+                                {{ $academy->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
+        </x-table.toolbar>
+
         <div class="table-wrapper">
             <table class="table">
 

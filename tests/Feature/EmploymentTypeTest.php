@@ -49,6 +49,22 @@ class EmploymentTypeTest extends TestCase
         return $user;
     }
 
+    protected function makeSuperAdmin(): User
+    {
+        Permission::firstOrCreate(['name' => 'employment_type.view', 'guard_name' => 'web']);
+
+        $role = Role::firstOrCreate([
+            'id_academy' => null,
+            'name' => 'Super Admin',
+            'guard_name' => 'web',
+        ]);
+
+        $user = User::factory()->create(['id_academy' => null, 'status' => true]);
+        $user->assignRole($role);
+
+        return $user;
+    }
+
     public function test_create_default_employment_types_membuat_6_type_dari_config(): void
     {
         $academy = Academy::factory()->create();
@@ -100,5 +116,69 @@ class EmploymentTypeTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Volunteer');
         $response->assertSee('Freelance');
+    }
+
+    public function test_filter_search_by_name(): void
+    {
+        $academy = Academy::factory()->create();
+
+        EmploymentType::factory()->create(['id_academy' => $academy->id_academy, 'name' => 'Volunteer']);
+        EmploymentType::factory()->create(['id_academy' => $academy->id_academy, 'name' => 'Freelance']);
+
+        $user = $this->makeUser($academy, ['employment_type.view']);
+
+        $response = $this->actingAs($user)->get(route('employment-types.index', ['search' => 'Volunteer']));
+
+        $response->assertOk();
+        $response->assertSee('Volunteer');
+        $response->assertDontSee('Freelance');
+    }
+
+    public function test_filter_status_active_dan_inactive(): void
+    {
+        $academy = Academy::factory()->create();
+
+        EmploymentType::factory()->create(['id_academy' => $academy->id_academy, 'name' => 'Volunteer', 'status' => true]);
+        EmploymentType::factory()->create(['id_academy' => $academy->id_academy, 'name' => 'Freelance', 'status' => false]);
+
+        $user = $this->makeUser($academy, ['employment_type.view']);
+
+        $activeOnly = $this->actingAs($user)->get(route('employment-types.index', ['status' => 'active']));
+        $activeOnly->assertSee('Volunteer');
+        $activeOnly->assertDontSee('Freelance');
+
+        $inactiveOnly = $this->actingAs($user)->get(route('employment-types.index', ['status' => 'inactive']));
+        $inactiveOnly->assertSee('Freelance');
+        $inactiveOnly->assertDontSee('Volunteer');
+    }
+
+    public function test_filter_academy_hanya_berlaku_untuk_super_admin(): void
+    {
+        $academyA = Academy::factory()->create();
+        $academyB = Academy::factory()->create();
+
+        EmploymentType::factory()->create(['id_academy' => $academyA->id_academy, 'name' => 'Volunteer']);
+        EmploymentType::factory()->create(['id_academy' => $academyB->id_academy, 'name' => 'Freelance']);
+
+        // User academy biasa -- dropdown filter Academy tidak ditampilkan sama
+        // sekali (tidak pernah bisa mengirim id_academy lewat UI). AcademyScope
+        // tetap membatasinya ke academy sendiri seperti biasa.
+        $ownerA = $this->makeUser($academyA, ['employment_type.view']);
+
+        $responseOwner = $this->actingAs($ownerA)->get(route('employment-types.index'));
+        $responseOwner->assertOk();
+        $responseOwner->assertDontSee('name="id_academy"', false);
+        $responseOwner->assertSee('Volunteer');
+        $responseOwner->assertDontSee('Freelance');
+
+        // Super Admin -- dropdown Academy muncul, dan filter id_academy
+        // benar-benar mempersempit ke academy yang dipilih.
+        $superAdmin = $this->makeSuperAdmin();
+
+        $responseSuperAdmin = $this->actingAs($superAdmin)->get(route('employment-types.index', ['id_academy' => $academyB->id_academy]));
+        $responseSuperAdmin->assertOk();
+        $responseSuperAdmin->assertSee('name="id_academy"', false);
+        $responseSuperAdmin->assertSee('Freelance');
+        $responseSuperAdmin->assertDontSee('Volunteer');
     }
 }
