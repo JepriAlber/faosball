@@ -8,6 +8,32 @@
 
 ---
 
+## Progress Implementasi
+
+> Dicentang begitu tahap selesai dikerjakan **dan** lolos blok ✅ Cek dulu masing-masing. Update checklist ini tiap kali sebuah tahap selesai, supaya siapapun yang melanjutkan brief ini (termasuk sesi/agent lain) tahu persis titik berhentinya tanpa perlu re-check semua dari awal.
+
+- [x] Tahap 1 — Migration `seasons` & `team_staff_positions`
+- [x] Tahap 2 — Season: Model + Factory + Service + Request + Controller + Routes + Views
+- [x] Tahap 3 — TeamStaffPosition: Model + Factory + Service + Request + Controller + Routes + Views + config templates + hook `AcademyManagementService`
+- [x] Tahap 4 — Migration `teams`
+- [x] Tahap 5 — Model `Team` + Factory
+- [x] Tahap 6 — `TeamService` (lint OK; verifikasi fungsional penuh menyusul setelah Tahap 10/11, karena `paginate()`/`delete()` bergantung ke `TeamPlayer`/`TeamStaff`)
+- [x] Tahap 7 — Team: Request + Controller + Routes (route:list terkonfirmasi 7 baris, semua permission:team.*)
+- [x] Tahap 8 — Views `teams/index.blade.php`, `create.blade.php`, `edit.blade.php` (lint OK; verifikasi HTTP penuh menyusul setelah Tahap 10, karena index butuh `TeamPlayer`/`TeamStaff` utk `withCount`)
+- [x] Tahap 9 — Migration `team_players` & `team_staff`
+- [x] Tahap 10 — Model `TeamPlayer`/`TeamStaff` + Factory + Relasi Balik
+- [x] Tahap 11 — `TeamPlayerService` (verifikasi tinker: nomor punggung unik ditolak, auto-lepas captain lama, reuse nomor setelah leave — semua lolos)
+- [x] Tahap 12 — `TeamStaffService` (lint OK; verifikasi tinker: Head Coach baru otomatis mengeluarkan Head Coach lama, leave() menolak keanggotaan yang sudah tidak aktif -- semua lolos)
+- [x] Tahap 13 — TeamPlayer/TeamStaff: Requests + Controllers + Routes (route:list terkonfirmasi 5 baris teams.players.*/teams.staff.*, semua permission:team.update, tanpa DELETE)
+- [x] Tahap 14 — View `teams/show.blade.php` (blade compile OK; verifikasi HTTP penuh di Tahap 18 test `test_halaman_index_dan_detail_team_bisa_diakses`)
+- [x] Tahap 15 — Menu Sidebar (blade compile OK; verifikasi visual login Owner menyusul di Tahap 18 lewat test HTTP)
+- [x] Tahap 16 — Permission Seeder & Role Template (permission `season.*`/`team_staff_position.*` ditambah ke `RolePermissionSeeder`/`config('faos.role_templates')`/`PermissionPresenter`; verifikasi count 4+4 lolos. Catatan: `db:seed --class=RolePermissionSeeder` penuh sengaja TIDAK dijalankan di DB dev karena `RoleService::createDefaultRoles()` pakai `Role::create()` bukan `firstOrCreate` -- re-run akan duplikat role Owner utk academy yang sudah ada, bug pra-eksisting di luar scope; permission baru sudah dibuat manual & terverifikasi via `Permission::firstOrCreate` idempotent)
+- [x] Tahap 17 — Multi-Language (lang/en.json valid JSON, tanpa duplikat key; dicek lengkap terhadap SEMUA string `__()` yang benar-benar dipakai di file Season/TeamStaffPosition/Team/TeamPlayer/TeamStaff -- termasuk string di view index/create/edit yang tidak disebut eksplisit di draf Tahap 17, bukan cuma list contoh di brief)
+- [x] Tahap 18 — Tests (`SeasonTest` 5 test, `TeamStaffPositionTest` 5 test, `TeamTest` 7 test -- semua lulus; full suite: 174 test, 167 passed, 5 failure + 2 error baseline Breeze bawaan tidak bertambah)
+- [x] Tahap 19 — Dokumentasi (`docs/permission-reference.md`: baris Team dihapus dari tabel "belum dipakai", 3 section baru ditambah + TOC, Summary diupdate; `route:list` teams/seasons/team-staff-positions cross-check cocok dengan tabel permission)
+
+---
+
 ## 0. Aturan Emas
 
 | ❌ Jangan | Kenapa singkatnya | Detail |

@@ -65,6 +65,8 @@ class PermissionPresenter
             'player_category' => 'Player Category',
             'coach' => 'Coach',
             'team' => 'Team',
+            'season' => 'Season',
+            'team_staff_position' => 'Team Staff Position',
             'training' => 'Training',
             'attendance' => 'Attendance',
             'evaluation' => 'Evaluation',

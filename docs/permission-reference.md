@@ -21,6 +21,9 @@ Sumber kebenaran (source of truth) tetap kode — `database/seeders/RolePermissi
 - [Module: Staff](#module-staff)
 - [Module: Player Position (Master Global)](#module-player-position-master-global)
 - [Module: Academy Management](#module-academy-management)
+- [Module: Season](#module-season)
+- [Module: Team Staff Position](#module-team-staff-position)
+- [Module: Team (+ Team Player, Team Staff)](#module-team--team-player-team-staff)
 - [Permission Belum Dipakai Module Manapun](#permission-belum-dipakai-module-manapun)
 - [Role Template Default per Academy Baru](#role-template-default-per-academy-baru)
 - [Development Rules](#development-rules)
@@ -291,6 +294,61 @@ Catatan:
 
 ---
 
+## Module: Season
+
+Status: **✅ Implemented**
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `season.view` | Lihat daftar season | `seasons.index` (route middleware) + menu sidebar |
+| `season.create` | Tambah season baru | `seasons.create`, `seasons.store` |
+| `season.update` | Ubah nama/rentang tanggal/status season | `seasons.edit`, `seasons.update` |
+| `season.delete` | Hapus season (kalau tidak dipakai tim manapun) | `seasons.destroy` |
+
+Catatan:
+- Isolasi antar academy memakai `AcademyScope`, bukan Policy — akses season academy lain menghasilkan 404.
+- Default: 4 permission ini cuma di-assign ke role **Owner** (`config('faos.role_templates')`), sama seperti `player_category.*`/`staff_position.*`.
+- **Sengaja tidak ada** `createDefaultSeasons()` otomatis tiap academy baru (beda dari Player Category/Employment Type) — musim berganti tiap tahun, tidak ada default universal yang masuk akal, Owner membuat Season pertamanya sendiri (lihat `issue16.md` Aturan Emas).
+
+---
+
+## Module: Team Staff Position
+
+Status: **✅ Implemented**
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `team_staff_position.view` | Lihat daftar peran staff tim | `team-staff-positions.index` |
+| `team_staff_position.create` | Tambah peran baru | `team-staff-positions.create`, `.store` |
+| `team_staff_position.update` | Ubah kode/nama/status peran | `team-staff-positions.edit`, `.update` |
+| `team_staff_position.delete` | Hapus peran (kalau tidak dipakai Team Staff manapun) | `team-staff-positions.destroy` |
+
+Catatan:
+- **Bukan** `StaffPosition` — dimensi berbeda (jabatan kepegawaian Academy vs peran fungsional di 1 tim tertentu). Lihat `issue16.md` Bagian 2b.
+- Default 6 posisi (Head Coach/Assistant Coach/Goalkeeper Coach/Fitness Coach/Team Manager/Physiotherapist) otomatis dibuat tiap academy baru dari `config('faos.team_staff_position_templates')`, pola sama Employment Type/Staff Position.
+- Kode `HC` (Head Coach) adalah konvensi tetap yang dipakai `TeamStaffService` untuk guard "1 Head Coach aktif per tim" — kalau academy mengubah/menghapus posisi ber-kode ini, guard tersebut otomatis tidak berlaku (bukan error).
+
+---
+
+## Module: Team (+ Team Player, Team Staff)
+
+Status: **✅ Implemented**
+
+| Permission | Untuk apa | Digerbang di |
+|---|---|---|
+| `team.view` | Lihat daftar & detail tim | `teams.index`, `teams.show` (route middleware) + menu sidebar |
+| `team.create` | Tambah tim baru | `teams.create`, `teams.store` |
+| `team.update` | Ubah data tim, assign/keluarkan Player & Staff dari tim | `teams.edit`, `teams.update`, `teams.players.*`, `teams.staff.*` |
+| `team.delete` | Hapus (archive) tim | `teams.destroy` |
+
+Catatan:
+- Permission `team.*` **sudah ada** di seeder/role template sejak awal (placeholder) — brief `issue16.md` cuma menggerbang route dengannya, tidak menambah permission baru.
+- **Team Player**/**Team Staff** (sub-resource nested `teams/{team}/players|staff`) **reuse** `team.view`/`team.update` — bukan permission terpisah, pola sama Employment Contract reuse `staff.*` (`issue12.md`).
+- `Team` pakai `SoftDeletes` (archive), bukan hard delete — beda dari kebanyakan master data lain di dokumen ini. Guard: tidak bisa di-archive kalau masih ada Team Player/Team Staff **aktif** (`leave_date IS NULL`).
+- Tidak ada route `DELETE` untuk Team Player/Team Staff — "keluar tim" adalah `leave_date` terisi (histori permanen), bukan baris dihapus.
+
+---
+
 ## Permission Belum Dipakai Module Manapun
 
 Permission ini sudah ada di `RolePermissionSeeder` dan sudah masuk beberapa role template (`config('faos.role_templates')`), tapi **module/Controller/View-nya belum dibangun**, jadi belum ada yang benar-benar mengeceknya:
@@ -298,7 +356,6 @@ Permission ini sudah ada di `RolePermissionSeeder` dan sudah masuk beberapa role
 | Module (rencana) | Permission |
 |---|---|
 | Coach | `coach.view`, `coach.create`, `coach.update`, `coach.delete` |
-| Team | `team.view`, `team.create`, `team.update`, `team.delete` |
 | Training | `training.view`, `training.create`, `training.update`, `training.delete` |
 | Attendance | `attendance.view`, `attendance.create`, `attendance.update` |
 | Evaluation | `evaluation.view`, `evaluation.create`, `evaluation.update` |
@@ -362,4 +419,4 @@ Wajib diikuti supaya dokumen ini tidak basi:
 
 ## Summary
 
-FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, Player Management, Player Type, Player Category, Player Position, Academy Management (termasuk sub-module Academy Account), dan Academy Profile sudah digerbang penuh** (route + Blade), dan sisanya (Coach, Team, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.
+FAOSBall punya banyak permission yang sudah disiapkan di seeder untuk pengembangan jangka panjang, tapi tidak semuanya sudah benar-benar ditegakkan di kode. Saat ini **Role, Permission, Player Management, Player Type, Player Category, Player Position, Academy Management (termasuk sub-module Academy Account), Academy Profile, Season, Team Staff Position, dan Team (+ Team Player, Team Staff) sudah digerbang penuh** (route + Blade), dan sisanya (Coach, Training, Attendance, Evaluation, Payment, Report, Parent Portal) masih berupa permission yang menunggu module-nya dibangun. Dokumen ini jadi rujukan tunggal supaya saat customize role per academy, jelas fitur apa yang sebenarnya dikunci oleh permission apa — dan supaya module yang permission-nya belum digerbang tidak terlupakan.

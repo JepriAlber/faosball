@@ -74,6 +74,11 @@ class Staff extends FaosModel
         return $this->morphMany(Document::class, 'documentable')->latest();
     }
 
+    public function teamStaff(): HasMany
+    {
+        return $this->hasMany(TeamStaff::class, 'id_staff', 'id_staff');
+    }
+
     /**
      * Accessor supaya komponen shared yang generik mengasumsikan atribut
      * `name` (mis. <x-account.dropdown>, dipakai bersama Player) tetap

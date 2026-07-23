@@ -139,4 +139,14 @@ class Player extends FaosModel
         return $this->morphMany(Document::class, 'documentable')->latest();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationship Team Player
+    |--------------------------------------------------------------------------
+    */
+    public function teamPlayers()
+    {
+        return $this->hasMany(\App\Models\TeamPlayer::class, 'id_player', 'id_player');
+    }
+
 }

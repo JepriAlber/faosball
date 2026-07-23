@@ -105,7 +105,7 @@
                     <!-- ===== Menu Item: Football Academy (dengan dropdown) ===== -->
 
                     @php
-                        $footballAcademyRoutes = ['players.*', 'player-types.*', 'player-categories.*', 'training.*'];
+                        $footballAcademyRoutes = ['players.*', 'player-types.*', 'player-categories.*', 'teams.*', 'seasons.*', 'team-staff-positions.*', 'training.*'];
 
                         $isFootballAcademyActive = false;
 
@@ -187,6 +187,45 @@
                                                 'menu-dropdown-item-active' :
                                                 'menu-dropdown-item-inactive'">
                                             {{ __('Player Categories') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Teams --}}
+                                @can('team.view')
+                                    <li>
+                                        <a href="{{ route('teams.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('teams.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Teams') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Seasons --}}
+                                @can('season.view')
+                                    <li>
+                                        <a href="{{ route('seasons.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('seasons.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Seasons') }}
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                {{-- Team Staff Positions --}}
+                                @can('team_staff_position.view')
+                                    <li>
+                                        <a href="{{ route('team-staff-positions.index') }}" class="menu-dropdown-item group"
+                                            :class="{{ Route::is('team-staff-positions.*') ? 'true' : 'false' }}
+                                                ?
+                                                'menu-dropdown-item-active' :
+                                                'menu-dropdown-item-inactive'">
+                                            {{ __('Team Staff Positions') }}
                                         </a>
                                     </li>
                                 @endcan
