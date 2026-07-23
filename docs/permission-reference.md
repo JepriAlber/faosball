@@ -178,6 +178,8 @@ Status: **✅ Implemented**
 | `staff.update` | Ubah data staff | `staff.edit`, `staff.update` (route middleware) + `@can()` tombol Edit |
 | `staff.delete` | Hapus staff | `staff.destroy` (route middleware) + `@can()` tombol Hapus |
 
+Catatan: `staff.delete` **tidak berlaku** untuk Staff yang kebetulan Owner academy-nya sendiri (`staff.id_user === academies.id_owner_user`) — `StaffService::delete()` menolaknya walau permission-nya ada, termasuk untuk Super Admin. Lihat *Sub-module: Academy Account* di bawah.
+
 ### Sub-module: Staff Account (login staff, opsional)
 
 | Permission | Untuk apa | Digerbang di |
@@ -263,6 +265,8 @@ Nested di `academies/{academy}/account/*`. Sama seperti *Sub-module: Player Acco
 Kenapa **tidak** dipisah seperti Player Account (`user.create`/`user.update` terpisah dari `player.*`): pemisahan itu berguna di Player karena role macam Coach/Staff **memang** didelegasikan `player.update` tapi belum tentu boleh membuat akun login player. Di Academy, tidak ada role manapun (termasuk Owner) yang pernah punya `academy.*` sama sekali (lihat catatan di atas) — jadi menambah permission terpisah untuk sub-resource-nya tidak memberi pemisahan hak akses yang nyata, cuma menambah satu baris permission yang tidak pernah dipakai membedakan siapa boleh apa.
 
 Akun Owner yang dibuat lewat sub-module ini otomatis diberi role **Owner** (hardcode di `AcademyManagementService::create()` dan `AcademyAccountController::store()`) — role lain **tidak bisa** dipilih lewat jalur ini. Relasi ke akun disimpan lewat kolom `academies.id_owner_user` (bukan dicari lewat role) — lihat `issue2.md` Bagian 2a. Membuat akun Owner **tidak otomatis** membuatnya bisa login — `LoginRequest` juga mensyaratkan `academies.status = true`, dua kondisi yang sengaja independen (lihat `issue2.md` Bagian 2e).
+
+Sejak `issue13.md`, pembuatan akun Owner **selalu diikuti** pembuatan 1 baris `Staff` (`StaffService::createForOwner()`, posisi "Academy Director" + jenis "Permanent" otomatis) — bukan permission baru, tapi efek samping yang perlu diingat: Staff yang tertaut ke `academies.id_owner_user` **ditolak** kalau dicoba dihapus lewat `staff.delete` (guard di `StaffService::delete()`), supaya academy tidak kehilangan Owner secara diam-diam. Guard ini bukan permission check (`@can()`), jadi berlaku untuk **siapapun** termasuk Super Admin — beda dari pola permission lain di dokumen ini yang selalu bisa dilewati `Gate::before()`.
 
 ---
 
