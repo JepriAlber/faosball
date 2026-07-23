@@ -8,6 +8,17 @@
 
 ---
 
+## Progress Implementasi
+
+> Dicentang begitu tahap selesai dikerjakan **dan** lolos blok ✅ Cek dulu masing-masing. Update checklist ini tiap kali sebuah tahap selesai, supaya siapapun yang melanjutkan brief ini (termasuk sesi/agent lain) tahu persis titik berhentinya tanpa perlu re-check semua dari awal.
+
+- [x] Tahap 1 — `PlayerCategoryService::suggestFromCollection()` (lint OK; verifikasi tinker: umur 14→U-15, umur 11→U-12, birth_date null→null, umur tanpa kategori cocok→null -- semua lolos)
+- [x] Tahap 2 — Wire ke `players/index.blade.php` (blade compile OK; verifikasi HTTP nyata lewat 2 test baru di Tahap 4 -- badge muncul saat mismatch umur, tidak muncul saat kategori sudah sesuai)
+- [x] Tahap 3 — Multi-Language (lang/en.json valid JSON tanpa duplikat; "Kategori" sudah ada sebelumnya, "Saran"/"Saran berdasarkan umur saat ini" ditambah & diverifikasi resolve ke "Suggested"/"Suggestion based on current age" saat locale=en)
+- [x] Tahap 4 — Tests (2 test baru di `PlayerCategoryTest` lulus; full suite 176 test, 169 passed, baseline 5 failure + 2 error bawaan Breeze tidak bertambah)
+
+---
+
 ## 0. Aturan Emas
 
 | ❌ Jangan | Kenapa singkatnya | Detail |

@@ -291,4 +291,73 @@ class PlayerCategoryTest extends TestCase
             ])
             ->assertSessionHasErrors('max_age');
     }
+
+    protected function actingAsPlayerViewer(Academy $academy): User
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        Permission::firstOrCreate(['name' => 'player.view', 'guard_name' => 'web']);
+
+        $role = Role::create(['id_academy' => $academy->id_academy, 'name' => 'Owner', 'guard_name' => 'web']);
+        $role->syncPermissions(Permission::where('name', 'player.view')->get());
+
+        $user = User::factory()->create(['id_academy' => $academy->id_academy, 'status' => true]);
+        $user->assignRole($role);
+
+        $this->actingAs($user);
+
+        return $user;
+    }
+
+    public function test_index_players_menampilkan_saran_kategori_saat_mismatch(): void
+    {
+        $academy = Academy::factory()->create();
+
+        $categoryU12 = PlayerCategory::factory()->create([
+            'id_academy' => $academy->id_academy, 'name' => 'U-12', 'min_age' => 10, 'max_age' => 12,
+        ]);
+
+        PlayerCategory::factory()->create([
+            'id_academy' => $academy->id_academy, 'name' => 'U-15', 'min_age' => 13, 'max_age' => 15,
+        ]);
+
+        Player::create([
+            'id_academy' => $academy->id_academy,
+            'id_player_category' => $categoryU12->id_player_category,
+            'player_code' => 'TEST00001',
+            'name' => 'Test Player',
+            'birth_date' => now()->subYears(14)->format('Y-m-d'), // umur 14, tersimpan U-12 -- MISMATCH
+            'gender' => 'male',
+        ]);
+
+        $this->actingAsPlayerViewer($academy);
+
+        $this->get(route('players.index'))
+            ->assertOk()
+            ->assertSee('Saran');
+    }
+
+    public function test_index_players_tidak_menampilkan_saran_kalau_kategori_sudah_sesuai(): void
+    {
+        $academy = Academy::factory()->create();
+
+        $categoryU12 = PlayerCategory::factory()->create([
+            'id_academy' => $academy->id_academy, 'name' => 'U-12', 'min_age' => 10, 'max_age' => 12,
+        ]);
+
+        Player::create([
+            'id_academy' => $academy->id_academy,
+            'id_player_category' => $categoryU12->id_player_category,
+            'player_code' => 'TEST00002',
+            'name' => 'Test Player Cocok',
+            'birth_date' => now()->subYears(11)->format('Y-m-d'), // umur 11, cocok U-12
+            'gender' => 'male',
+        ]);
+
+        $this->actingAsPlayerViewer($academy);
+
+        $this->get(route('players.index'))
+            ->assertOk()
+            ->assertDontSee('Saran');
+    }
 }

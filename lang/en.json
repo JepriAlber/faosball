@@ -1014,5 +1014,8 @@
     "Nomor punggung maksimal 99.": "Jersey number must not exceed 99.",
     "Tanggal bergabung wajib diisi.": "Join date is required.",
     "Staff wajib dipilih.": "Staff is required.",
-    "Peran di tim wajib dipilih.": "Team role is required."
+    "Peran di tim wajib dipilih.": "Team role is required.",
+
+    "Saran": "Suggested",
+    "Saran berdasarkan umur saat ini": "Suggestion based on current age"
 }
