@@ -8,6 +8,7 @@ import statusModal from './components/status-modal'
 import logoutModal from './components/logout-modal'
 import rolePermissionForm from './components/role-permission-form';
 import logoCropField from './components/logo-crop-field';
+import currencyInput from './components/currency-input';
 
 Alpine.plugin(persist);
 Alpine.plugin(focus);
@@ -18,6 +19,7 @@ Alpine.data('statusModal', statusModal)
 Alpine.data('logoutModal', logoutModal)
 Alpine.data('rolePermissionForm', rolePermissionForm);
 Alpine.data('logoCropField', logoCropField);
+Alpine.data('currencyInput', currencyInput);
 
 window.Alpine = Alpine;
 

@@ -120,8 +120,9 @@
                         <div class="form-group">
                             <label class="form-label">{{ __('Gaji') }}</label>
 
-                            <input type="number" name="salary" value="{{ old('salary') }}" step="1000" min="0"
-                                class="form-input @error('salary') form-danger @enderror">
+                            <x-currency-input name="salary" :value="old('salary')"
+                                placeholder="{{ __('Contoh: 5.000.000') }}"
+                                :class="$errors->has('salary') ? 'form-danger' : ''" />
 
                             @error('salary')
                                 <span class="form-error">{{ $message }}</span>
