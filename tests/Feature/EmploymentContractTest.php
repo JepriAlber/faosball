@@ -5,11 +5,15 @@ namespace Tests\Feature;
 use App\Models\Academy;
 use App\Models\EmploymentContract;
 use App\Models\EmploymentType;
+use App\Models\Role;
 use App\Models\Staff;
 use App\Models\StaffPosition;
+use App\Models\User;
 use App\Services\EmploymentContractService;
 use App\Services\StaffService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class EmploymentContractTest extends TestCase
@@ -22,6 +26,30 @@ class EmploymentContractTest extends TestCase
             'employmentType' => EmploymentType::factory()->create(['id_academy' => $academy->id_academy]),
             'staffPosition' => StaffPosition::factory()->create(['id_academy' => $academy->id_academy]),
         ];
+    }
+
+    protected function actingAsOwner(Academy $academy): User
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        foreach (['staff.view', 'staff.create', 'staff.update'] as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
+
+        $role = Role::create([
+            'id_academy' => $academy->id_academy,
+            'name' => 'Owner',
+            'guard_name' => 'web',
+        ]);
+
+        $role->syncPermissions(Permission::whereIn('name', ['staff.view', 'staff.create', 'staff.update'])->get());
+
+        $owner = User::factory()->create(['id_academy' => $academy->id_academy, 'status' => true]);
+        $owner->assignRole($role);
+
+        $this->actingAs($owner);
+
+        return $owner;
     }
 
     public function test_create_staff_otomatis_membuat_contract_pertama_berstatus_active(): void
@@ -114,5 +142,97 @@ class EmploymentContractTest extends TestCase
             'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
             'start_date' => now(),
         ]);
+    }
+
+    public function test_halaman_index_kontrak_bisa_diakses_dan_menampilkan_data(): void
+    {
+        $academy = Academy::factory()->create();
+        $prereqs = $this->makePrereqs($academy);
+        $staff = Staff::factory()->create(['id_academy' => $academy->id_academy]);
+
+        $contract = EmploymentContract::factory()->create([
+            'id_academy' => $academy->id_academy,
+            'id_staff' => $staff->id_staff,
+            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
+            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
+            'status' => 'active',
+        ]);
+
+        $this->actingAsOwner($academy);
+
+        $this->get(route('employment-contracts.index'))
+            ->assertOk()
+            ->assertSee($staff->full_name)
+            ->assertSee($contract->contract_code);
+    }
+
+    public function test_filter_status_di_halaman_index_kontrak(): void
+    {
+        $academy = Academy::factory()->create();
+        $prereqs = $this->makePrereqs($academy);
+        $staff = Staff::factory()->create(['id_academy' => $academy->id_academy]);
+
+        $activeContract = EmploymentContract::factory()->create([
+            'id_academy' => $academy->id_academy,
+            'id_staff' => $staff->id_staff,
+            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
+            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
+            'status' => 'active',
+            'contract_code' => 'ACTIVE-001',
+        ]);
+
+        $cancelledContract = EmploymentContract::factory()->create([
+            'id_academy' => $academy->id_academy,
+            'id_staff' => $staff->id_staff,
+            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
+            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
+            'status' => 'cancelled',
+            'contract_code' => 'CANCELLED-001',
+        ]);
+
+        $this->actingAsOwner($academy);
+
+        $response = $this->get(route('employment-contracts.index', ['status' => 'active']));
+
+        $response->assertOk()->assertSee('ACTIVE-001')->assertDontSee('CANCELLED-001');
+    }
+
+    public function test_filter_bulan_berakhir_di_halaman_index_kontrak(): void
+    {
+        $academy = Academy::factory()->create();
+        $prereqs = $this->makePrereqs($academy);
+        $staff = Staff::factory()->create(['id_academy' => $academy->id_academy]);
+
+        $endingAugust = EmploymentContract::factory()->create([
+            'id_academy' => $academy->id_academy,
+            'id_staff' => $staff->id_staff,
+            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
+            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
+            'end_date' => '2026-08-15',
+            'contract_code' => 'AUG-001',
+        ]);
+
+        $endingSeptember = EmploymentContract::factory()->create([
+            'id_academy' => $academy->id_academy,
+            'id_staff' => $staff->id_staff,
+            'id_employment_type' => $prereqs['employmentType']->id_employment_type,
+            'id_staff_position' => $prereqs['staffPosition']->id_staff_position,
+            'end_date' => '2026-09-15',
+            'contract_code' => 'SEP-001',
+        ]);
+
+        $this->actingAsOwner($academy);
+
+        $response = $this->get(route('employment-contracts.index', ['end_month' => '2026-08']));
+
+        $response->assertOk()->assertSee('AUG-001')->assertDontSee('SEP-001');
+    }
+
+    public function test_user_tanpa_staffview_ditolak_akses_index_kontrak(): void
+    {
+        $academy = Academy::factory()->create();
+        $user = User::factory()->create(['id_academy' => $academy->id_academy, 'status' => true]);
+
+        $this->actingAs($user)->get(route('employment-contracts.index'))->assertForbidden();
     }
 }

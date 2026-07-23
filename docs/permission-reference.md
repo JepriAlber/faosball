@@ -196,10 +196,12 @@ Catatan:
 
 | Permission | Untuk apa | Digerbang di |
 |---|---|---|
+| `staff.view` | Lihat daftar kontrak lintas-staff, cari kontrak yang akan berakhir bulan tertentu | `employment-contracts.index` (route middleware) |
 | `staff.update` | Buat/edit/aktifkan/selesaikan/hentikan/batalkan kontrak | `staff.contracts.*` (route middleware) |
 
 Catatan:
-- **Reuse** permission `staff.update` — bukan permission baru `employment_contract.*` (pola sama Staff Account yang reuse `user.create`/`user.update`).
+- **Reuse** permission `staff.view`/`staff.update` — bukan permission baru `employment_contract.*` (pola sama Staff Account yang reuse `user.create`/`user.update`).
+- `employment-contracts.index` (`issue14.md`) murni halaman baca lintas-staff — tidak ada tombol buat/edit di situ, aksi tulis tetap lewat `staff.contracts.*` dalam konteks 1 staff.
 - Tidak ada permission/route untuk hapus kontrak — Contract adalah histori permanen (Rule 3), tidak pernah dihapus lewat UI maupun API.
 
 ### Sub-module: Salary Visibility (masking nominal gaji)
