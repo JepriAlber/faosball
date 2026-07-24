@@ -47,14 +47,19 @@
                         $isDashboardActive = in_array(Route::currentRouteName(), $dashboardRoutes);
                     @endphp
 
-                    <li x-data="{ open: {{ $isDashboardActive ? 'true' : 'false' }} }">
+                    <li x-data="{ open: {{ $isDashboardActive ? 'true' : 'false' }}, active: {{ $isDashboardActive ? 'true' : 'false' }} }">
                         <a href="#" @click.prevent="open = !open" class="menu-item group"
-                            :class="open ? 'menu-item-active' : 'menu-item-inactive'">
-                            <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                            :class="active ? 'menu-item-active' : 'menu-item-inactive'">
+                            <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z"
-                                    fill="" />
+                                <rect x="3.25" y="3.25" width="8" height="8" rx="1.5" fill="none" stroke=""
+                                    stroke-width="1.8" />
+                                <rect x="12.75" y="3.25" width="8" height="8" rx="1.5" fill="none" stroke=""
+                                    stroke-width="1.8" />
+                                <rect x="3.25" y="12.75" width="8" height="8" rx="1.5" fill="none" stroke=""
+                                    stroke-width="1.8" />
+                                <rect x="12.75" y="12.75" width="8" height="8" rx="1.5" fill="none" stroke=""
+                                    stroke-width="1.8" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -62,7 +67,9 @@
                             </span>
 
                             <svg class="menu-item-arrow transition-transform duration-200"
-                                :class="[open ? 'menu-item-arrow-active rotate-180' : 'menu-item-arrow-inactive',
+                                :class="[
+                                    active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                    open ? 'rotate-180' : '',
                                     sidebarToggle ? 'lg:hidden' : ''
                                 ]"
                                 width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -102,42 +109,52 @@
                         </svg>
                     </h3>
 
-                    <!-- ===== Menu Item: Football Academy (dengan dropdown) ===== -->
+                    {{--
+                        Heading "Football Academy" menaungi DUA dropdown terpisah
+                        (Players & Teams) sebagai saudara, pola sama persis
+                        "Administrasi" yang menaungi dropdown "Roles & Permissions"
+                        + "Master" -- bukan dropdown bersarang, cuma 2 <li> dropdown
+                        di bawah 1 heading yang sama.
+                    --}}
+
+                    {{-- ===== Menu Item: Players (dengan dropdown) ===== --}}
 
                     @php
-                        $footballAcademyRoutes = ['players.*', 'player-types.*', 'player-categories.*', 'teams.*', 'seasons.*', 'team-staff-positions.*', 'training.*'];
+                        $playersRoutes = ['players.*', 'player-types.*', 'player-categories.*'];
 
-                        $isFootballAcademyActive = false;
+                        $isPlayersActive = false;
 
-                        foreach ($footballAcademyRoutes as $route) {
+                        foreach ($playersRoutes as $route) {
                             if (Route::is($route)) {
-                                $isFootballAcademyActive = true;
+                                $isPlayersActive = true;
                                 break;
                             }
                         }
 
                     @endphp
 
-                    <li x-data="{ open: {{ $isFootballAcademyActive ? 'true' : 'false' }} }">
+                    <li x-data="{ open: {{ $isPlayersActive ? 'true' : 'false' }}, active: {{ $isPlayersActive ? 'true' : 'false' }} }">
 
                         <a href="#" @click.prevent="open = !open" class="menu-item group"
-                            :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+                            :class="active ? 'menu-item-active' : 'menu-item-inactive'">
 
-                            <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                            <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M9,4 L4,6 L4,10 L8,8 L7,20 L17,20 L16,8 L20,10 L20,6 L15,4 Q12,7 9,4 Z"
-                                    fill="" />
+                                <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M5 20v-1a7 7 0 0 1 14 0v1" fill="none" stroke="" stroke-width="1.8"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
-                                {{ __('Football Academy') }}
+                                {{ __('Players') }}
                             </span>
 
                             <svg class="menu-item-arrow transition-transform duration-200"
                                 :class="[
-                                    open ? 'menu-item-arrow-active rotate-180' : 'menu-item-arrow-inactive',
+                                    active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                    open ? 'rotate-180' : '',
                                     sidebarToggle ? 'lg:hidden' : ''
                                 ]"
                                 width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -190,7 +207,67 @@
                                         </a>
                                     </li>
                                 @endcan
+                            </ul>
+                        </div>
+                    </li>
 
+                    <!-- ===== END: Players ===== -->
+
+                    {{-- ===== Menu Item: Teams (dengan dropdown) ===== --}}
+
+                    @php
+                        $teamsRoutes = ['teams.*', 'seasons.*', 'team-staff-positions.*', 'training.*'];
+
+                        $isTeamsActive = false;
+
+                        foreach ($teamsRoutes as $route) {
+                            if (Route::is($route)) {
+                                $isTeamsActive = true;
+                                break;
+                            }
+                        }
+
+                    @endphp
+
+                    <li x-data="{ open: {{ $isTeamsActive ? 'true' : 'false' }}, active: {{ $isTeamsActive ? 'true' : 'false' }} }">
+
+                        <a href="#" @click.prevent="open = !open" class="menu-item group"
+                            :class="active ? 'menu-item-active' : 'menu-item-inactive'">
+
+                            <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                                height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="7" r="4" fill="none" stroke="" stroke-width="1.8" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+
+                            <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
+                                {{ __('Teams') }}
+                            </span>
+
+                            <svg class="menu-item-arrow transition-transform duration-200"
+                                :class="[
+                                    active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                    open ? 'rotate-180' : '',
+                                    sidebarToggle ? 'lg:hidden' : ''
+                                ]"
+                                width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585" stroke=""
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+
+                        </a>
+
+                        {{-- Dropdown submenu --}}
+
+                        <div x-show="open" x-collapse class="overflow-hidden">
+
+                            <ul :class="sidebarToggle ? 'lg:hidden' : 'flex'" class="menu-dropdown">
                                 {{-- Teams --}}
                                 @can('team.view')
                                     <li>
@@ -231,7 +308,7 @@
                                 @endcan
 
                                 {{-- Training nanti --}}
-                                {{-- 
+                                {{--
                                     <li>
                                         <a href="{{ route('training.index') }}"
                                             class="menu-dropdown-item group"
@@ -246,7 +323,7 @@
                         </div>
                     </li>
 
-                    <!-- ===== END: Football Academy ===== -->
+                    <!-- ===== END: Teams ===== -->
 
                     <h3 class="menu-group-heading">
                         <span class="menu-group-title" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -277,19 +354,19 @@
                         }
                     @endphp
 
-                    <li x-data="{ open: {{ $isOfficeActive ? 'true' : 'false' }} }">
+                    <li x-data="{ open: {{ $isOfficeActive ? 'true' : 'false' }}, active: {{ $isOfficeActive ? 'true' : 'false' }} }">
 
                         <a href="#" @click.prevent="open = !open" class="menu-item group"
-                            :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+                            :class="active ? 'menu-item-active' : 'menu-item-inactive'">
 
-                            <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
+                            <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" width="24"
                                 height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 8.5C4 7.39543 4.89543 6.5 6 6.5H18C19.1046 6.5 20 7.39543 20 8.5V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V8.5Z"
-                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M8.5 6.5V5.5C8.5 4.67157 9.17157 4 10 4H14C14.8284 4 15.5 4.67157 15.5 5.5V6.5"
-                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M4 12H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                <path d="M5 21V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v16" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M3 21h18" fill="none" stroke="" stroke-width="1.8" stroke-linecap="round"
                                     stroke-linejoin="round" />
+                                <path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -298,7 +375,8 @@
 
                             <svg class="menu-item-arrow transition-transform duration-200"
                                 :class="[
-                                    open ? 'menu-item-arrow-active rotate-180' : 'menu-item-arrow-inactive',
+                                    active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                    open ? 'rotate-180' : '',
                                     sidebarToggle ? 'lg:hidden' : ''
                                 ]"
                                 width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -382,9 +460,10 @@
                             <svg class="{{ $isProfileActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 14.1526 4.3002 16.1184 5.61936 17.616C6.17279 15.3096 8.24852 13.5955 10.7246 13.5955H13.2746C15.7509 13.5955 17.8268 15.31 18.38 17.6167C19.6996 16.119 20.5 14.153 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5ZM17.0246 18.8566V18.8455C17.0246 16.7744 15.3457 15.0955 13.2746 15.0955H10.7246C8.65354 15.0955 6.97461 16.7744 6.97461 18.8455V18.856C8.38223 19.8895 10.1198 20.5 12 20.5C13.8798 20.5 15.6171 19.8898 17.0246 18.8566ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9991 7.25C10.8847 7.25 9.98126 8.15342 9.98126 9.26784C9.98126 10.3823 10.8847 11.2857 11.9991 11.2857C13.1135 11.2857 14.0169 10.3823 14.0169 9.26784C14.0169 8.15342 13.1135 7.25 11.9991 7.25ZM8.48126 9.26784C8.48126 7.32499 10.0563 5.75 11.9991 5.75C13.9419 5.75 15.5169 7.32499 15.5169 9.26784C15.5169 11.2107 13.9419 12.7857 11.9991 12.7857C10.0563 12.7857 8.48126 11.2107 8.48126 9.26784Z"
-                                    fill="" />
+                                <path d="M19 20v-1a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v1" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" fill="none" stroke=""
+                                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -415,7 +494,7 @@
                                 <svg class="{{ $isAcademyProfileActive ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
                                     width="24" height="24" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 21V8L12 3L20 8V21H14V14H10V21H4Z" stroke="currentColor"
+                                    <path d="M4 21V8L12 3L20 8V21H14V14H10V21H4Z" fill="none" stroke=""
                                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
 
@@ -462,8 +541,12 @@
                                     <svg class="{{ Route::is('academies.*') ? 'menu-item-icon-active' : 'menu-item-icon-inactive' }}"
                                         width="24" height="24" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 21V8L12 3L20 8V21H14V14H10V21H4Z" stroke="currentColor"
-                                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                        <circle cx="12" cy="12" r="8.5" fill="none" stroke="" stroke-width="1.8" />
+                                        <path d="M12 8L14.2 9.6L13.4 12.2H10.6L9.8 9.6L12 8Z" fill="none" stroke=""
+                                            stroke-width="1.3" stroke-linejoin="round" />
+                                        <path
+                                            d="M12 8V5.2M14.2 9.6L16.6 8.2M13.4 12.2L15.1 14.5M10.6 12.2L8.9 14.5M9.8 9.6L7.4 8.2"
+                                            fill="none" stroke="" stroke-width="1.2" stroke-linecap="round" />
                                     </svg>
 
                                     <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -479,13 +562,14 @@
                             $isRolesPermissionsActive = Route::is('roles.*') || Route::is('permissions.*');
                         @endphp
 
-                        <li x-data="{ open: {{ $isRolesPermissionsActive ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ $isRolesPermissionsActive ? 'true' : 'false' }}, active: {{ $isRolesPermissionsActive ? 'true' : 'false' }} }">
 
                             <a href="#" @click.prevent="open=!open" class="menu-item group"
-                                :class="open ? 'menu-item-active' : 'menu-item-inactive'">
-                                <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                :class="active ? 'menu-item-active' : 'menu-item-inactive'">
+                                <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                     width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M4 5H20V7H4V5ZM4 11H20V13H4V11ZM4 17H20V19H4V17Z" fill="currentColor" />
+                                    <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="" stroke-width="1.8"
+                                        stroke-linecap="round" />
 
                                 </svg>
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -493,9 +577,8 @@
                                 </span>
                                 <svg class="menu-item-arrow transition-transform duration-200"
                                     :class="[
-                                        open ?
-                                        'menu-item-arrow-active rotate-180' :
-                                        'menu-item-arrow-inactive',
+                                        active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                        open ? 'rotate-180' : '',
                                         sidebarToggle ? 'lg:hidden' : ''
                                     ]"
                                     width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -563,16 +646,21 @@
                             }
                         @endphp
 
-                        <li x-data="{ open: {{ $isMasterActive ? 'true' : 'false' }} }">
+                        <li x-data="{ open: {{ $isMasterActive ? 'true' : 'false' }}, active: {{ $isMasterActive ? 'true' : 'false' }} }">
 
                             <a href="#" @click.prevent="open=!open" class="menu-item group"
-                                :class="open ? 'menu-item-active' : 'menu-item-inactive'">
+                                :class="active ? 'menu-item-active' : 'menu-item-inactive'">
 
-                                <svg :class="open ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                <svg :class="active ? 'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                     width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                        d="M4 4H10V10H4V4ZM14 4H20V10H14V4ZM4 14H10V20H4V14ZM14 14H20V20H14V14Z"
-                                        fill="currentColor" />
+                                    <rect x="3.25" y="3.25" width="7.5" height="7.5" rx="1" fill="none" stroke=""
+                                        stroke-width="1.8" />
+                                    <rect x="13.25" y="3.25" width="7.5" height="7.5" rx="1" fill="none" stroke=""
+                                        stroke-width="1.8" />
+                                    <rect x="3.25" y="13.25" width="7.5" height="7.5" rx="1" fill="none" stroke=""
+                                        stroke-width="1.8" />
+                                    <rect x="13.25" y="13.25" width="7.5" height="7.5" rx="1" fill="none" stroke=""
+                                        stroke-width="1.8" />
                                 </svg>
 
                                 <span class="menu-item-text" :class="sidebarToggle ? 'lg:hidden' : ''">
@@ -581,9 +669,8 @@
 
                                 <svg class="menu-item-arrow transition-transform duration-200"
                                     :class="[
-                                        open ?
-                                        'menu-item-arrow-active rotate-180' :
-                                        'menu-item-arrow-inactive',
+                                        active ? 'menu-item-arrow-active' : 'menu-item-arrow-inactive',
+                                        open ? 'rotate-180' : '',
                                         sidebarToggle ? 'lg:hidden' : ''
                                     ]"
                                     width="20" height="20" viewBox="0 0 20 20" fill="none">
