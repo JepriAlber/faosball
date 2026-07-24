@@ -23,6 +23,7 @@ Dokumen ini menjelaskan standar penulisan CSS/Tailwind dan Blade view pada FAOSB
 - [Input Nominal Rupiah (Pemisah Ribuan)](#input-nominal-rupiah-pemisah-ribuan)
 - [Cascading Dropdown Academy-Scoped (AJAX)](#cascading-dropdown-academy-scoped-ajax)
 - [`table-card` Tanpa `table-card-list` untuk Panel Sempit di Halaman Detail](#table-card-tanpa-table-card-list-untuk-panel-sempit-di-halaman-detail)
+- [Modal Konfirmasi (Pola Alpine Dispatch)](#modal-konfirmasi-pola-alpine-dispatch)
 - [Development Rules](#development-rules)
 - [Summary](#summary)
 
@@ -448,6 +449,35 @@ Konten tabular apapun yang ditampilkan di dalam kolom sempit halaman detail (buk
 
 ---
 
+## Modal Konfirmasi (Pola Alpine Dispatch)
+
+### Masalah
+
+Aksi yang butuh konfirmasi sebelum jalan (hapus, nonaktifkan, reset password, keluarkan dari tim, dst) gampang tergoda dipasang pakai `onsubmit="return confirm(...)"`/`alert()` bawaan browser -- gaya tampilannya tidak konsisten dengan UI, tidak bisa di-styling, dan block main thread. Notifikasi hasil aksi (sukses/gagal) juga sama -- **jangan** diganti `alert()`/toast custom. Project ini sudah punya `<x-alert />` (class-based Blade Component `app/View/Components/Alert.php`, lihat [Reusable View dengan Data Dinamis](#reusable-view-dengan-data-dinamis)) yang otomatis membaca session flash `success`/`error` dari controller manapun -- cukup `redirect()->with('success', ...)`/`->with('error', ...)`, tidak perlu kerja tambahan di view selama `<x-alert />` sudah di-include di halaman itu.
+
+### Solusi: `$dispatch` event -> modal Alpine listen `@event.window` -> submit form
+
+Pola baku (dipakai di 6 varian saat ini): tombol trigger `@click="$dispatch('nama-event', {action: '...', name: '...'})"`, lalu **1 modal** `x-data="xxxModal"` di-include **sekali** per halaman (bukan per baris/tombol), listen `@nama-event.window="open($event.detail.action, $event.detail.name)"`. State Alpine minimal `show`/`action`/`name` + method `open()`/`close()` (`resources/js/components/*.js`, registrasi lewat `Alpine.data(...)` di `app.js`). Modal-nya berisi `<form :action="action" method="POST">` dengan `@method(...)` sesuai kebutuhan (`DELETE` untuk hapus permanen, `PATCH`/`PUT` untuk aksi non-destruktif). Kalau endpoint-nya butuh field lain di luar `action`/`name` (mis. `jersey_number`), tambahkan sebagai parameter tambahan di `open()`/payload `$dispatch` (lihat `makeCaptainModal`), lalu render sebagai `<input type="hidden" :value="...">` di dalam form modal.
+
+Varian yang sudah ada -- reuse/contek polanya, jangan bikin varian baru kalau salah satu ini sudah pas secara method HTTP + semantik:
+
+| Varian | Event | Method | Kapan dipakai |
+|---|---|---|---|
+| `deleteModal` (`modal/delete.blade.php`, `button/delete.blade.php`) | `delete-confirm` | `DELETE` | Hapus permanen data |
+| `statusModal` (`modal/status.blade.php`) | `status-confirm` | `PATCH` | Toggle enable/disable akun |
+| `resetAkunModal` (`modal/reset-password.blade.php`) | `reset-password-confirm` | `PATCH` | Reset password user |
+| `logoutModal` (`modal/logout.blade.php`) | `logout-confirm` | `POST` | Logout (tanpa parameter action/name dinamis) |
+| `leaveTeamModal` (`modal/leave-team.blade.php`, `button/leave-team.blade.php`) | `leave-team-confirm` | `PATCH` | Keluarkan player/staff dari tim (`issue20.md`) |
+| `makeCaptainModal` (`modal/make-captain.blade.php`, `button/make-captain.blade.php`) | `make-captain-confirm` | `PUT` | Jadikan player sebagai captain tim, bawa parameter tambahan `jerseyNumber` (`issue20.md`) |
+
+**Gotcha**: `statusModal`/`resetAkunModal` pakai class `modal-icon-success`/`modal-icon-warning` yang **tidak pernah didefinisikan** di `components.css` (cuma `modal-icon`/`modal-icon-danger` yang benar-benar ada) -- bug lama, jangan dicontek kalau bikin varian baru. Untuk aksi destruktif pakai `modal-icon-danger`, untuk aksi positif/non-destruktif pakai `modal-icon-primary` (keduanya sudah didefinisikan dan bergaya) -- tambahkan dulu utility class-nya kalau memang perlu warna lain di luar 2 ini.
+
+### Kapan pola ini dipakai lagi
+
+Aksi apapun yang mengubah data dan butuh jeda konfirmasi -- kalau salah satu varian di atas cocok, reuse langsung. Kalau beda (method HTTP lain, pesan/semantik beda), bikin varian baru dengan pola arsitektur identik, **jangan** `confirm()`/`alert()` native. Untuk notifikasi hasil aksi (bukan konfirmasi sebelum aksi), selalu lewat `<x-alert />` + session flash dari controller, bukan notifikasi manual di view.
+
+---
+
 ## Development Rules
 
 Gunakan:
@@ -463,6 +493,7 @@ Gunakan:
 - `<x-currency-input>` untuk semua field nominal mata uang (gaji, biaya, tarif, dst), bukan `<input type="number">` polos (lihat [Input Nominal Rupiah](#input-nominal-rupiah-pemisah-ribuan)).
 - Alpine helper `academyCascade()` untuk dropdown anak yang bergantung Academy di form create Super Admin (lihat [Cascading Dropdown Academy-Scoped](#cascading-dropdown-academy-scoped-ajax)).
 - `table-card` **tanpa** wrapper `table-card-list` untuk konten tabular di kolom sempit halaman detail (bukan halaman index/list full-width) (lihat [`table-card` Tanpa `table-card-list`](#table-card-tanpa-table-card-list-untuk-panel-sempit-di-halaman-detail)).
+- Modal Alpine (`$dispatch` event -> `x-data` modal listen `@event.window`) untuk semua aksi yang butuh konfirmasi, dan `<x-alert />` (session flash) untuk semua notifikasi hasil aksi (lihat [Modal Konfirmasi](#modal-konfirmasi-pola-alpine-dispatch)).
 
 Hindari:
 
@@ -474,6 +505,7 @@ Hindari:
 - Field form yang saling berhubungan (identitas & kode, klasifikasi & relasi) dipisah oleh field dari kategori lain, atau urutan/kolom field yang berbeda antara create dan edit di module yang sama.
 - Hand-roll ulang markup upload/komponen form yang sudah ada (`<x-logo-upload-field>`, `<x-currency-input>`, dst) — reuse komponen yang sudah ada.
 - Membungkus setiap kelompok kecil field (2-3 field) jadi section berjudul — section hanya untuk sub-entitas/concern yang benar-benar terpisah (subscription, permission matrix, dst).
+- `onsubmit="return confirm(...)"`/`alert()` bawaan browser untuk konfirmasi aksi atau notifikasi hasil — pakai pola modal Alpine + `<x-alert />` yang sudah baku (lihat [Modal Konfirmasi](#modal-konfirmasi-pola-alpine-dispatch)).
 
 ---
 

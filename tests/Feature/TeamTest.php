@@ -222,4 +222,60 @@ class TeamTest extends TestCase
             ->assertOk()
             ->assertSee('table-card-list', false);
     }
+
+    public function test_http_set_captain_lewat_form_jadikan_kapten(): void
+    {
+        $academy = Academy::factory()->create();
+        $team = $this->makeTeam($academy);
+        $playerA = $this->makePlayer($academy, 'Player A');
+        $playerB = $this->makePlayer($academy, 'Player B');
+
+        $service = app(TeamPlayerService::class);
+        $tpA = $service->assign($team, ['id_player' => $playerA->id_player, 'jersey_number' => 10, 'is_captain' => true]);
+        $tpB = $service->assign($team, ['id_player' => $playerB->id_player, 'jersey_number' => 7]);
+
+        $this->actingAsOwner($academy);
+
+        $response = $this->put(route('teams.players.update', [$team, $tpB]), [
+            'jersey_number' => $tpB->jersey_number,
+            'is_captain' => 1,
+        ]);
+
+        $response->assertRedirect(route('teams.show', $team));
+        $this->assertTrue($tpB->fresh()->is_captain);
+        $this->assertFalse($tpA->fresh()->is_captain);
+    }
+
+    public function test_halaman_show_team_tidak_pakai_native_confirm_lagi(): void
+    {
+        $academy = Academy::factory()->create();
+        $team = $this->makeTeam($academy);
+        $player = $this->makePlayer($academy);
+
+        app(TeamPlayerService::class)->assign($team, ['id_player' => $player->id_player, 'jersey_number' => 10]);
+
+        $this->actingAsOwner($academy);
+
+        $response = $this->get(route('teams.show', $team));
+
+        $response->assertOk();
+        $response->assertDontSee('onsubmit="return confirm', false);
+        $response->assertSee('leave-team-confirm', false);
+    }
+
+    public function test_tombol_jadikan_kapten_pakai_modal_konfirmasi(): void
+    {
+        $academy = Academy::factory()->create();
+        $team = $this->makeTeam($academy);
+        $player = $this->makePlayer($academy);
+
+        app(TeamPlayerService::class)->assign($team, ['id_player' => $player->id_player, 'jersey_number' => 10]);
+
+        $this->actingAsOwner($academy);
+
+        $response = $this->get(route('teams.show', $team));
+
+        $response->assertOk();
+        $response->assertSee('make-captain-confirm', false);
+    }
 }

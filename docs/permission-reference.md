@@ -350,6 +350,7 @@ Catatan:
 - `Team` pakai `SoftDeletes` (archive), bukan hard delete — beda dari kebanyakan master data lain di dokumen ini. Guard: tidak bisa di-archive kalau masih ada Team Player/Team Staff **aktif** (`leave_date IS NULL`).
 - Tidak ada route `DELETE` untuk Team Player/Team Staff — "keluar tim" adalah `leave_date` terisi (histori permanen), bukan baris dihapus.
 - Endpoint `teams.cascade-options` (dipakai AJAX cascading dropdown Season + Player Category di form create, `issue19.md`) reuse `team.create`, bukan permission baru.
+- Aksi "Jadikan Kapten" (tombol di `teams/show.blade.php`, reuse route `teams.players.update`/`TeamPlayerController::update()`) reuse `team.update` — endpoint ini sudah tergerbang sejak `issue16.md`, `issue20.md` cuma menyambungkan UI-nya (sebelumnya tidak ada tombol yang memanggilnya).
 
 ---
 

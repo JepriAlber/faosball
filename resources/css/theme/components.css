@@ -528,6 +528,10 @@
     @apply bg-error-50 text-error-600 dark:bg-error-500/10 dark:text-error-400;
 }
 
+@utility modal-icon-primary {
+    @apply bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400;
+}
+
 
 
 

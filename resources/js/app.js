@@ -10,6 +10,8 @@ import rolePermissionForm from './components/role-permission-form';
 import logoCropField from './components/logo-crop-field';
 import currencyInput from './components/currency-input';
 import academyCascade from './components/academy-cascade';
+import leaveTeamModal from './components/leave-team-modal'
+import makeCaptainModal from './components/make-captain-modal'
 
 Alpine.plugin(persist);
 Alpine.plugin(focus);
@@ -22,6 +24,8 @@ Alpine.data('rolePermissionForm', rolePermissionForm);
 Alpine.data('logoCropField', logoCropField);
 Alpine.data('currencyInput', currencyInput);
 Alpine.data('academyCascade', academyCascade);
+Alpine.data('leaveTeamModal', leaveTeamModal)
+Alpine.data('makeCaptainModal', makeCaptainModal)
 
 window.Alpine = Alpine;
 
