@@ -107,6 +107,14 @@
 
                         </button>
 
+
+                        <button type="button" class="focus:outline-none" @click="tab='teams'"
+                            :class="tab === 'teams' ? 'tab tab-active' : 'tab'">
+
+                            {{ __('Teams') }}
+
+                        </button>
+
                     </div>
 
 
@@ -255,6 +263,71 @@
 
                         <x-document-manager :documentable="$player" :upload-route="route('players.documents.store', $player)"
                             :types="config('faos.document_types.player')" :can-manage="auth()->user()->can('player.update')" />
+
+                    </div>
+
+
+                    <div x-show="tab==='teams'" x-cloak class="tab-panel">
+
+                        <div class="space-y-3">
+                            @forelse ($player->teamPlayers as $teamPlayer)
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <div class="min-w-0">
+                                            @can('team.view')
+                                                <a href="{{ route('teams.show', $teamPlayer->team) }}" class="table-title truncate">
+                                                    {{ $teamPlayer->team->name }}
+                                                </a>
+                                            @else
+                                                <span class="table-title truncate">{{ $teamPlayer->team->name }}</span>
+                                            @endcan
+                                            <span class="table-subtitle truncate">
+                                                {{ $teamPlayer->team->code }} &middot; {{ $teamPlayer->team->season->name }}
+                                            </span>
+                                        </div>
+
+                                        @if ($teamPlayer->isActive())
+                                            <span class="badge badge-success shrink-0">{{ __('Aktif') }}</span>
+                                        @else
+                                            <span class="badge badge-secondary shrink-0">{{ __('Keluar') }}</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="table-card-body">
+                                        <div class="table-card-field">
+                                            <span class="table-card-label">{{ __('Nomor Punggung') }}</span>
+                                            <span class="table-text">{{ $teamPlayer->jersey_number }}</span>
+                                        </div>
+
+                                        <div class="table-card-field">
+                                            <span class="table-card-label">{{ __('Captain') }}</span>
+                                            <span class="table-text">{{ $teamPlayer->is_captain ? __('Ya') : '-' }}</span>
+                                        </div>
+
+                                        <div class="table-card-field">
+                                            <span class="table-card-label">{{ __('Bergabung') }}</span>
+                                            <span class="table-text">{{ $teamPlayer->join_date->format('d M Y') }}</span>
+                                        </div>
+
+                                        @if (! $teamPlayer->isActive())
+                                            <div class="table-card-field">
+                                                <span class="table-card-label">{{ __('Keluar') }}</span>
+                                                <span class="table-text">{{ $teamPlayer->leave_date->format('d M Y') }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="table-card">
+                                    <div class="empty-state">
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="mb-3 text-gray-300 dark:text-gray-700">
+                                            <path d="M24 14V18M24 30H24.02M42 24C42 33.9411 33.9411 42 24 42C14.01 42 6 33.9411 6 24C6 14.0589 14.01 6 24 6C33.9411 6 42 14.0589 42 24Z" stroke="currentColor" stroke-width="2.5" />
+                                        </svg>
+                                        <h4 class="empty-title">{{ __('Belum menjadi anggota tim manapun.') }}</h4>
+                                    </div>
+                                </div>
+                            @endforelse
+                        </div>
 
                     </div>
 

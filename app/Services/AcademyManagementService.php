@@ -37,6 +37,7 @@ class AcademyManagementService
     protected PlayerCategoryService $playerCategoryService;
     protected EmploymentTypeService $employmentTypeService;
     protected StaffPositionService $staffPositionService;
+    protected TeamStaffPositionService $teamStaffPositionService;
     protected AccountService $accountService;
     protected StaffService $staffService;
 
@@ -46,6 +47,7 @@ class AcademyManagementService
         PlayerCategoryService $playerCategoryService,
         EmploymentTypeService $employmentTypeService,
         StaffPositionService $staffPositionService,
+        TeamStaffPositionService $teamStaffPositionService,
         AccountService $accountService,
         StaffService $staffService
     ) {
@@ -54,6 +56,7 @@ class AcademyManagementService
         $this->playerCategoryService = $playerCategoryService;
         $this->employmentTypeService = $employmentTypeService;
         $this->staffPositionService = $staffPositionService;
+        $this->teamStaffPositionService = $teamStaffPositionService;
         $this->accountService = $accountService;
         $this->staffService = $staffService;
     }
@@ -424,6 +427,7 @@ class AcademyManagementService
             $this->playerCategoryService->createDefaultPlayerCategories($academy);
             $this->employmentTypeService->createDefaultEmploymentTypes($academy);
             $this->staffPositionService->createDefaultStaffPositions($academy);
+            $this->teamStaffPositionService->createDefaultTeamStaffPositions($academy);
 
             if (!empty($data['create_account'])) {
 

@@ -88,6 +88,32 @@ class PlayerCategoryService
     }
 
     /**
+     * Versi in-memory dari suggestFor() -- beroperasi di atas collection
+     * kategori yang SUDAH di-fetch (mis. $playerCategoryOptions di halaman
+     * index Players), TIDAK query database lagi. Wajib dipakai kalau
+     * pemanggilnya di dalam loop banyak baris (issue17.md Aturan Emas --
+     * cegah N+1, lihat docs/query-performance.md).
+     *
+     * $categories HARUS sudah difilter ke id_academy yang benar oleh
+     * pemanggil sebelum dipassing ke sini -- method ini tidak melakukan
+     * filter academy sendiri.
+     */
+    public function suggestFromCollection(Collection $categories, Carbon|string|null $birthDate): ?PlayerCategory
+    {
+        if (! $birthDate) {
+            return null;
+        }
+
+        $age = Carbon::parse($birthDate)->age;
+
+        return $categories
+            ->where('status', true)
+            ->filter(fn (PlayerCategory $category) => $category->min_age <= $age && $category->max_age >= $age)
+            ->sortBy('min_age')
+            ->first();
+    }
+
+    /**
      * Tentukan id_academy untuk kategori baru.
      *
      * User academy : otomatis dari academy miliknya, input form DIABAIKAN.

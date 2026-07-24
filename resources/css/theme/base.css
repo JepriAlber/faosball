@@ -40,10 +40,41 @@
         @apply transition-colors duration-200;
     }
 
+    /*
+    | Reset outline fokus default browser (biasanya hitam) untuk SELURUH
+    | elemen interaktif -- ganti jadi ring warna brand, dan cuma tampil untuk
+    | navigasi keyboard (:focus-visible), bukan klik mouse biasa. Berlaku
+    | otomatis di semua halaman termasuk auth/login (layouts/app-auth),
+    | tanpa perlu ditambahkan manual per component/class baru.
+    |
+    | Component yang sudah punya focus style sendiri (form-input/
+    | form-select/form-textarea, btn-primary/btn-success) TETAP menang
+    | karena classnya lebih spesifik -- reset ini cuma jaring pengaman
+    | default untuk yang belum punya.
+    */
+    a,
+    button,
+    [role="button"],
+    summary {
+        @apply outline-none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    [role="button"]:focus-visible,
+    summary:focus-visible {
+        @apply ring-4 ring-brand-500/20 rounded-sm;
+    }
+
     input,
     textarea,
     select {
         @apply outline-none;
+    }
+
+    input[type="checkbox"]:focus-visible,
+    input[type="radio"]:focus-visible {
+        @apply ring-4 ring-brand-500/20;
     }
 }
 

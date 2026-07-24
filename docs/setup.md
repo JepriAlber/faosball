@@ -170,10 +170,13 @@ app/
 │   ├── Controllers/
 │   └── Requests/
 ├── Models/
-├── Services/
-├── Traits/
+├── Providers/
 ├── Scopes/
-└── Providers/
+├── Services/
+├── Support/
+├── Traits/
+└── View/
+    └── Components/
 
 database/
 ├── migrations/
@@ -199,6 +202,9 @@ Setelah instalasi selesai, lanjutkan dengan membaca dokumentasi berikut:
 3. `docs/authorization.md`
 4. `docs/coding-standard.md`
 5. `docs/development-guide.md`
-6. `docs/frontend-standard.md`
+6. `docs/module-standard.md`
+7. `docs/frontend-standard.md`
+8. `docs/query-performance.md`
+9. `docs/permission-reference.md`
 
 Dokumen tersebut menjelaskan standar arsitektur dan aturan pengembangan yang wajib diikuti pada seluruh module FAOSBall.

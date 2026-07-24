@@ -282,8 +282,11 @@ Model hanya digunakan untuk:
 - Scope
 - Cast
 - UUID Generation
+- `SoftDeletes` (kalau "hapus" untuk entity ini berarti archive, bukan musnah permanen)
 
 Model tidak boleh berisi business logic.
+
+`SoftDeletes` dipakai kalau entity punya histori/relasi anak yang harus tetap utuh setelah "dihapus" (mis. `Player`, `Staff`, `Team`, `User`) — guard tambahan (mis. tidak bisa dihapus kalau masih ada anak yang aktif) tetap ditegakkan di Service, bukan cuma mengandalkan `SoftDeletes` di Model. Master data murni tanpa histori anak (mis. `Season`, `PlayerCategory`, `StaffPosition`) cukup hard-delete dengan guard "masih dipakai" di Service — lihat `docs/architecture.md#model-responsibility`.
 
 ---
 

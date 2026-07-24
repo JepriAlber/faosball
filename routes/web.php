@@ -15,9 +15,14 @@ use App\Http\Controllers\PlayerPositionController;
 use App\Http\Controllers\PlayerTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SeasonController;
 use App\Http\Controllers\StaffAccountController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StaffPositionController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamPlayerController;
+use App\Http\Controllers\TeamStaffController;
+use App\Http\Controllers\TeamStaffPositionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -191,6 +196,79 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Season Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('seasons', SeasonController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:season.view')
+        ->middlewareFor(['create', 'store'], 'permission:season.create')
+        ->middlewareFor(['edit', 'update'], 'permission:season.update')
+        ->middlewareFor('destroy', 'permission:season.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Team Staff Position Management
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('team-staff-positions', TeamStaffPositionController::class)
+        ->except(['show'])
+        ->middlewareFor('index', 'permission:team_staff_position.view')
+        ->middlewareFor(['create', 'store'], 'permission:team_staff_position.create')
+        ->middlewareFor(['edit', 'update'], 'permission:team_staff_position.update')
+        ->middlewareFor('destroy', 'permission:team_staff_position.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Team Management
+    |--------------------------------------------------------------------------
+    | Reuse permission team.* yang SUDAH ADA di seeder/role template sejak
+    | awal (placeholder), BUKAN permission baru -- lihat issue16.md.
+    */
+    /*
+    |--------------------------------------------------------------------------
+    | Team Cascade Options (AJAX academy-scoped, issue19.md)
+    |--------------------------------------------------------------------------
+    | WAJIB didaftarkan SEBELUM Route::resource('teams', ...) di bawah ini --
+    | kalau dipindah ke bawah, "cascade-options" akan ketangkep GET
+    | teams/{team} (show) dan dianggap UUID team, bukan hit endpoint ini.
+    */
+    Route::get('teams/cascade-options', [TeamController::class, 'cascadeOptions'])
+        ->name('teams.cascade-options')
+        ->middleware('permission:team.create');
+
+    Route::resource('teams', TeamController::class)
+        ->middlewareFor(['index', 'show'], 'permission:team.view')
+        ->middlewareFor(['create', 'store'], 'permission:team.create')
+        ->middlewareFor(['edit', 'update'], 'permission:team.update')
+        ->middlewareFor('destroy', 'permission:team.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Team Player & Team Staff (nested di bawah Team) -- reuse team.update,
+    | BUKAN permission baru. TIDAK ADA route destroy -- "keluar tim" adalah
+    | leave_date, bukan hapus baris (issue16.md Rule/Aturan Emas).
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('teams/{team}/players')
+        ->name('teams.players.')
+        ->middleware('permission:team.update')
+        ->group(function () {
+            Route::post('/', [TeamPlayerController::class, 'store'])->name('store');
+            Route::put('/{teamPlayer}', [TeamPlayerController::class, 'update'])->name('update');
+            Route::patch('/{teamPlayer}/leave', [TeamPlayerController::class, 'leave'])->name('leave');
+        });
+
+    Route::prefix('teams/{team}/staff')
+        ->name('teams.staff.')
+        ->middleware('permission:team.update')
+        ->group(function () {
+            Route::post('/', [TeamStaffController::class, 'store'])->name('store');
+            Route::patch('/{teamStaff}/leave', [TeamStaffController::class, 'leave'])->name('leave');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
     | Employment Type Management
     |--------------------------------------------------------------------------
     */
@@ -206,6 +284,10 @@ Route::middleware('auth')->group(function () {
     | Staff Position Management
     |--------------------------------------------------------------------------
     */
+    Route::get('staff-positions/cascade-options', [StaffPositionController::class, 'cascadeOptions'])
+        ->name('staff-positions.cascade-options')
+        ->middleware('permission:staff_position.create');
+
     Route::resource('staff-positions', StaffPositionController::class)
         ->except(['show'])
         ->middlewareFor('index', 'permission:staff_position.view')
@@ -245,6 +327,10 @@ Route::middleware('auth')->group(function () {
     | Staff Management
     |--------------------------------------------------------------------------
     */
+    Route::get('staff/cascade-options', [StaffController::class, 'cascadeOptions'])
+        ->name('staff.cascade-options')
+        ->middleware('permission:staff.create');
+
     Route::resource('staff', StaffController::class)
         ->middlewareFor(['index', 'show'], 'permission:staff.view')
         ->middlewareFor(['create', 'store'], 'permission:staff.create')

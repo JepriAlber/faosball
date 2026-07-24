@@ -34,6 +34,17 @@
         @php
             $allCount = array_sum($statusCounts);
             $hasActiveFilters = !empty($filters);
+
+            // Saran kategori in-memory (TIDAK query DB per baris, issue17.md
+            // Aturan Emas) -- dipakai buat badge "saran kategori" kalau beda
+            // dari yang tersimpan.
+            $suggestedCategoryFor = function ($player) use ($playerCategoryOptions) {
+
+                $academyCategories = $playerCategoryOptions->where('id_academy', $player->id_academy);
+
+                return app(\App\Services\PlayerCategoryService::class)
+                    ->suggestFromCollection($academyCategories, $player->birth_date);
+            };
         @endphp
 
         <div class="border-b border-gray-100 p-4 dark:border-gray-800">
@@ -173,6 +184,13 @@
                             <td class="table-cell">
                                 @if ($player->playerCategory)
                                     <span class="badge badge-secondary">{{ $player->playerCategory->name }}</span>
+
+                                    @php $suggested = $suggestedCategoryFor($player); @endphp
+                                    @if ($suggested && $suggested->id_player_category !== $player->id_player_category)
+                                        <span class="table-subtitle" title="{{ __('Saran berdasarkan umur saat ini') }}">
+                                            ⚠ {{ __('Saran') }}: {{ $suggested->name }}
+                                        </span>
+                                    @endif
                                 @else
                                     <span class="table-subtitle">-</span>
                                 @endif
@@ -374,6 +392,13 @@
                             <span class="table-card-label">{{ __('Kategori') }}</span>
                             @if ($player->playerCategory)
                                 <span class="badge badge-secondary w-fit">{{ $player->playerCategory->name }}</span>
+
+                                @php $suggested = $suggestedCategoryFor($player); @endphp
+                                @if ($suggested && $suggested->id_player_category !== $player->id_player_category)
+                                    <span class="table-subtitle" title="{{ __('Saran berdasarkan umur saat ini') }}">
+                                        ⚠ {{ __('Saran') }}: {{ $suggested->name }}
+                                    </span>
+                                @endif
                             @else
                                 <span class="table-subtitle">-</span>
                             @endif

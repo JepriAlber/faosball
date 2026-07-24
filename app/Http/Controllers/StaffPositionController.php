@@ -55,13 +55,26 @@ class StaffPositionController extends Controller
             ],
             'isSuperAdmin' => $isSuperAdmin,
             'academies' => $isSuperAdmin ? Academy::orderBy('name')->get() : collect(),
-            // Super Admin: dikelompokkan per academy (Role tenant-scoped per
-            // academy) supaya tidak salah pilih role dari academy lain.
-            // Owner biasa: cukup role academy-nya sendiri.
-            'roles' => $isSuperAdmin
-                ? Role::whereNotNull('id_academy')->with('academy')->orderBy('name')->get()->groupBy(fn ($role) => $role->academy->name)
-                : Role::forCurrentAcademy()->orderBy('name')->get(),
+            // Super Admin: diisi AJAX begitu Academy dipilih (issue19.md Tahap
+            // 6-7) -- dulunya groupBy academy tapi tetap tidak sinkron ke
+            // pilihan Academy (issue18.md Temuan 5). User academy biasa: tetap.
+            'roles' => $isSuperAdmin ? collect() : Role::forCurrentAcademy()->orderBy('name')->get(),
         ]);
+    }
+
+    public function cascadeOptions(Request $request)
+    {
+        $academyId = $this->academyService->isSuperAdmin()
+            ? $request->query('id_academy')
+            : $this->academyService->currentId();
+
+        $roles = Role::where('id_academy', $academyId)
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($role) => ['value' => $role->id, 'label' => $role->name])
+            ->values();
+
+        return response()->json(['role_id' => $roles]);
     }
 
     public function store(StaffPositionFormRequest $request)

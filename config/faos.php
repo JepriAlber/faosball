@@ -43,6 +43,8 @@ return [
             'player_category.view', 'player_category.create', 'player_category.update', 'player_category.delete',
             'employment_type.view', 'employment_type.create', 'employment_type.update', 'employment_type.delete',
             'staff_position.view', 'staff_position.create', 'staff_position.update', 'staff_position.delete',
+            'season.view', 'season.create', 'season.update', 'season.delete',
+            'team_staff_position.view', 'team_staff_position.create', 'team_staff_position.update', 'team_staff_position.delete',
             'staff.view', 'staff.create', 'staff.update', 'staff.delete',
             'salary.view',
             'coach.view', 'coach.create', 'coach.update', 'coach.delete',
@@ -232,6 +234,24 @@ return [
             'description' => 'Staff administrasi umum academy.',
         ],
 
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Team Staff Position Templates
+    |--------------------------------------------------------------------------
+    | Peran fungsional staff DI SATU TIM (beda dari staff_position_templates
+    | yang jabatan kepegawaian Academy) -- lihat issue16.md Bagian 2b.
+    | Code "HC" WAJIB ada persis segini -- dipakai guard "1 Head Coach aktif
+    | per tim" (TeamStaffService, issue16.md Bagian 2e).
+    */
+    'team_staff_position_templates' => [
+        'Head Coach' => ['code' => 'HC', 'description' => 'Pelatih kepala, penanggung jawab utama tim.'],
+        'Assistant Coach' => ['code' => 'AC', 'description' => 'Pelatih asisten, membantu Head Coach.'],
+        'Goalkeeper Coach' => ['code' => 'GK', 'description' => 'Pelatih khusus penjaga gawang.'],
+        'Fitness Coach' => ['code' => 'FT', 'description' => 'Pelatih kebugaran/fisik.'],
+        'Team Manager' => ['code' => 'TM', 'description' => 'Pengurus administratif & logistik tim.'],
+        'Physiotherapist' => ['code' => 'PHY', 'description' => 'Penanganan cedera & pemulihan fisik pemain.'],
     ],
 
     /*

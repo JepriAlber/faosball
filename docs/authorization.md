@@ -161,6 +161,8 @@ Sebagai gantinya, isolasi akses Role memakai dua lapis:
 
 ## Role Responsibility
 
+> Section ini menjelaskan **desain** role template (`config('faos.role_templates')`) — permission untuk Training/Attendance/Evaluation/Payment/Report sudah di-seed sejak awal sebagai persiapan, tapi module-nya **belum dibangun** (belum ada Controller/View, lihat Roadmap di `README.md`). Untuk peta permission yang **benar-benar** ditegakkan di kode saat ini (route middleware/`@can()`), rujuk `docs/permission-reference.md` — dokumen itu yang selalu jadi sumber kebenaran terkini, section ini cuma gambaran arah desain per role.
+
 ### Super Admin
 
 Memiliki akses penuh terhadap sistem.
@@ -489,19 +491,18 @@ Super Admin tidak memerlukan seluruh permission satu per satu.
 
 ## Administration Module
 
-Menu Administration hanya dapat diakses oleh Super Admin.
-
-Module yang tersedia:
+Menu group "Administrasi" di sidebar **bukan** Super-Admin-only secara keseluruhan — pengecualiannya adalah **Roles**, yang juga bisa diakses Owner (permission `role.*` ada di `role_templates` Owner, dibatasi ke academy-nya sendiri lewat `Role::scopeForCurrentAcademy()`). **Academy Management**, **Permissions**, dan **Master** (mis. Player Position) tetap murni Super-Admin-only.
 
 ```text
-Administration
+Administrasi
 │
-├── Academy Management
-├── Roles
-└── Permissions
+├── Academy Management   -- Super Admin only
+├── Roles                -- Super Admin ATAU user dengan permission role.view (termasuk Owner)
+├── Permissions          -- Super Admin only
+└── Master               -- Super Admin only (mis. Player Position)
 ```
 
-Role selain Super Admin tidak dapat mengakses menu tersebut.
+Heading group "Administrasi" sendiri digerbang `isSuperAdmin() || can('role.view')` (lihat `resources/views/partials/sidebar.blade.php`), supaya Owner tetap melihat groupnya demi mengakses Roles, tapi item Academy Management/Permissions/Master di dalamnya tetap dibungkus `@can()`/pengecekan `isSuperAdmin()` masing-masing sehingga tidak ikut kebuka untuk Owner. Dropdown "Master" sendiri digerbang di level dropdown (bukan cuma item di dalamnya), supaya Owner yang lolos gate "Administrasi" lewat `role.view` tidak melihat dropdown yang bisa diklik tapi kosong isinya.
 
 ---
 

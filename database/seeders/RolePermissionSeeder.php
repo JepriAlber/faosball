@@ -97,6 +97,18 @@ class RolePermissionSeeder extends Seeder
             'staff_position.update',
             'staff_position.delete',
 
+            // Season
+            'season.view',
+            'season.create',
+            'season.update',
+            'season.delete',
+
+            // Team Staff Position
+            'team_staff_position.view',
+            'team_staff_position.create',
+            'team_staff_position.update',
+            'team_staff_position.delete',
+
             // Staff
             'staff.view',
             'staff.create',

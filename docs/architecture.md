@@ -18,6 +18,7 @@ Seluruh module yang dikembangkan wajib mengikuti arsitektur ini agar kode tetap 
 - [Dependency Injection](#dependency-injection)
 - [UUID Standard](#uuid-standard)
 - [Database Transaction](#database-transaction)
+  - [Row-Lock Guard untuk Business Rule Lintas Baris](#row-lock-guard-untuk-business-rule-lintas-baris)
 - [File Storage](#file-storage)
 - [Model Responsibility](#model-responsibility)
 - [Project Structure](#project-structure)
@@ -148,12 +149,14 @@ Setiap Service memiliki satu tanggung jawab utama.
 
 | Service | Responsibility |
 |----------|----------------|
-| AcademyService | Academy Context |
-| AcademyManagementService | Academy Management |
+| AcademyService | Academy Context (academy aktif, cek Super Admin) |
+| AcademyManagementService | Academy Management (CRUD lintas academy, seed default tiap academy baru) |
 | PlayerService | Player Management |
-| AccountService | User Account Management |
+| AccountService | User Account Management (reusable lintas Player/Staff/Coach/Parent/Owner) |
+| DocumentService | Upload/hapus dokumen privat, reusable lintas module (`issue15.md`) |
+| TeamPlayerService / TeamStaffService | Sub-resource roster Team dengan row-lock guard (lihat [Row-Lock Guard untuk Business Rule Lintas Baris](#row-lock-guard-untuk-business-rule-lintas-baris)) |
 
-Setiap Service hanya menangani domain yang menjadi tanggung jawabnya.
+Tabel di atas cuma contoh yang mewakili tiap pola tanggung jawab, **bukan daftar lengkap** — lihat `app/Services/` untuk daftar Service yang sebenarnya (bertambah tiap module baru). Setiap Service hanya menangani domain yang menjadi tanggung jawabnya.
 
 ---
 
@@ -264,6 +267,24 @@ DB::transaction(function () {
 
 Jika salah satu proses gagal, seluruh perubahan akan dibatalkan sehingga tidak ada data yang tersimpan dalam kondisi tidak lengkap.
 
+### Row-Lock Guard untuk Business Rule Lintas Baris
+
+MySQL tidak punya *partial/filtered unique index* (`UNIQUE WHERE leave_date IS NULL`), jadi business rule seperti "nomor punggung unik di antara anggota **aktif**", "1 captain aktif", "1 kontrak **aktif** per staff", atau "1 Head Coach aktif per tim" tidak bisa ditegakkan lewat constraint database biasa — constraint itu juga harus tetap membolehkan reuse nilai yang sama setelah baris lama jadi tidak-aktif (`leave_date`/`terminated_at` terisi).
+
+Solusinya: kunci baris **induk** (`lockForUpdate()`) sebagai mutex sebelum insert/update, di dalam `DB::transaction()` yang sama, supaya dua request nyaris bersamaan tidak lolos guard bersamaan:
+
+```php
+DB::transaction(function () use ($team, $data) {
+
+    Team::withoutGlobalScopes()->whereKey($team->id_team)->lockForUpdate()->first();
+
+    // ... cek duplikat di antara baris yang masih aktif, lempar Exception kalau ada
+    // ... insert/update baris anak
+});
+```
+
+Contoh yang sudah pakai pola ini: `EmploymentContractService::lockStaff()` (kunci `staff`, guard 1 kontrak aktif), `TeamPlayerService::lockTeam()` (kunci `teams`, guard nomor punggung unik + 1 captain), `TeamStaffService::lockTeam()` (kunci `teams`, guard 1 Head Coach aktif). Pola ini dipakai lagi kalau ada business rule serupa (unik/singleton di antara baris yang masih "aktif", pada tabel sub-resource yang punya `leave_date`/kolom penanda tidak-aktif sejenis) — jangan coba tegakkan lewat unique index DB biasa untuk kasus ini.
+
 ---
 
 ## File Storage
@@ -315,8 +336,11 @@ Model hanya digunakan untuk:
 - Cast
 - Fillable
 - UUID Generation
+- SoftDeletes (untuk entity yang "hapus"-nya berarti archive, bukan musnah permanen — lihat di bawah)
 
 Business logic tidak ditempatkan pada Model.
+
+Beberapa model tenant (`Player`, `Staff`, `Team`, `User`) pakai `SoftDeletes` — "hapus" berarti mengisi `deleted_at`, tetap bisa di-restore, dan relasi anak (histori/riwayat yang menunjuk ke baris itu) tidak pernah orphan. Guard tambahan (mis. tidak bisa dihapus kalau masih ada anak yang aktif) tetap ditegakkan di Service, `SoftDeletes` di Model cuma mekanisme dasarnya. Model tenant lain yang murni master data tanpa histori anak (mis. `Season`, `PlayerCategory`) cukup hard-delete dengan guard "masih dipakai" di Service, tidak perlu `SoftDeletes`.
 
 Seluruh proses berikut berada pada Service:
 
@@ -345,8 +369,10 @@ app
 ├── Providers
 ├── Scopes
 ├── Services
+├── Support
 ├── Traits
 └── View
+    └── Components
 ```
 
 ---
@@ -370,4 +396,4 @@ Seluruh module wajib mengikuti aturan berikut.
 
 ## Summary
 
-FAOSBall menggunakan Service Layer sebagai pusat business logic. Controller hanya menangani request dan response, Model hanya merepresentasikan data, sedangkan seluruh proses bisnis ditempatkan pada Service. Dengan pola ini, setiap module memiliki struktur yang konsisten, mudah dipelihara, dan mudah dikembangkan.
+FAOSBall menggunakan Service Layer sebagai pusat business logic. Controller hanya menangani request dan response, Model hanya merepresentasikan data (termasuk `SoftDeletes` untuk entity yang "hapus"-nya berarti archive), sedangkan seluruh proses bisnis ditempatkan pada Service — termasuk business rule lintas baris yang tidak bisa ditegakkan lewat unique index database biasa, yang ditegakkan lewat row-lock guard (`lockForUpdate()` pada baris induk di dalam `DB::transaction()`). Dengan pola ini, setiap module memiliki struktur yang konsisten, mudah dipelihara, dan mudah dikembangkan.

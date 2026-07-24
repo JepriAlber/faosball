@@ -21,7 +21,9 @@
             </div>
         </div>
 
-        <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('staff.store') }}" method="POST" enctype="multipart/form-data"
+            x-data="academyCascade('{{ route('staff.cascade-options') }}')"
+            x-init="init('{{ old('id_academy') }}', { id_employment_type: '{{ old('id_employment_type') }}', id_staff_position: '{{ old('id_staff_position') }}' })">
             @csrf
 
             <div class="form-row">
@@ -35,7 +37,9 @@
                                 {{ __('Academy') }} <span class="text-error-500">*</span>
                             </label>
 
-                            <select name="id_academy" class="form-select @error('id_academy') form-danger @enderror" required>
+                            <select name="id_academy" x-model="idAcademy"
+                                @change="loadOptions({ id_employment_type: '', id_staff_position: '' })"
+                                class="form-select @error('id_academy') form-danger @enderror" required>
                                 <option value="">{{ __('Pilih Academy') }}</option>
                                 @foreach ($academies as $academy)
                                     <option value="{{ $academy->id_academy }}" @selected(old('id_academy') === $academy->id_academy)>
@@ -82,7 +86,7 @@
                             {{ __('Employment Type') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <select name="id_employment_type"
+                        <select name="id_employment_type" :disabled="loading"
                             class="form-select @error('id_employment_type') form-danger @enderror" required>
                             <option value="">{{ __('Pilih Employment Type') }}</option>
                             @foreach ($employmentTypes as $type)
@@ -91,6 +95,10 @@
                                 </option>
                             @endforeach
                         </select>
+
+                        @if ($isSuperAdmin)
+                            <p class="form-helper" x-show="!idAcademy" x-cloak>{{ __('Pilih Academy dulu untuk melihat pilihan Employment Type.') }}</p>
+                        @endif
 
                         @error('id_employment_type')
                             <span class="form-error">{{ $message }}</span>
@@ -103,7 +111,7 @@
                             {{ __('Staff Position') }} <span class="text-error-500">*</span>
                         </label>
 
-                        <select name="id_staff_position"
+                        <select name="id_staff_position" :disabled="loading"
                             class="form-select @error('id_staff_position') form-danger @enderror" required>
                             <option value="">{{ __('Pilih Staff Position') }}</option>
                             @foreach ($staffPositions as $position)
@@ -112,6 +120,10 @@
                                 </option>
                             @endforeach
                         </select>
+
+                        @if ($isSuperAdmin)
+                            <p class="form-helper" x-show="!idAcademy" x-cloak>{{ __('Pilih Academy dulu untuk melihat pilihan Staff Position.') }}</p>
+                        @endif
 
                         @error('id_staff_position')
                             <span class="form-error">{{ $message }}</span>
